@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zion.Aggregates\Zion.Aggregates.csproj" />
+    <ProjectReference Include="..\Zion.EntityFrameworkCore.Commands\Zion.EntityFrameworkCore.Commands.csproj" />
+    <ProjectReference Include="..\Zion.EntityFrameworkCore.Events\Zion.EntityFrameworkCore.Events.csproj" />
+    <ProjectReference Include="..\Zion.EntityFrameworkCore\Zion.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+
+</Project>

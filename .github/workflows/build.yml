@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    # Install .NET
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+
+    # Restore projects
+    - name: Restore projects
+      run: dotnet restore
+
+    # Build projects
+    - name: Build projects
+      run: dotnet build --configuration Release --no-restore
+
+    # Run test projects
+    - name: Run test projects
+      run: dotnet test Zion.Core.sln --configuration Release --no-restore --no-build --verbosity normal --filter Category=Unit -- xunit.parallelizeAssembly=true

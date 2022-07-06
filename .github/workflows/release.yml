@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    branches: [ release/* ]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+
+    - name: Split branch name
+      uses: jungwinter/split@v2
+      id: branch_split
+      with:
+        msg: ${{ steps.extract_branch.outputs.branch }}
+        separator: '/'        
+        
+    # Install .NET
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+
+    # Restore projects
+    - name: Restore
+      run: dotnet restore
+
+    # Build projects
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Pack 
+      run: dotnet pack --output "./" --configuration Release --include-symbols -p:SymbolPackageFormat=snupkg -p:Version=${{ steps.split.outputs._1 }} --no-restore --no-build --verbosity normal
+
+    - name: publish
+      run: dotnet nuget push *.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

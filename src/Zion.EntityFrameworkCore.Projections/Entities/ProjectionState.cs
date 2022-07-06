@@ -1,0 +1,12 @@
+﻿using Zion.Projections;
+
+namespace Zion.EntityFrameworkCore.Projections.Entities
+{
+    public class ProjectionState : IProjectionState
+    {
+        public string Key { get; set; }
+        public long Position { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public DateTimeOffset? LastModifiedDate { get; set; }
+    }
+}

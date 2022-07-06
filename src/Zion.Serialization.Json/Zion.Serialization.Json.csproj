@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zion.Commands\Zion.Commands.csproj" />
+    <ProjectReference Include="..\Zion.Encryption\Zion.Encryption.csproj" />
+    <ProjectReference Include="..\Zion.Events\Zion.Events.csproj" />
+    <ProjectReference Include="..\Zion.Queries\Zion.Queries.csproj" />
+  </ItemGroup>
+
+</Project>
