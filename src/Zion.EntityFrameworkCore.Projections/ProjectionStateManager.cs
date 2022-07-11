@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Zion.Core.Extensions;
 using Zion.EntityFrameworkCore.Projections.Entities;
-using Zion.EntityFrameworkCore.Projections.Factories;
+using Zion.EntityFrameworkCore.Projections.Factories.DbContexts.ProjectionStates;
 using Zion.Projections;
 
 namespace Zion.EntityFrameworkCore.Projections
@@ -10,19 +10,19 @@ namespace Zion.EntityFrameworkCore.Projections
         where TProjection : class, IProjection
     {
         private readonly ILogger<ProjectionStateManager<TProjection>> _logger;
-        private readonly IProjectionDbContextFactory _projectionDbContextFactory;
+        private readonly IProjectionStateDbContextFactory _projectionStateDbContextFactory;
         private readonly string _key;
 
         public ProjectionStateManager(ILogger<ProjectionStateManager<TProjection>> logger,
-            IProjectionDbContextFactory projectionDbContextFactory)
+            IProjectionStateDbContextFactory projectionStateDbContextFactory)
         {
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
-            if (projectionDbContextFactory == null)
-                throw new ArgumentNullException(nameof(projectionDbContextFactory));
+            if (projectionStateDbContextFactory == null)
+                throw new ArgumentNullException(nameof(projectionStateDbContextFactory));
 
             _logger = logger;
-            _projectionDbContextFactory = projectionDbContextFactory;
+            _projectionStateDbContextFactory = projectionStateDbContextFactory;
             _key = $"ProjectionState_{typeof(TProjection).FriendlyName()}";
         }
         
@@ -34,7 +34,7 @@ namespace Zion.EntityFrameworkCore.Projections
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            using var context = _projectionDbContextFactory.Create<TProjection>();
+            using var context = _projectionStateDbContextFactory.Create<TProjection>();
             var state = await context.ProjectionStates.FindAsync(new { Key = _key }, cancellationToken);
             
             if (state is not null)
@@ -51,11 +51,11 @@ namespace Zion.EntityFrameworkCore.Projections
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            using var context = _projectionDbContextFactory.Create<TProjection>();
+            using var context = _projectionStateDbContextFactory.Create<TProjection>();
             return await context.ProjectionStates.FindAsync(new { Key = _key }, cancellationToken);
         }
 
-        public async Task<IProjectionState> UpdateAsync(Action<IProjectionState>? update, CancellationToken cancellationToken = default)
+        public async Task<IProjectionState> UpdateAsync(Action<IProjectionState> update, CancellationToken cancellationToken = default)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -63,25 +63,40 @@ namespace Zion.EntityFrameworkCore.Projections
                 cancellationToken.ThrowIfCancellationRequested();
             }
             
-            using var context = _projectionDbContextFactory.Create<TProjection>();
+            using var context = _projectionStateDbContextFactory.Create<TProjection>();
 
             var entity = await context.ProjectionStates.FindAsync(new { Key = _key }, cancellationToken);
             
             if(entity is null)
-            {
-                entity = new ProjectionState
-                {
-                    Key = _key,
-                    CreatedDate = DateTimeOffset.UtcNow,
-                    Position = 1
-                };
+                throw new InvalidOperationException("Missing state for projection");
 
-                context.Add(entity);
-            }
-
-            update?.Invoke(entity);
+            update(entity);
             context.Update(entity);
             
+            await context.SaveChangesAsync(cancellationToken);
+
+            return entity;
+        }
+
+        public async Task<IProjectionState> CreateAsync(CancellationToken cancellationToken = default)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{nameof(ProjectionStateManager<TProjection>)}.{nameof(UpdateAsync)} was cancelled before execution");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            using var context = _projectionStateDbContextFactory.Create<TProjection>();
+
+            var entity = new ProjectionState
+            {
+                Key = _key,
+                CreatedDate = DateTimeOffset.UtcNow,
+                Position = 1
+            };
+
+            context.Add(entity);
+
             await context.SaveChangesAsync(cancellationToken);
 
             return entity;

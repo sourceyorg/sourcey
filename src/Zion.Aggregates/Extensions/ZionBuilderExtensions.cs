@@ -5,9 +5,13 @@ namespace Zion.Aggregates.Extensions
 {
     public static class ZionBuilderExtensions
     {
-        public static IZionAggregateBuilder<TAggregate, TAggregateState> AddAggregate<TAggregate, TAggregateState>(this IZionBuilder builder)
+        public static IZionBuilder AddAggregate<TAggregate, TAggregateState>(this IZionBuilder builder, Action<IZionAggregateBuilder<TAggregate, TAggregateState>> configuration)
             where TAggregate : Aggregate<TAggregateState>
             where TAggregateState : IAggregateState, new()
-            => new ZionAggregateBuilder<TAggregate, TAggregateState>(builder.Services);
+        {
+            var zionAggregateBuilder = new ZionAggregateBuilder<TAggregate, TAggregateState>(builder.Services);
+            configuration(zionAggregateBuilder);
+            return builder;
+        }
     }
 }

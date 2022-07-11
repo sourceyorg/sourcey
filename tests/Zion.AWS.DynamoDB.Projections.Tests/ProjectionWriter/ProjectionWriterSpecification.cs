@@ -18,7 +18,7 @@ namespace Zion.AWS.DynamoDB.Projections.Tests.ProjectionWriter
     {
         protected readonly IProjectionTableInitializer _projectionTableInitializer;
         protected readonly IProjectionWriter<TestProjection> _projectionWriter;
-        private readonly ITestOutputHelper _testOutputHelper;
+        protected readonly ITestOutputHelper _testOutputHelper;
         protected readonly string _tableName = Subject.New();
 
         protected override IServiceCollection BuildServices(IServiceCollection services)
@@ -53,6 +53,7 @@ namespace Zion.AWS.DynamoDB.Projections.Tests.ProjectionWriter
         {
             _projectionTableInitializer = _serviceProvider.GetRequiredService<IProjectionTableInitializer>();
             _projectionWriter = _serviceProvider.GetRequiredService<IProjectionWriter<TestProjection>>();
+            _testOutputHelper = testOutputHelper;
         }
 
         private class ProjectionSerializer : IProjectionSerializer

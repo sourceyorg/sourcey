@@ -38,7 +38,7 @@ namespace Zion.AWS.DynamoDB.Projections
             await context.DeleteAsync(_key, cancellationToken);
         }
 
-        public async Task<IProjectionState> RetrieveAsync(CancellationToken cancellationToken = default)
+        public async Task<IProjectionState?> RetrieveAsync(CancellationToken cancellationToken = default)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -60,15 +60,34 @@ namespace Zion.AWS.DynamoDB.Projections
 
             using var context = _dynamoDBClientFactory.Create<TProjection>();
 
-            var entity = await context.LoadAsync<ProjectionState>(_key, cancellationToken) 
-                ?? new ProjectionState 
-                {
-                    Key = _key,
-                    CreatedDate = DateTimeOffset.UtcNow,
-                    Position = 1
-                };
+            var entity = await context.LoadAsync<ProjectionState>(_key, cancellationToken);
+
+            if (entity is null)
+                throw new InvalidOperationException("Missing state for projection");
 
             update(entity);
+
+            await context.SaveAsync(entity, cancellationToken);
+
+            return entity;
+        }
+
+        public async Task<IProjectionState> CreateAsync(CancellationToken cancellationToken = default)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{nameof(ProjectionStateManager<TProjection>)}.{nameof(UpdateAsync)} was cancelled before execution");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            using var context = _dynamoDBClientFactory.Create<TProjection>();
+
+            var entity = new ProjectionState
+            {
+                Key = _key,
+                CreatedDate = DateTimeOffset.UtcNow,
+                Position = 1
+            };
 
             await context.SaveAsync(entity, cancellationToken);
 
