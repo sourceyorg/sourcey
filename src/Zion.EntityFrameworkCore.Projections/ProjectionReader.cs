@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Zion.Core.Keys;
-using Zion.EntityFrameworkCore.Projections.Factories;
+using Zion.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
 using Zion.Projections;
 
 namespace Zion.EntityFrameworkCore.Projections

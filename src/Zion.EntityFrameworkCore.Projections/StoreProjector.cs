@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Zion.EntityFrameworkCore.Events.DbContexts;
 using Zion.EntityFrameworkCore.Projections.Configuration;
 using Zion.EntityFrameworkCore.Projections.Entities;
-using Zion.EntityFrameworkCore.Projections.Factories;
+using Zion.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
 using Zion.Events.Stores;
 using Zion.Projections;
 
@@ -17,6 +17,7 @@ namespace Zion.EntityFrameworkCore.Projections
         where TDbContextStore : DbContext, IEventStoreDbContext
     {
         private readonly IProjectionManager<TProjection> _projectionManager;
+        private readonly IProjectionStateManager<TProjection> _projectionStateManager;
         private readonly IServiceScope _scope;
         private readonly IEventStore<TDbContextStore> _eventStore;
         private readonly ILogger<StoreProjector<TProjection, TDbContextStore>> _logger;
@@ -36,6 +37,7 @@ namespace Zion.EntityFrameworkCore.Projections
             _logger = logger;
 
             _projectionManager = _scope.ServiceProvider.GetRequiredService<IProjectionManager<TProjection>>();
+            _projectionStateManager = _scope.ServiceProvider.GetRequiredService<IProjectionStateManager<TProjection>>();
             _eventStore = _scope.ServiceProvider.GetRequiredService<IEventStore<TDbContextStore>>();
             _options = _scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<StoreProjectorOptions<TProjection>>>();
             _projectionDbContextFactory = _scope.ServiceProvider.GetRequiredService<IProjectionDbContextFactory>();
@@ -51,20 +53,9 @@ namespace Zion.EntityFrameworkCore.Projections
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            using (var context = _projectionDbContextFactory.Create<TProjection>())
-            {
-                var state = await context.ProjectionStates.FindAsync(_name);
-
-                if (state != null)
-                {
-                    state.Position = 0;
-                    state.LastModifiedDate = DateTimeOffset.UtcNow;
-
-                    await context.SaveChangesAsync(cancellationToken);
-                }
-
-                await _projectionManager.ResetAsync(cancellationToken);
-            }
+            await Task.WhenAll(
+                _projectionManager.ResetAsync(cancellationToken),
+                _projectionStateManager.RemoveAsync(cancellationToken));
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken = default)
@@ -75,52 +66,36 @@ namespace Zion.EntityFrameworkCore.Projections
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            using (var context = _projectionDbContextFactory.Create<TProjection>())
+            var state = await _projectionStateManager.RetrieveAsync(cancellationToken) ?? await _projectionStateManager.CreateAsync(cancellationToken);
+
+            while (!cancellationToken.IsCancellationRequested)
             {
-                var state = await context.ProjectionStates.FindAsync(_name);
-
-                if (state == null)
+                try
                 {
-                    state = new ProjectionState
+                    state = await _projectionStateManager.RetrieveAsync(cancellationToken);
+                    
+                    var page = await _eventStore.GetEventsAsync(state.Position);
+
+                    foreach (var @event in page.Events)
+                        await _projectionManager.HandleAsync(@event.Payload);
+
+                    if (state.Position == page.Offset)
                     {
-                        Key = _name,
-                        CreatedDate = DateTimeOffset.UtcNow,
-                        Position = 1
-                    };
-
-                    context.ProjectionStates.Add(state);
-
-                    await context.SaveChangesAsync(cancellationToken);
-                }
-
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    try
+                        await Task.Delay(_options.Value.Interval);
+                    }
+                    else
                     {
-                        await context.Entry(state).ReloadAsync();
-
-                        var page = await _eventStore.GetEventsAsync(state.Position);
-
-                        foreach (var @event in page.Events)
-                            await _projectionManager.HandleAsync(@event.Payload);
-
-                        if (state.Position == page.Offset)
-                        {
-                            await Task.Delay(_options.Value.Interval);
-                        }
-                        else
+                        await _projectionStateManager.UpdateAsync(state =>
                         {
                             state.Position = page.Offset;
                             state.LastModifiedDate = DateTimeOffset.UtcNow;
-
-                            await context.SaveChangesAsync();
-                        }
+                        }, cancellationToken);
                     }
-                    catch (Exception ex)
-                    {
-                        _logger.LogCritical(ex, $"Process '{typeof(TProjection).Name}' failed at postion '{state.Position}' due to an unexpected error. See exception details for more information.");
-                        break;
-                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical(ex, $"Process '{typeof(TProjection).Name}' failed at postion '{state.Position}' due to an unexpected error. See exception details for more information.");
+                    break;
                 }
             }
         }

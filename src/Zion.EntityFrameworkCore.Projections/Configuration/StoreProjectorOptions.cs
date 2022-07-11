@@ -2,7 +2,7 @@
 
 namespace Zion.EntityFrameworkCore.Projections.Configuration
 {
-    public sealed class StoreProjectorOptions<TProjection>
+    internal sealed class StoreProjectorOptions<TProjection>
         where TProjection : class, IProjection
     {
         public StoreProjectorOptions()
@@ -11,7 +11,11 @@ namespace Zion.EntityFrameworkCore.Projections.Configuration
         }
 
         public int Interval { get; set; }
+        
 
-        internal static Action<StoreProjectorOptions<TProjection>> Default => o => o.Interval = 5000;
+        internal static StoreProjectorOptions<TProjection> Default = new()
+        {
+            Interval = 5000
+        };
     }
 }
