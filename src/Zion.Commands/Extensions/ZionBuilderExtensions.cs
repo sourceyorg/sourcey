@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using Zion.Commands.Builder;
 using Zion.Commands.Execution;
 using Zion.Commands.Stores;
 using Zion.Core.Builder;
@@ -8,22 +8,16 @@ namespace Zion.Commands.Extensions
 {
     public static class ZionBuilderExtensions
     {
-        public static IZionBuilder AddCommands(this IZionBuilder builder)
+        public static IZionBuilder AddCommand<TCommand>(this IZionBuilder builder, Action<IZionCommandBuilder<TCommand>> configuration)
+            where TCommand : ICommand
         {
-            builder.Services.TryAdd(StoreServices());
-            builder.Services.TryAdd(DispatcherServices());
+            builder.Services.TryAddScoped<ICommandStore, NoOpCommandStore>();
+            builder.Services.TryAddScoped<ICommandDispatcher, CommandDispatcher>();
 
+            var zionCommandBuilder = new ZionCommandBuilder<TCommand>(builder.Services);
+            configuration(zionCommandBuilder);
+            
             return builder;
-        }
-
-        private static IEnumerable<ServiceDescriptor> StoreServices()
-        {
-            yield return ServiceDescriptor.Scoped<ICommandStore, NoOpCommandStore>();
-        }
-
-        private static IEnumerable<ServiceDescriptor> DispatcherServices()
-        {
-            yield return ServiceDescriptor.Scoped<ICommandDispatcher, CommandDispatcher>();
         }
     }
 }
