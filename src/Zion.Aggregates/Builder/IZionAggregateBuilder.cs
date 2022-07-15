@@ -21,5 +21,7 @@ namespace Zion.Aggregates.Builder
             where TConflictResolution : class, IConflictResolution<TAggregateState, TPrevEvent, TNextEvent>
             where TPrevEvent : IEvent
             where TNextEvent : IEvent;
+
+        IZionAggregateBuilder<TAggregate, TAggregateState> WithAutoResolution(Action<IZionAggregateAutoResolverBuilder<TAggregateState>> configuration);
     }
 }

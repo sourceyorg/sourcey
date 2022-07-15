@@ -19,7 +19,8 @@ namespace Zion.Aggregates.Builder
 
             Services = services;
 
-            Services.TryAdd(FactoryServices());
+            Services.TryAddScoped<IAggregateFactory, AggregateFactory>();
+            Services.TryAddScoped<IConflictResolver, ConflictResolver>();
         }
 
         public IZionAggregateBuilder<TAggregate, TAggregateState> WithConflictResolution<TConflictResolution>() 
@@ -46,10 +47,11 @@ namespace Zion.Aggregates.Builder
             return this;
         }
 
-        private static IEnumerable<ServiceDescriptor> FactoryServices()
+        public IZionAggregateBuilder<TAggregate, TAggregateState> WithAutoResolution(Action<IZionAggregateAutoResolverBuilder<TAggregateState>> configuration)
         {
-            yield return ServiceDescriptor.Scoped<IAggregateFactory, AggregateFactory>();
-            yield return ServiceDescriptor.Scoped<IConflictResolver, ConflictResolver>();
+            var zionAggregateAutoResolverBuilder = new ZionAggregateAutoResolverBuilder<TAggregateState>(Services);
+            configuration(zionAggregateAutoResolverBuilder);
+            return this;
         }
     }
 }
