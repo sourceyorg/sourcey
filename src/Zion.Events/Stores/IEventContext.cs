@@ -1,10 +1,12 @@
 ﻿using Zion.Core.Keys;
+using Zion.Events.Streams;
+
 namespace Zion.Events.Stores
 {
     public interface IEventContext<out TEvent>
         where TEvent : IEvent
     {
-        string StreamId { get; }
+        StreamId StreamId { get; }
         Correlation? Correlation { get; }
         Causation? Causation { get; }
         TEvent Payload { get; }

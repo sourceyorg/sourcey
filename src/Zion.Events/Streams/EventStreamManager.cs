@@ -14,9 +14,10 @@ namespace Zion.Events.Streams
                 var streamId = StreamId.From(stream.Key);
 
                 if (!_events.TryGetValue(streamId, out var storedEvents))
-                    _streamIds.Add(streamId);
-                else
+                {
                     storedEvents = new();
+                    _streamIds.Add(streamId);
+                }
 
                 storedEvents.AddRange(stream.Select(e => e.Payload));
 

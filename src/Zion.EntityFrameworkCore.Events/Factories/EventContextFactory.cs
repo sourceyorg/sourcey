@@ -6,6 +6,7 @@ using Zion.Events;
 using Zion.Events.Cache;
 using Zion.Events.Serialization;
 using Zion.Events.Stores;
+using Zion.Events.Streams;
 
 namespace Zion.EntityFrameworkCore.Events.Factories
 {
@@ -52,7 +53,7 @@ namespace Zion.EntityFrameworkCore.Events.Factories
 
         private Activator<IEventContext<IEvent>> BuildActivator(Type type)
         {
-            var expectedParameterTypes = new Type[] { typeof(string), type.GenericTypeArguments[0], typeof(Correlation?), typeof(Causation?), typeof(DateTimeOffset), typeof(Actor), typeof(DateTimeOffset?) };
+            var expectedParameterTypes = new Type[] { typeof(StreamId), type.GenericTypeArguments[0], typeof(Correlation?), typeof(Causation?), typeof(DateTimeOffset), typeof(Actor), typeof(DateTimeOffset?) };
             var constructor = type.GetConstructor(expectedParameterTypes);
 
             if (constructor == null)
