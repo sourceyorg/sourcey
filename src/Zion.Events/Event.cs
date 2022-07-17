@@ -9,6 +9,11 @@ namespace Zion.Events
         public DateTimeOffset Timestamp { get; protected init; }
         public int Version { get; protected init; }
 
+        public Event()
+        {
+
+        }
+        
         public Event(StreamId streamId, int version)
         {
             Id = EventId.New();

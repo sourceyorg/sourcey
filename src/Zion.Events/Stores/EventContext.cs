@@ -1,11 +1,12 @@
 ﻿using Zion.Core.Keys;
+using Zion.Events.Streams;
 
 namespace Zion.Events.Stores
 {
     public sealed record EventContext<TEvent> : IEventContext<TEvent>
         where TEvent : IEvent
     {
-        public string StreamId { get; }
+        public StreamId StreamId { get; }
         public Correlation? Correlation { get; }
         public Causation? Causation { get; }
         public TEvent Payload { get; }
@@ -13,7 +14,7 @@ namespace Zion.Events.Stores
         public Actor Actor { get; }
         public DateTimeOffset? ScheduledPublication { get; }
 
-        public EventContext(string streamId, TEvent @event, Correlation? correlation, Causation? causation, DateTimeOffset timestamp, Actor actor, DateTimeOffset? scheduledPublication = null)
+        public EventContext(StreamId streamId, TEvent @event, Correlation? correlation, Causation? causation, DateTimeOffset timestamp, Actor actor, DateTimeOffset? scheduledPublication = null)
         {
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
