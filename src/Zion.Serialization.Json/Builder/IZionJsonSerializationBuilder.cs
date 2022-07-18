@@ -4,6 +4,8 @@ namespace Zion.Serialization.Json.Builder
 {
     public interface IZionJsonSerializationBuilder
     {
-        IServiceCollection Services { get; }
+        IZionJsonSerializationBuilder AddCommandSerialization();
+        IZionJsonSerializationBuilder AddQuerySerialization();
+        IZionJsonSerializationBuilder AddEventSerialization();
     }
 }

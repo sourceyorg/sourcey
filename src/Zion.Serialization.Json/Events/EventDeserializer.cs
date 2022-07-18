@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json;
-using Zion.Commands.Serialization;
+using Zion.Events.Serialization;
 using Zion.Serialization.Json.Resolvers;
 
-namespace Zion.Serialization.Json.Commands
+namespace Zion.Serialization.Json.Events
 {
-    internal sealed class JsonCommandDeserializer : ICommandDeserializer
+    internal sealed class EventDeserializer : IEventDeserializer
     {
         private readonly JsonSerializerSettings _serializerSettings;
 
-        public JsonCommandDeserializer(IEnumerable<JsonConverter> jsonConverters)
+        public EventDeserializer(IEnumerable<JsonConverter> jsonConverters)
         {
             _serializerSettings = new JsonSerializerSettings
             {
