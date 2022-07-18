@@ -4,11 +4,11 @@ using Zion.Serialization.Json.Resolvers;
 
 namespace Zion.Serialization.Json.Queries
 {
-    internal sealed class JsonQueryDeserializer : IQueryDeserializer
+    internal sealed class QueryDeserializer : IQueryDeserializer
     {
         private readonly JsonSerializerSettings _serializerSettings;
 
-        public JsonQueryDeserializer(IEnumerable<JsonConverter> jsonConverters)
+        public QueryDeserializer(IEnumerable<JsonConverter> jsonConverters)
         {
             _serializerSettings = new JsonSerializerSettings
             {

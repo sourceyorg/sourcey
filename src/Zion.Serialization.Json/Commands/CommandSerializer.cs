@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Zion.Events.Serialization;
+using Zion.Commands.Serialization;
 
-namespace Zion.Serialization.Json.Events
+namespace Zion.Serialization.Json.Commands
 {
-    internal class JsonEventSerializer : IEventSerializer
+    internal class CommandSerializer : ICommandSerializer
     {
         private readonly JsonSerializerSettings _serializerSettings;
 
-        public JsonEventSerializer(IEnumerable<JsonConverter> jsonConverters)
+        public CommandSerializer(IEnumerable<JsonConverter> jsonConverters)
         {
             _serializerSettings = new JsonSerializerSettings
             {
@@ -19,6 +19,7 @@ namespace Zion.Serialization.Json.Events
                 Converters = jsonConverters?.ToList() ?? new List<JsonConverter>()
             };
         }
+
         public string Serialize<T>(T data)
         {
             if (data == null)

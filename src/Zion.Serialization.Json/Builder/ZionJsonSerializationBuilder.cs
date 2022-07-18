@@ -1,34 +1,64 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json;
+using Zion.Commands.Serialization;
+using Zion.Events.Serialization;
+using Zion.Queries.Serialization;
+using Zion.Serialization.Json.Commands;
 using Zion.Serialization.Json.Converters;
+using Zion.Serialization.Json.Events;
+using Zion.Serialization.Json.Queries;
 
 namespace Zion.Serialization.Json.Builder
 {
     internal readonly struct ZionJsonSerializationBuilder : IZionJsonSerializationBuilder
     {
-        public readonly IServiceCollection Services { get; }
+        public readonly IServiceCollection _services;
 
         public ZionJsonSerializationBuilder(IServiceCollection services)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            Services = services;
+            _services = services;
 
-            services.AddScoped<JsonConverter, ActorJsonConverter>();
-            services.AddScoped<JsonConverter, CausationJsonConverter>();
-            services.AddScoped<JsonConverter, CommandIdJsonConverter>();
-            services.AddScoped<JsonConverter, CorrelationJsonConverter>();
-            services.AddScoped<JsonConverter, EventIdJsonConverter>();
-            services.AddScoped<JsonConverter, NullableActorJsonConverter>();
-            services.AddScoped<JsonConverter, NullableCausationJsonConverter>();
-            services.AddScoped<JsonConverter, NullableCommandIdJsonConverter>();
-            services.AddScoped<JsonConverter, NullableCorrelationJsonConverter>();
-            services.AddScoped<JsonConverter, NullableEventIdJsonConverter>();
-            services.AddScoped<JsonConverter, NullableQueryIdJsonConverter>();
-            services.AddScoped<JsonConverter, NullableSecretJsonConverter>();
-            services.AddScoped<JsonConverter, QueryIdJsonConverter>();
-            services.AddScoped<JsonConverter, SecretJsonConverter>();
+            services.AddSingleton<JsonConverter, ActorJsonConverter>();
+            services.AddSingleton<JsonConverter, CausationJsonConverter>();
+            services.AddSingleton<JsonConverter, CommandIdJsonConverter>();
+            services.AddSingleton<JsonConverter, CorrelationJsonConverter>();
+            services.AddSingleton<JsonConverter, EventIdJsonConverter>();
+            services.AddSingleton<JsonConverter, QueryIdJsonConverter>();
+            services.AddSingleton<JsonConverter, SecretJsonConverter>();
+            services.AddSingleton<JsonConverter, StreamIdJsonConverter>();
+            services.AddSingleton<JsonConverter, NullableActorJsonConverter>();
+            services.AddSingleton<JsonConverter, NullableCausationJsonConverter>();
+            services.AddSingleton<JsonConverter, NullableCommandIdJsonConverter>();
+            services.AddSingleton<JsonConverter, NullableCorrelationJsonConverter>();
+            services.AddSingleton<JsonConverter, NullableEventIdJsonConverter>();
+            services.AddSingleton<JsonConverter, NullableQueryIdJsonConverter>();
+            services.AddSingleton<JsonConverter, NullableSecretJsonConverter>();
+            services.AddSingleton<JsonConverter, NullableStreamIdJsonConverter>();
+        }
+
+        public IZionJsonSerializationBuilder AddCommandSerialization()
+        {
+            _services.TryAddSingleton<ICommandSerializer, CommandSerializer>();
+            _services.TryAddSingleton<ICommandDeserializer, CommandDeserializer>();
+            return this;
+        }
+
+        public IZionJsonSerializationBuilder AddEventSerialization()
+        {
+            _services.TryAddSingleton<IEventSerializer, EventSerializer>();
+            _services.TryAddSingleton<IEventDeserializer, EventDeserializer>();
+            return this;
+        }
+
+        public IZionJsonSerializationBuilder AddQuerySerialization()
+        {
+            _services.TryAddSingleton<IQuerySerializer, QuerySerializer>();
+            _services.TryAddSingleton<IQueryDeserializer, QueryDeserializer>();
+            return this;
         }
     }
 }
