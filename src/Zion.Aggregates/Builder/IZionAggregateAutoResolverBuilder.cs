@@ -10,5 +10,7 @@ namespace Zion.Aggregates.Builder
         IZionAggregateAutoResolverBuilder<TAggregateState> For<TPrevEvent, TNextEvent>(bool includePermutation = false)
             where TPrevEvent : IEvent
             where TNextEvent : IEvent;
+
+        IZionAggregateAutoResolverBuilder<TAggregateState> For(PermutationType permutation, params Type[] events);
     }
 }
