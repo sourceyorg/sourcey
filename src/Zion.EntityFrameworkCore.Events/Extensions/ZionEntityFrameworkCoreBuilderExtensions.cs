@@ -23,8 +23,8 @@ namespace Zion.EntityFrameworkCore.Events.Extensions
             builder.Services.AddDbContext<TEventStoreContext>(options);
             builder.Services.TryAdd(GetStoreServices<TEventStoreContext>());
             builder.Services.TryAdd(GetFactoryServices());
-            builder.Services.TryAddSingleton<IZionInitializer, EventStoreInitializer<TEventStoreContext>>();
-            builder.Services.TryAddSingleton(new EventStoreInitializerOptions<TEventStoreContext>(autoMigrate));
+            builder.Services.AddScoped<IZionInitializer, EventStoreInitializer<TEventStoreContext>>();
+            builder.Services.AddSingleton(new EventStoreInitializerOptions<TEventStoreContext>(autoMigrate));
 
             return new ZionEntityFrameworkCoreEventStoreBuilder<TEventStoreContext>(builder);
         }

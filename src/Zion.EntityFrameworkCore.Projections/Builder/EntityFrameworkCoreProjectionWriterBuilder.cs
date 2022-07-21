@@ -28,7 +28,7 @@ namespace Zion.EntityFrameworkCore.Projections.Builder
             where TProjectionContext : DbContext
         {
             _services.AddSingleton(new ProjectionDbType(typeof(TProjection), typeof(DbContextOptions<TProjectionContext>), typeof(TProjectionContext)));
-            _services.AddSingleton<IZionInitializer, ProjectionInitializer<TProjection>>();
+            _services.AddScoped<IZionInitializer, ProjectionInitializer<TProjection>>();
             _services.AddSingleton(new ProjectionOptions<TProjection>(autoMigrate));
             _services.AddDbContext<TProjectionContext>(dbOptions);
 
@@ -43,7 +43,7 @@ namespace Zion.EntityFrameworkCore.Projections.Builder
             _services.AddSingleton(new ProjectionStateOptions<TProjection>(autoMigrate));
             
             _services.TryAddSingleton<IDbTypeFactory<ProjectionStateDbType>, DbTypeFactory<ProjectionStateDbType>>();
-            _services.TryAddScoped<IZionInitializer, ProjectionStateInitializer<TProjection>>();
+            _services.AddScoped<IZionInitializer, ProjectionStateInitializer<TProjection>>();
             _services.TryAddScoped<IProjectionStateManager<TProjection>, ProjectionStateManager<TProjection>>();
             _services.TryAddScoped<IProjectionStateDbContextFactory, ProjectionStateDbContextFactory>();
 
