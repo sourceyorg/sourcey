@@ -35,7 +35,7 @@ namespace Zion.EntityFrameworkCore.Projections
             }
 
             using var context = _projectionStateDbContextFactory.Create<TProjection>();
-            var state = await context.Set<ProjectionState>().FindAsync(new { Key = _key }, cancellationToken);
+            var state = await context.Set<ProjectionState>().FindAsync(new object[] { _key }, cancellationToken: cancellationToken);
             
             if (state is not null)
                 context.Remove(state);
@@ -52,7 +52,7 @@ namespace Zion.EntityFrameworkCore.Projections
             }
 
             using var context = _projectionStateDbContextFactory.Create<TProjection>();
-            return await context.Set<ProjectionState>().FindAsync(new { Key = _key }, cancellationToken);
+            return await context.Set<ProjectionState>().FindAsync(new object[] { _key }, cancellationToken: cancellationToken);
         }
 
         public async Task<IProjectionState> UpdateAsync(Action<IProjectionState> update, CancellationToken cancellationToken = default)
@@ -65,9 +65,9 @@ namespace Zion.EntityFrameworkCore.Projections
             
             using var context = _projectionStateDbContextFactory.Create<TProjection>();
 
-            var entity = await context.Set<ProjectionState>().FindAsync(new { Key = _key }, cancellationToken);
-            
-            if(entity is null)
+            var entity = await context.Set<ProjectionState>().FindAsync(new object[] { _key }, cancellationToken: cancellationToken);
+
+            if (entity is null)
                 throw new InvalidOperationException("Missing state for projection");
 
             update(entity);

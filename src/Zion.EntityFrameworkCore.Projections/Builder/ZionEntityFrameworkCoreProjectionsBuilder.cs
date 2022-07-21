@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Zion.Core.Initialization;
 using Zion.EntityFrameworkCore.Events.DbContexts;
-using Zion.EntityFrameworkCore.Projections.Initializers;
 using Zion.Projections;
 
 namespace Zion.EntityFrameworkCore.Projections.Builder
