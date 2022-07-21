@@ -32,6 +32,9 @@ namespace Zion.EntityFrameworkCore.Projections.Builder
             _services.AddSingleton(new ProjectionOptions<TProjection>(autoMigrate));
             _services.AddDbContext<TProjectionContext>(dbOptions);
 
+            _services.TryAddSingleton<IDbTypeFactory<ProjectionDbType>, DbTypeFactory<ProjectionDbType>>();
+            _services.TryAddScoped<IProjectionDbContextFactory, ProjectionDbContextFactory>();
+
             return this;
         }
 

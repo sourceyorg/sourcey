@@ -10,8 +10,8 @@ namespace Zion.EntityFrameworkCore.Projections.Factories.DbContexts
         public DbTypeFactory(IEnumerable<TDbType> dbTypes)
         {
             _dbTypes = dbTypes?
-                .DistinctBy(pdbt => pdbt.ProjectionType.FriendlyName())
-                ?.ToDictionary(pdbt => pdbt.ProjectionType.FriendlyName(), pdbt => pdbt)
+                .DistinctBy(pdbt => pdbt.ProjectionType.FriendlyFullName())
+                ?.ToDictionary(pdbt => pdbt.ProjectionType.FriendlyFullName(), pdbt => pdbt)
                 ?? new Dictionary<string, TDbType>();
 
         }

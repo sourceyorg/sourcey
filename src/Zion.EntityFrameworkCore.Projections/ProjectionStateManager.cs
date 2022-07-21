@@ -23,7 +23,7 @@ namespace Zion.EntityFrameworkCore.Projections
 
             _logger = logger;
             _projectionStateDbContextFactory = projectionStateDbContextFactory;
-            _key = $"ProjectionState_{typeof(TProjection).FriendlyName()}";
+            _key = $"ProjectionState_{typeof(TProjection).FriendlyFullName()}";
         }
         
         public async Task RemoveAsync(CancellationToken cancellationToken = default)

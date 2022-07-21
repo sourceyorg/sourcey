@@ -14,8 +14,6 @@ namespace Zion.EntityFrameworkCore.Projections.Extensions
             
             where TProjection : class, IProjection
         {
-            builder.Services.TryAddSingleton<IDbTypeFactory<ProjectionDbType>, DbTypeFactory<ProjectionDbType>>();
-            builder.Services.TryAddScoped<IProjectionDbContextFactory, ProjectionDbContextFactory>();
             builder.Services.TryAddScoped<IProjectionWriter<TProjection>, ProjectionWriter<TProjection>>();
             builder.Services.TryAddScoped<IProjectionReader<TProjection>, ProjectionReader<TProjection>>();
 
