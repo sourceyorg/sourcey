@@ -42,11 +42,11 @@ namespace Zion.Aggregates.Builder
                 if(useSingle)
                     singleEventMethod?.MakeGenericMethod(eventType)?.Invoke(this, new object[] { });
 
+                if(useDuplicates)
+                    multiEventMethod?.MakeGenericMethod(eventType, eventType)?.Invoke(this, new object[] { false });
+
                 if (useMultiple)
                     foreach (var innerEventType in types)
-                        if (eventType == innerEventType && !useDuplicates)
-                            continue;
-                        else
                             multiEventMethod?.MakeGenericMethod(eventType, innerEventType)?.Invoke(this, new object[] { false });
             }
 
