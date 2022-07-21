@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Zion.Core.Initialization;
 using Zion.EntityFrameworkCore.Builder;
 using Zion.EntityFrameworkCore.Events.Builder;
 using Zion.EntityFrameworkCore.Events.DbContexts;
 using Zion.EntityFrameworkCore.Events.Factories;
+using Zion.EntityFrameworkCore.Events.Initializers;
 using Zion.EntityFrameworkCore.Events.Stores;
 using Zion.Events.Stores;
 
@@ -14,12 +16,15 @@ namespace Zion.EntityFrameworkCore.Events.Extensions
     {
         public static IZionEntityFrameworkCoreEventStoreBuilder<TEventStoreContext> AddEventStore<TEventStoreContext>(
             this IZionEntityFrameworkCoreBuilder builder,
-            Action<DbContextOptionsBuilder> options)
+            Action<DbContextOptionsBuilder> options,
+            bool autoMigrate = true)
             where TEventStoreContext : DbContext, IEventStoreDbContext
         {
             builder.Services.AddDbContext<TEventStoreContext>(options);
             builder.Services.TryAdd(GetStoreServices<TEventStoreContext>());
             builder.Services.TryAdd(GetFactoryServices());
+            builder.Services.TryAddSingleton<IZionInitializer, EventStoreInitializer<TEventStoreContext>>();
+            builder.Services.TryAddSingleton(new EventStoreInitializerOptions<TEventStoreContext>(autoMigrate));
 
             return new ZionEntityFrameworkCoreEventStoreBuilder<TEventStoreContext>(builder);
         }
