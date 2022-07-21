@@ -6,5 +6,6 @@ namespace Zion.Projections
         where TProjection : class, IProjection
     {
         Task<TProjection?> RetrieveAsync(Subject subject, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TProjection>> RetrieveAsync(CancellationToken cancellationToken = default);
     }
 }

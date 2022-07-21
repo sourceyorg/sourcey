@@ -67,6 +67,11 @@ namespace Zion.AWS.DynamoDB.Projections
             return entity;
         }
 
+        public Task<IEnumerable<TProjection>> RetrieveAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
         private DynamoDBOperationConfig BuildDynamoDBOperationConfig(Action<string?, CreateTableRequest>? options = null)
         {
             var request = new CreateTableRequest()
