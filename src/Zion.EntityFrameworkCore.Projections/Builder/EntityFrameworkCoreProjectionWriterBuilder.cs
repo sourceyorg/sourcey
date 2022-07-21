@@ -36,7 +36,7 @@ namespace Zion.EntityFrameworkCore.Projections.Builder
         }
 
         public IEntityFrameworkCoreProjectionWriterBuilder<TProjection> WithStateManagement<TProjectionStateDbContext>(Action<DbContextOptionsBuilder> dbOptions, bool autoMigrate = true)
-            where TProjectionStateDbContext : ProjectionStateDbContext
+            where TProjectionStateDbContext : ProjectionStateDbContextBase<TProjectionStateDbContext>
         {
             _services.AddDbContext<TProjectionStateDbContext>(dbOptions);
             _services.AddSingleton(new ProjectionStateDbType(typeof(TProjection), typeof(DbContextOptions<TProjectionStateDbContext>), typeof(TProjectionStateDbContext)));

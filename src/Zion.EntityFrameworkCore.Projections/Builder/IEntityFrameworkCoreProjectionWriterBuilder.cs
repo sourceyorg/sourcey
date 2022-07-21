@@ -11,6 +11,6 @@ namespace Zion.EntityFrameworkCore.Projections.Builder
             where TProjectionContext : DbContext;
 
         IEntityFrameworkCoreProjectionWriterBuilder<TProjection> WithStateManagement<TProjectionStateDbContext>(Action<DbContextOptionsBuilder> dbOptions, bool autoMigrate = true)
-            where TProjectionStateDbContext : ProjectionStateDbContext;
+            where TProjectionStateDbContext : ProjectionStateDbContextBase<TProjectionStateDbContext>;
     }
 }
