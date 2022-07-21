@@ -25,13 +25,11 @@ namespace Zion.EntityFrameworkCore.Projections.Builder
         {
             _services.AddHostedService<StoreProjector<TProjection, TEventStoreContext>>();
 
-            var zionEntityFrameworkCoreProjectionBuilder = new ZionEntityFrameworkCoreProjection<TProjection>(_services);
+            var zionEntityFrameworkCoreProjectionBuilder = new ZionEntityFrameworkCoreProjection<TProjection>();
             
             configuration(zionEntityFrameworkCoreProjectionBuilder);
 
             _services.Configure(zionEntityFrameworkCoreProjectionBuilder.BuildOptions());
-
-            zionEntityFrameworkCoreProjectionBuilder.Validate();
 
             return this;
         }
