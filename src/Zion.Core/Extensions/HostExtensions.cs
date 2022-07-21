@@ -9,7 +9,7 @@ namespace Zion.Core.Extensions
         public static async Task InitializeZionAsync(this IHost host)
         {
             using var scope = host.Services.CreateScope();
-            var initializers = scope.GetServices<IZionInitializer>();
+            var initializers = scope.ServiceProvider.GetServices<IZionInitializer>();
 
             if (initializers is null)
                 return;
