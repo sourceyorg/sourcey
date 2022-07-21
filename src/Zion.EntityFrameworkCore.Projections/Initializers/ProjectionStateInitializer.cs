@@ -30,6 +30,7 @@ namespace Zion.EntityFrameworkCore.Projections.Initializers
                 return;
             
             using var context = _projectionStateDbContextFactory.Create<TProjection>();
+            await context.Database.EnsureCreatedAsync();
             await context.Database.MigrateAsync();
         }
     }
