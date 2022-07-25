@@ -42,7 +42,7 @@ namespace Zion.Aggregates.Stores
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var events = await _eventStore.GetEventsAsync(id, cancellationToken);
+            var events = await _eventStore.GetEventsAsync(id, null, cancellationToken);
 
             if (!events.Any())
                 return default;
@@ -161,7 +161,7 @@ namespace Zion.Aggregates.Stores
         private async Task<bool> ResolveConflictAsync<TState>(Aggregate<TState> aggregate, int expectedVersion, long currentVersion, CancellationToken cancellationToken = default)
             where TState : IAggregateState, new()
         {
-            var exisitngEvents = await _eventStore.GetEventsAsync(aggregate.Id, cancellationToken);
+            var exisitngEvents = await _eventStore.GetEventsAsync(aggregate.Id, null, cancellationToken);
             exisitngEvents = exisitngEvents.OrderByDescending(e => e.Payload.Version);
             var prevEvent = exisitngEvents.FirstOrDefault(e => e.Payload.Version < expectedVersion);
             var nextEvent = exisitngEvents.FirstOrDefault(e => e.Payload.Version > expectedVersion);

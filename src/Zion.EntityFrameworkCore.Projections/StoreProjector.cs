@@ -7,6 +7,7 @@ using Zion.EntityFrameworkCore.Events.DbContexts;
 using Zion.EntityFrameworkCore.Projections.Configuration;
 using Zion.EntityFrameworkCore.Projections.Entities;
 using Zion.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
+using Zion.Events;
 using Zion.Events.Stores;
 using Zion.Projections;
 
@@ -73,15 +74,14 @@ namespace Zion.EntityFrameworkCore.Projections
                 try
                 {
                     state = await _projectionStateManager.RetrieveAsync(cancellationToken);
-                    
-                    var page = await _eventStore.GetEventsAsync(state.Position);
 
-                    foreach (var @event in page.Events)
-                        await _projectionManager.HandleAsync(@event.Payload);
+                    var page = await _eventStore.GetEventsAsync(state.Position, _options.Value.PageSize, cancellationToken);;
+
+                    await Task.WhenAll(page.Events.Select(e => ProjectStreamAsync(e.Value, cancellationToken)));
 
                     if (state.Position == page.Offset)
                     {
-                        await Task.Delay(_options.Value.Interval);
+                        await Task.Delay(_options.Value.Interval, cancellationToken);
                     }
                     else
                     {
@@ -98,6 +98,12 @@ namespace Zion.EntityFrameworkCore.Projections
                     break;
                 }
             }
+        }
+
+        private async Task ProjectStreamAsync(IEnumerable<IEventContext<IEvent>> events, CancellationToken cancellationToken = default)
+        {
+            foreach (var @event in events)
+                await _projectionManager.HandleAsync(@event.Payload, cancellationToken);
         }
     }
 }

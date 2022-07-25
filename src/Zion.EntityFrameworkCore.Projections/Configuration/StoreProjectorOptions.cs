@@ -11,11 +11,13 @@ namespace Zion.EntityFrameworkCore.Projections.Configuration
         }
 
         public int Interval { get; set; }
-        
+        public int PageSize { get; set; }
+
 
         internal static StoreProjectorOptions<TProjection> Default = new()
         {
-            Interval = 5000
+            Interval = 5000,
+            PageSize = 500
         };
     }
 }

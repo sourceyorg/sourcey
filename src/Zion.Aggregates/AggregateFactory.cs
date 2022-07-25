@@ -11,8 +11,11 @@ namespace Zion.Aggregates
             if (events == null)
                 throw new ArgumentNullException(nameof(events));
             
-            var aggregate = (TAggregate)Activator.CreateInstance(typeof(TAggregate), new object[] { new TState() });
+            var aggregate = (TAggregate?)Activator.CreateInstance(typeof(TAggregate), new object[] { new TState() });
 
+            if (aggregate is null)
+                throw new InvalidOperationException();
+            
             aggregate.FromHistory(events);
 
             return aggregate;
