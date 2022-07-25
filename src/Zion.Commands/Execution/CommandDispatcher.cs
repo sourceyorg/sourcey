@@ -35,9 +35,7 @@ namespace Zion.Commands.Execution
 
             if (handler == null)
                 throw new InvalidOperationException($"No command handler for type '{typeof(TCommand).FriendlyName()}' has been registered.");
-
-
-
+            
             if (!await DispatchMiddleWare<IPreCommandMiddleware<TCommand>, TCommand>(command, cancellationToken))
                 return;
             

@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zion.Core.Builder;
+using Zion.Queries.Builder;
 using Zion.Queries.Execution;
 using Zion.Queries.Stores;
 
@@ -8,22 +8,16 @@ namespace Zion.Queries.Extensions
 {
     public static class ZionBuilderExtensions
     {
-        public static IZionBuilder AddQueries(this IZionBuilder builder)
+        public static IZionBuilder AddQuery<TQuery, TResult>(this IZionBuilder builder, Action<IZionQueryBuilder<TQuery, TResult>> configuration)
+            where TQuery : IQuery<TResult>
         {
-            builder.Services.TryAdd(StoreServices());
-            builder.Services.TryAdd(DispatcherServices());
+            builder.Services.TryAddScoped<IQueryStore, NoOpQueryStore>();
+            builder.Services.TryAddScoped<IQueryDispatcher, QueryDispatcher>();
+
+            var zionQueryBuilder = new ZionQueryBuilder<TQuery, TResult>(builder.Services);
+            configuration(zionQueryBuilder);
 
             return builder;
-        }
-
-        private static IEnumerable<ServiceDescriptor> StoreServices()
-        {
-            yield return ServiceDescriptor.Scoped<IQueryStore, NoOpQueryStore>();
-        }
-
-        private static IEnumerable<ServiceDescriptor> DispatcherServices()
-        {
-            yield return ServiceDescriptor.Scoped<IQueryDispatcher, QueryDispatcher>();
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿namespace Zion.Queries.Execution
 {
-    public interface IQueryHandler<TRequest, TResult>
-        where TRequest : IQuery<TResult>
+    public interface IQueryHandler<TQuery, TResult>
+        where TQuery : IQuery<TResult>
     {
-        Task<TResult> RetrieveAsync(TRequest query, CancellationToken cancellationToken = default);
+        Task<TResult> RetrieveAsync(TQuery query, CancellationToken cancellationToken = default);
     }
 }
