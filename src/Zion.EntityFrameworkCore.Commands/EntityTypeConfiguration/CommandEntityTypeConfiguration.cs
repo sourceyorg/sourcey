@@ -21,6 +21,8 @@ namespace Zion.EntityFrameworkCore.Commands.EntityTypeConfiguration
 
             builder.Property(e => e.Id)
                 .HasCommandIdValueConversion();
+            builder.Property(e => e.Subject)
+                .HasSubjectValueConversion();
             builder.Property(e => e.Correlation)
                 .HasNullableCorrelationValueConversion();
             builder.Property(e => e.Actor)
