@@ -8,7 +8,7 @@ namespace Zion.EntityFrameworkCore.Commands.DbContexts
     {
         public DbSet<Command> Commands { get; set; }
 
-        public CommandStoreDbContext(DbContextOptions options) : base(options)
+        public CommandStoreDbContext(DbContextOptions<CommandStoreDbContext> options) : base(options)
         {
         }
 

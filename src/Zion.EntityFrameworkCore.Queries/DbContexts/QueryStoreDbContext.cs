@@ -8,7 +8,7 @@ namespace Zion.EntityFrameworkCore.Queries.DbContexts
     {
         public DbSet<Query> Queries { get; set; }
 
-        public QueryStoreDbContext(DbContextOptions options) : base(options)
+        public QueryStoreDbContext(DbContextOptions<QueryStoreDbContext> options) : base(options)
         {
         }
 
