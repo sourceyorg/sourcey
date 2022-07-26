@@ -7,22 +7,19 @@ using Zion.EntityFrameworkCore.Commands.DbContexts;
 using Zion.EntityFrameworkCore.Commands.Factories;
 using Zion.EntityFrameworkCore.Commands.Stores;
 
-namespace Zion.EntityFrameworkCore.Commands.Extensions
+namespace Zion.EntityFrameworkCore.Extensions
 {
     public static class ZionEntityFrameworkCoreBuilderExtensions
     {
         public static IZionEntityFrameworkCoreBuilder AddCommands(this IZionEntityFrameworkCoreBuilder builder, Action<DbContextOptionsBuilder> options)
         {
             builder.Services.RemoveAll<ICommandStore>();
-            builder.Services.TryAdd(GetCommandServices());
+            builder.Services.TryAddScoped<ICommandStoreDbContextFactory, CommandStoreDbContextFactory>();
+            builder.Services.TryAddSingleton<CommandStore>();
+            builder.Services.TryAddSingleton<ICommandStore>(sp => sp.GetRequiredService<CommandStore>());
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<CommandStore>());
             builder.Services.AddDbContext<CommandStoreDbContext>(options);
             return builder;
-        }
-
-        private static IEnumerable<ServiceDescriptor> GetCommandServices()
-        {
-            yield return ServiceDescriptor.Scoped<ICommandStoreDbContextFactory, CommandStoreDbContextFactory>();
-            yield return ServiceDescriptor.Scoped<ICommandStore, CommandStore>();
         }
     }
 }

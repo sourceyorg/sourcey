@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Zion.Core.Builder;
 using Zion.Events.Bus;
-using Zion.Events.Extensions;
+using Zion.RabbitMQ;
 using Zion.RabbitMQ.Connections;
 using Zion.RabbitMQ.Management;
 using Zion.RabbitMQ.Management.Api;
@@ -9,7 +9,7 @@ using Zion.RabbitMQ.Messages;
 using Zion.RabbitMQ.Queues;
 using Zion.RabbitMQ.Subscriptions;
 
-namespace Zion.RabbitMQ.Extensions
+namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {

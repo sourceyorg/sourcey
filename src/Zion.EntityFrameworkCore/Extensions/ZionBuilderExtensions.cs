@@ -1,7 +1,7 @@
 ﻿using Zion.Core.Builder;
 using Zion.EntityFrameworkCore.Builder;
 
-namespace Zion.EntityFrameworkCore.Extensions
+namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {
@@ -9,6 +9,13 @@ namespace Zion.EntityFrameworkCore.Extensions
         {
             var entityFrameworkCoreBuilder = new ZionEntityFrameworkCoreBuilder(builder.Services);
             configuration(entityFrameworkCoreBuilder);
+            return builder;
+        }
+
+        public static IZionBuilder AddEntityFrameworkCoreMigrator(this IZionBuilder builder, Action<IZionEntityFrameworkCoreMigratorBuilder> configuration)
+        {
+            var entityFrameworkCoreMigratorBuilder = new ZionEntityFrameworkCoreMigratorBuilder(builder.Services);
+            configuration(entityFrameworkCoreMigratorBuilder);
             return builder;
         }
     }

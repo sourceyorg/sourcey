@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Zion.Commands;
 using Zion.Commands.Serialization;
 using Zion.Commands.Stores;
@@ -7,29 +7,24 @@ using Zion.EntityFrameworkCore.Commands.Factories;
 
 namespace Zion.EntityFrameworkCore.Commands.Stores
 {
-    internal sealed class CommandStore : ICommandStore
+    internal sealed class CommandStore : BufferedCommandStore
     {
-        private readonly ICommandStoreDbContextFactory _dbContextFactory;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ICommandSerializer _commandSerializer;
-        private readonly ILogger<CommandStore> _logger;
 
-        public CommandStore(ICommandStoreDbContextFactory dbContextFactory,
-                                               ICommandSerializer commandSerializer,
-                                               ILogger<CommandStore> logger)
+        public CommandStore(IServiceScopeFactory serviceScopeFactory,
+            ICommandSerializer commandSerializer)
         {
-            if (dbContextFactory == null)
-                throw new ArgumentNullException(nameof(dbContextFactory));
+            if (serviceScopeFactory == null)
+                throw new ArgumentNullException(nameof(serviceScopeFactory));
             if (commandSerializer == null)
                 throw new ArgumentNullException(nameof(commandSerializer));
-            if (logger == null)
-                throw new ArgumentNullException(nameof(logger));
 
-            _dbContextFactory = dbContextFactory;
+            _serviceScopeFactory = serviceScopeFactory;
             _commandSerializer = commandSerializer;
-            _logger = logger;
         }
 
-        public async Task SaveAsync(ICommand command, CancellationToken cancellationToken = default)
+        protected override async Task ConsumeAsync(ICommand command, CancellationToken cancellationToken = default)
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
@@ -37,22 +32,23 @@ namespace Zion.EntityFrameworkCore.Commands.Stores
             var type = command.GetType();
             var data = _commandSerializer.Serialize(command);
 
-            using (var context = _dbContextFactory.Create())
-            {
-                await context.Commands.AddAsync(new Entities.Command
-                {
-                    Name = type.Name,
-                    Type = type.FriendlyFullName(),
-                    Subject = command.Subject,
-                    Correlation = command.Correlation,
-                    Data = data,
-                    Id = command.Id,
-                    Actor = command.Actor,
-                    Timestamp = command.Timestamp,
-                });
+            using var scope = _serviceScopeFactory.CreateScope();
+            var dbContextFactory = scope.ServiceProvider.GetRequiredService<ICommandStoreDbContextFactory>();
 
-                await context.SaveChangesAsync(cancellationToken);
-            }
+            using var context = dbContextFactory.Create();
+            await context.Commands.AddAsync(new Entities.Command
+            {
+                Name = type.Name,
+                Type = type.FriendlyFullName(),
+                Subject = command.Subject,
+                Correlation = command.Correlation,
+                Data = data,
+                Id = command.Id,
+                Actor = command.Actor,
+                Timestamp = command.Timestamp,
+            }, cancellationToken);
+
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

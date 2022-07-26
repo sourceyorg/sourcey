@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Zion.EntityFrameworkCore.Builder;
 using Zion.EntityFrameworkCore.Events.DbContexts;
-using Zion.EntityFrameworkCore.Events.Extensions;
+using Zion.EntityFrameworkCore.Extensions;
 
 namespace Zion.EntityFrameworkCore.Events.Builder
 {

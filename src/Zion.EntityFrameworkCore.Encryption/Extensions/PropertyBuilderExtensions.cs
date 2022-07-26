@@ -3,7 +3,7 @@ using Zion.Encryption;
 using Zion.EntityFrameworkCore.Encryption.ChangeTracking;
 using Zion.EntityFrameworkCore.Encryption.ValueConversion;
 
-namespace Zion.EntityFrameworkCore.Encryption.Extensions
+namespace Zion.EntityFrameworkCore.Extensions
 {
     public static class PropertyBuilderExtensions
     {

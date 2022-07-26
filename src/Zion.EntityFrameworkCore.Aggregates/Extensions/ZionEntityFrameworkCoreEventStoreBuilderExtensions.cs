@@ -5,7 +5,7 @@ using Zion.Aggregates.Stores;
 using Zion.EntityFrameworkCore.Events.Builder;
 using Zion.EntityFrameworkCore.Events.DbContexts;
 
-namespace Zion.EntityFrameworkCore.Aggregates.Extensions
+namespace Zion.EntityFrameworkCore.Extensions
 {
     public static class ZionEntityFrameworkCoreEventStoreBuilderExtensions
     {

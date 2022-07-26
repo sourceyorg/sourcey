@@ -1,7 +1,8 @@
 ﻿using Zion.Core.Builder;
+using Zion.Projections;
 using Zion.Projections.Builder;
 
-namespace Zion.Projections.Extensions
+namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {

@@ -1,7 +1,8 @@
-﻿using Zion.Aggregates.Builder;
+﻿using Zion.Aggregates;
+using Zion.Aggregates.Builder;
 using Zion.Core.Builder;
 
-namespace Zion.Aggregates.Extensions
+namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {

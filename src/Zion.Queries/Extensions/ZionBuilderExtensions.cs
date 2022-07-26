@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zion.Core.Builder;
+using Zion.Queries;
 using Zion.Queries.Builder;
 using Zion.Queries.Execution;
 using Zion.Queries.Stores;
 
-namespace Zion.Queries.Extensions
+namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {

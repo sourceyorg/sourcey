@@ -10,7 +10,7 @@ using Zion.EntityFrameworkCore.Events.Initializers;
 using Zion.EntityFrameworkCore.Events.Stores;
 using Zion.Events.Stores;
 
-namespace Zion.EntityFrameworkCore.Events.Extensions
+namespace Zion.EntityFrameworkCore.Extensions
 {
     public static class ZionEntityFrameworkCoreBuilderExtensions
     {

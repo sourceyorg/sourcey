@@ -1,7 +1,7 @@
 ﻿using Zion.Core.Builder;
 using Zion.Encryption.Builder;
 
-namespace Zion.Encryption.Extensions
+namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {

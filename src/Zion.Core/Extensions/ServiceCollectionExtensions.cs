@@ -2,8 +2,9 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zion.Core.Builder;
 using Zion.Core.Exceptions;
+using Zion.Core.Extensions;
 
-namespace Zion.Core.Extensions
+namespace Zion.Extensions
 {
     public static class ServiceCollectionExtensions
     {

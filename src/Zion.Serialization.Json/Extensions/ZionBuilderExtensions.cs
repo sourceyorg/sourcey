@@ -1,7 +1,7 @@
 ﻿using Zion.Core.Builder;
 using Zion.Serialization.Json.Builder;
 
-namespace Zion.Serialization.Json.Extensions
+namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {

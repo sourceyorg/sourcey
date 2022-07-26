@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using Zion.EntityFrameworkCore.Projections;
 using Zion.EntityFrameworkCore.Projections.Builder;
-using Zion.EntityFrameworkCore.Projections.Factories.DbContexts;
-using Zion.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
 using Zion.Projections;
 using Zion.Projections.Builder;
 
-namespace Zion.EntityFrameworkCore.Projections.Extensions
+namespace Zion.EntityFrameworkCore.Extensions
 {
     public static class ZionProjectionBuilderExtensions
     {

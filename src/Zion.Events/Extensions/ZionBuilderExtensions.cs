@@ -3,11 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.DependencyModel;
 using Zion.Core.Builder;
+using Zion.Events;
 using Zion.Events.Cache;
 using Zion.Events.Execution;
 using Zion.Events.Streams;
 
-namespace Zion.Events.Extensions
+namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {

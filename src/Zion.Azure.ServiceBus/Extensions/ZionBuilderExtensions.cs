@@ -2,15 +2,15 @@
 using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Zion.Azure.ServiceBus;
 using Zion.Azure.ServiceBus.Management;
 using Zion.Azure.ServiceBus.Messages;
 using Zion.Azure.ServiceBus.Subscriptions;
 using Zion.Azure.ServiceBus.Topics;
 using Zion.Core.Builder;
 using Zion.Events.Bus;
-using Zion.Events.Extensions;
 
-namespace Zion.Azure.ServiceBus.Extensions
+namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {
