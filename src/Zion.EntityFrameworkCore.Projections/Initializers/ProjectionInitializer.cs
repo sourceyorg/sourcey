@@ -28,11 +28,10 @@ namespace Zion.EntityFrameworkCore.Projections.Initializers
 
         public async Task InitializeAsync(IHost host)
         {
-            if (!_options._autoMigrate)
+            if (!_options.AutoMigrate)
                 return;
             
             using var context = _projectionDbContextFactory.Create<TProjection>();
-            await context.Database.EnsureCreatedAsync();
             await context.Database.MigrateAsync();
         }
     }

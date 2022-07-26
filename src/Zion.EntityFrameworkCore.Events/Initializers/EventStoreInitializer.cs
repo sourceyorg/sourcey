@@ -28,11 +28,10 @@ namespace Zion.EntityFrameworkCore.Events.Initializers
 
         public async Task InitializeAsync(IHost host)
         {
-            if (!_options._autoMigrate)
+            if (!_options.AutoMigrate)
                 return;
             
             using var context = _eventStoreDbContextFactory.Create();
-            await context.Database.EnsureCreatedAsync();
             await context.Database.MigrateAsync();
         }
     }
