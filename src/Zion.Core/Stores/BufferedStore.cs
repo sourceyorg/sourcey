@@ -9,13 +9,16 @@ namespace Zion.Core.Stores
         private readonly ConcurrentQueue<TItem> _itemQueue = new();
 
         public Task SaveAsync(TItem item, CancellationToken cancellationToken = default)
+            => InternalSaveAsync(item, cancellationToken);
+
+        protected Task InternalSaveAsync(TItem item, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            
+
             _itemQueue.Enqueue(item);
             return Task.CompletedTask;
         }
-        
+
         protected abstract Task ConsumeAsync(TItem item, CancellationToken cancellationToken);
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
