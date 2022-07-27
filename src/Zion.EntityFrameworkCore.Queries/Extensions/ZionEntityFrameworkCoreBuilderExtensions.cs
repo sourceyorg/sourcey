@@ -13,17 +13,27 @@ namespace Zion.EntityFrameworkCore.Extensions
 {
     public static class ZionEntityFrameworkCoreBuilderExtensions
     {
-        public static IZionEntityFrameworkCoreBuilder AddQueries(this IZionEntityFrameworkCoreBuilder builder, Action<DbContextOptionsBuilder> options, bool autoMigrate = true)
+        public static IZionEntityFrameworkCoreBuilder AddQueries(this IZionEntityFrameworkCoreBuilder builder, Action<DbContextOptionsBuilder> options, QueryStoreType type = QueryStoreType.Buffered, bool autoMigrate = true)
         {
             builder.Services.RemoveAll<IQueryStore>();
             builder.Services.TryAddScoped<IQueryStoreDbContextFactory, QueryStoreDbContextFactory>();
-            builder.Services.TryAddSingleton<QueryStore>();
-            builder.Services.TryAddSingleton<IQueryStore>(sp => sp.GetRequiredService<QueryStore>());
-            builder.Services.AddHostedService(sp => sp.GetRequiredService<QueryStore>());
             builder.Services.AddDbContext<QueryStoreDbContext>(options);
             builder.Services.AddScoped<IZionInitializer, QueryStoreInitializer>();
             builder.Services.AddSingleton(new QueryStoreOptions(autoMigrate));
+
+            if (type == QueryStoreType.Buffered)
+                builder.RegisterBufferedQueryStore();
+            else
+                builder.Services.TryAddSingleton<IQueryStore, QueryStore>();
+            
             return builder;
+        }
+
+        private static void RegisterBufferedQueryStore(this IZionEntityFrameworkCoreBuilder builder)
+        {
+            builder.Services.TryAddSingleton<Queries.Stores.BufferedQueryStore>();
+            builder.Services.TryAddSingleton<IQueryStore>(sp => sp.GetRequiredService<Queries.Stores.BufferedQueryStore>());
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<Queries.Stores.BufferedQueryStore>());
         }
     }
 }

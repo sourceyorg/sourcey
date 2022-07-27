@@ -8,12 +8,12 @@ using Zion.Queries.Stores;
 
 namespace Zion.EntityFrameworkCore.Queries.Stores
 {
-    internal sealed class QueryStore : IQueryStore
+    internal sealed class BufferedQueryStore : Zion.Queries.Stores.BufferedQueryStore
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IQuerySerializer _querySerializer;
 
-        public QueryStore(IServiceScopeFactory serviceScopeFactory,
+        public BufferedQueryStore(IServiceScopeFactory serviceScopeFactory,
             IQuerySerializer querySerializer)
         {
             if (serviceScopeFactory == null)
@@ -25,7 +25,7 @@ namespace Zion.EntityFrameworkCore.Queries.Stores
             _querySerializer = querySerializer;
         }
 
-        public async Task SaveAsync<TQueryResult>(IQuery<TQueryResult> query, CancellationToken cancellationToken = default)
+        protected override async Task ConsumeAsync(IQuery<object> query, CancellationToken cancellationToken = default)
         {
             if (query == null)
                 throw new ArgumentNullException(nameof(query));

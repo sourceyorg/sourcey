@@ -7,12 +7,12 @@ using Zion.EntityFrameworkCore.Commands.Factories;
 
 namespace Zion.EntityFrameworkCore.Commands.Stores
 {
-    internal sealed class CommandStore : ICommandStore
+    internal sealed class BufferedCommandStore : Zion.Commands.Stores.BufferedCommandStore
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ICommandSerializer _commandSerializer;
 
-        public CommandStore(IServiceScopeFactory serviceScopeFactory,
+        public BufferedCommandStore(IServiceScopeFactory serviceScopeFactory,
             ICommandSerializer commandSerializer)
         {
             if (serviceScopeFactory == null)
@@ -24,7 +24,7 @@ namespace Zion.EntityFrameworkCore.Commands.Stores
             _commandSerializer = commandSerializer;
         }
 
-        public async Task SaveAsync(ICommand command, CancellationToken cancellationToken = default)
+        protected override async Task ConsumeAsync(ICommand command, CancellationToken cancellationToken = default)
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
