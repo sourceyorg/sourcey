@@ -4,7 +4,7 @@ namespace Zion.Aggregates
 {
     public interface IAggregateFactory
     {
-        TAggregate FromHistory<TAggregate, TState>(IEnumerable<IEvent> events)
+        TAggregate FromHistory<TAggregate, TState>(IEnumerable<IEvent>? events = null)
             where TAggregate : Aggregate<TState>
             where TState : IAggregateState, new();
     }

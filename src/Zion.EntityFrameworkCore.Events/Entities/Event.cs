@@ -17,5 +17,6 @@ namespace Zion.EntityFrameworkCore.Events.Entities
         public Actor Actor { get; set; }
         public DateTimeOffset Timestamp { get; set; }
         public DateTimeOffset? ScheduledPublication { get; set; }
+        public int Version { get; set; }
     }
 }

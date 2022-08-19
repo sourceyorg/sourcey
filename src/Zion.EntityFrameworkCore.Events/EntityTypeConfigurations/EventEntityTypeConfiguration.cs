@@ -19,6 +19,7 @@ namespace Zion.EntityFrameworkCore.Events.EntityTypeConfigurations
             builder.HasIndex(c => c.Causation);
             builder.HasIndex(c => c.Name);
             builder.HasIndex(c => c.Actor);
+            builder.HasIndex(c => c.Version);
 
             builder.Property(e => e.Id)
                 .HasEventIdValueConversion();

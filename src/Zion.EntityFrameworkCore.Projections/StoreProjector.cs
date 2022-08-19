@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Zion.Core.Extensions;
 using Zion.EntityFrameworkCore.Events.DbContexts;
 using Zion.EntityFrameworkCore.Projections.Configuration;
-using Zion.EntityFrameworkCore.Projections.Entities;
 using Zion.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
 using Zion.Events;
 using Zion.Events.Stores;
@@ -22,7 +22,7 @@ namespace Zion.EntityFrameworkCore.Projections
         private readonly IServiceScope _scope;
         private readonly IEventStore<TDbContextStore> _eventStore;
         private readonly ILogger<StoreProjector<TProjection, TDbContextStore>> _logger;
-        private readonly IOptionsSnapshot<StoreProjectorOptions<TProjection>> _options;
+        private readonly IOptionsMonitor<StoreProjectorOptions<TProjection>> _options;
         private readonly IProjectionDbContextFactory _projectionDbContextFactory;
         private readonly string _name;
 
@@ -40,10 +40,10 @@ namespace Zion.EntityFrameworkCore.Projections
             _projectionManager = _scope.ServiceProvider.GetRequiredService<IProjectionManager<TProjection>>();
             _projectionStateManager = _scope.ServiceProvider.GetRequiredService<IProjectionStateManager<TProjection>>();
             _eventStore = _scope.ServiceProvider.GetRequiredService<IEventStore<TDbContextStore>>();
-            _options = _scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<StoreProjectorOptions<TProjection>>>();
+            _options = _scope.ServiceProvider.GetRequiredService<IOptionsMonitor<StoreProjectorOptions<TProjection>>>();
             _projectionDbContextFactory = _scope.ServiceProvider.GetRequiredService<IProjectionDbContextFactory>();
 
-            _name = typeof(TProjection).FullName;
+            _name = typeof(TProjection).FriendlyFullName();
         }
 
         public async Task ResetAsync(CancellationToken cancellationToken = default)
@@ -75,13 +75,13 @@ namespace Zion.EntityFrameworkCore.Projections
                 {
                     state = await _projectionStateManager.RetrieveAsync(cancellationToken);
 
-                    var page = await _eventStore.GetEventsAsync(state.Position, _options.Value.PageSize, cancellationToken);;
+                    var page = await _eventStore.GetEventsAsync(state.Position, _options.CurrentValue.PageSize, cancellationToken);;
 
                     await Task.WhenAll(page.Events.Select(e => ProjectStreamAsync(e.Value, cancellationToken)));
 
                     if (state.Position == page.Offset)
                     {
-                        await Task.Delay(_options.Value.Interval, cancellationToken);
+                        await Task.Delay(_options.CurrentValue.Interval, cancellationToken);
                     }
                     else
                     {

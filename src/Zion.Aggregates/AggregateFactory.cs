@@ -4,12 +4,11 @@ namespace Zion.Aggregates
 {
     internal sealed class AggregateFactory : IAggregateFactory
     {
-        public TAggregate FromHistory<TAggregate, TState>(IEnumerable<IEvent> events)
+        public TAggregate FromHistory<TAggregate, TState>(IEnumerable<IEvent>? events = null)
             where TAggregate : Aggregate<TState>
             where TState : IAggregateState, new()
         {
-            if (events == null)
-                throw new ArgumentNullException(nameof(events));
+            events ??= Enumerable.Empty<IEvent>();
             
             var aggregate = (TAggregate?)Activator.CreateInstance(typeof(TAggregate), new object[] { new TState() });
 

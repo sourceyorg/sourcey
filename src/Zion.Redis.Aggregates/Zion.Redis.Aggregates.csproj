@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Zion.Aggregates\Zion.Aggregates.csproj" />
+    <ProjectReference Include="..\Zion.Redis\Zion.Redis.csproj" />
+  </ItemGroup>
+
+</Project>

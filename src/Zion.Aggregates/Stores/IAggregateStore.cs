@@ -8,7 +8,7 @@ namespace Zion.Aggregates.Stores
     public interface IAggregateStore<TEventStoreContext>
         where TEventStoreContext : IEventStoreContext
     {
-        Task<TAggregate> GetAsync<TAggregate, TState>(StreamId id, CancellationToken cancellationToken = default)
+        Task<TAggregate?> GetAsync<TAggregate, TState>(StreamId id, CancellationToken cancellationToken = default)
             where TAggregate : Aggregate<TState>
             where TState : IAggregateState, new();
         Task SaveAsync<TState>(Aggregate<TState> aggregate, int? expectedVersion = null, CancellationToken cancellationToken = default)

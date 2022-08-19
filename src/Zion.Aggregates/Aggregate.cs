@@ -45,7 +45,8 @@ namespace Zion.Aggregates
         {
             _eventHandlers.Add(typeof(TEvent), @event => handler((TEvent)@event));
         }
-        protected void Apply(IEvent @event)
+        
+        public void Apply(IEvent @event)
         {
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
@@ -53,12 +54,11 @@ namespace Zion.Aggregates
             Apply(@event, isNew: true);
         }
 
-        private void Apply(IEvent @event, bool isNew)
+        public void Apply(IEvent @event, bool isNew)
         {
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
 
-            // TODO(Dan): The fact we have no handler registered for the event will need logging most likely.
             if (_eventHandlers.TryGetValue(@event.GetType(), out var handler))
                 handler(@event);
 

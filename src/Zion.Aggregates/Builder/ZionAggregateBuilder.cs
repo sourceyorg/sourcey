@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zion.Aggregates.Concurrency;
-
+using Zion.Aggregates.Snapshots;
 using Zion.Events;
 
 namespace Zion.Aggregates.Builder
@@ -51,6 +51,26 @@ namespace Zion.Aggregates.Builder
         {
             var zionAggregateAutoResolverBuilder = new ZionAggregateAutoResolverBuilder<TAggregateState>(Services);
             configuration(zionAggregateAutoResolverBuilder);
+            return this;
+        }
+
+        public IZionAggregateBuilder<TAggregate, TAggregateState> WithSnapshotStrategy<TSnapshot, TSnapshooter>(SnapshotExecution execution)
+            where TSnapshot : class, IAggregateSnapshot<TAggregate, TAggregateState>
+            where TSnapshooter : class, IAggregateSnapshooter<TAggregateState>
+        {
+            Services.AddSingleton<IAggregateSnapshot<TAggregate, TAggregateState>, TSnapshot>();
+
+            if (execution == SnapshotExecution.Sync)
+            {
+                Services.AddSingleton<IAggregateSnapshooter<TAggregateState>, TSnapshooter>();
+                return this;
+            }
+
+            Services.AddSingleton<TSnapshooter>();
+            Services.AddSingleton(sp => new BufferedAggregateSnapshooter<TAggregateState>(sp.GetRequiredService<TSnapshooter>()));
+            Services.AddSingleton<IAggregateSnapshooter<TAggregateState>>(sp => sp.GetRequiredService<BufferedAggregateSnapshooter<TAggregateState>>());
+            Services.AddHostedService(sp => sp.GetRequiredService<BufferedAggregateSnapshooter<TAggregateState>>());
+
             return this;
         }
     }

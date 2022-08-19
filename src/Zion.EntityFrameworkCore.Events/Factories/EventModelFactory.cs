@@ -39,7 +39,8 @@ namespace Zion.EntityFrameworkCore.Events.Factories
                 Type = type.FriendlyFullName(),
                 Timestamp = @event.Timestamp,
                 Actor = context.Actor,
-                ScheduledPublication = context.ScheduledPublication
+                ScheduledPublication = context.ScheduledPublication,
+                Version = @event.Version
             };
         }
     }

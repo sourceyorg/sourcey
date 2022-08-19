@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Zion.Aggregates.Concurrency;
+using Zion.Aggregates.Snapshots;
 using Zion.Events;
 
 namespace Zion.Aggregates.Builder
@@ -21,6 +22,10 @@ namespace Zion.Aggregates.Builder
             where TConflictResolution : class, IConflictResolution<TAggregateState, TPrevEvent, TNextEvent>
             where TPrevEvent : IEvent
             where TNextEvent : IEvent;
+
+        IZionAggregateBuilder<TAggregate, TAggregateState> WithSnapshotStrategy<TSnapshot, TSnapshooter>(SnapshotExecution execution)
+            where TSnapshot : class, IAggregateSnapshot<TAggregate, TAggregateState>
+            where TSnapshooter : class, IAggregateSnapshooter<TAggregateState>;
 
         IZionAggregateBuilder<TAggregate, TAggregateState> WithAutoResolution(Action<IZionAggregateAutoResolverBuilder<TAggregateState>> configuration);
     }
