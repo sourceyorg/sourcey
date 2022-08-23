@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Zion.Aggregates;
+using Zion.Aggregates.Serialization;
 using Zion.Aggregates.Snapshots;
 using Zion.Events.Streams;
 
@@ -11,17 +12,22 @@ namespace Zion.Redis.Aggregates.Snapshots
         where TState : IAggregateState, new()
     {
         private readonly IConnectionMultiplexerFactory _connectionMultiplexerFactory;
+        private readonly IAggregateDeserializer _aggregateDeserializer;
         private readonly IOptionsMonitor<AggregateSnapshotSettings<TState>> _aggregateSnapshotSettings;
 
         public AggregateSnapshot(IConnectionMultiplexerFactory connectionMultiplexerFactory,
+            IAggregateDeserializer aggregateDeserializer,
             IOptionsMonitor<AggregateSnapshotSettings<TState>> aggregateSnapshotSettings)
         {
             if (connectionMultiplexerFactory is null)
                 throw new ArgumentNullException(nameof(connectionMultiplexerFactory));
+            if (aggregateDeserializer is null)
+                throw new ArgumentNullException(nameof(aggregateDeserializer));
             if (aggregateSnapshotSettings is null)
                 throw new ArgumentNullException(nameof(aggregateSnapshotSettings));
 
             _connectionMultiplexerFactory = connectionMultiplexerFactory;
+            _aggregateDeserializer = aggregateDeserializer;
             _aggregateSnapshotSettings = aggregateSnapshotSettings;
         }
 
@@ -38,7 +44,7 @@ namespace Zion.Redis.Aggregates.Snapshots
             if (string.IsNullOrWhiteSpace(value))
                 return null;
 
-            return JsonSerializer.Deserialize<TAggregate>(value);
+            return _aggregateDeserializer.Deserialize<TAggregate>(value);
         }
     }
 }

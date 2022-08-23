@@ -7,5 +7,6 @@ namespace Zion.Serialization.Json.Builder
         IZionJsonSerializationBuilder AddCommandSerialization();
         IZionJsonSerializationBuilder AddQuerySerialization();
         IZionJsonSerializationBuilder AddEventSerialization();
+        IZionJsonSerializationBuilder AddAggregateSerialization();
     }
 }
