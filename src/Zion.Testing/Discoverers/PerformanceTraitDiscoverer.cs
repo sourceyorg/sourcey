@@ -3,11 +3,11 @@ using Xunit.Sdk;
 
 namespace Zion.Testing.Discoverers
 {
-    public class IntegrationTraitDiscoverer : ITraitDiscoverer
+    public class PerformanceTraitDiscoverer : ITraitDiscoverer
     {
         public IEnumerable<KeyValuePair<string, string>> GetTraits(IAttributeInfo traitAttribute)
         {
-            yield return new KeyValuePair<string, string>("Category", "Integration");
+            yield return new KeyValuePair<string, string>("Category", "Performance");
         }
     }
 }

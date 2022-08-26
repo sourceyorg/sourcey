@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -19,8 +14,8 @@ namespace Zion.Testing.Integration.Extensions
         {
             return builder.ConfigureTestServices(services =>
             {
-                services.AddAuthentication("Test")
-                        .AddScheme<AuthenticationSchemeOptions, AuthenticatedAuthHandler>("Test", op => { });
+                services.AddAuthentication(AuthenticatedAuthHandler.AuthenticationScheme)
+                        .AddScheme<AuthenticationSchemeOptions, AuthenticatedAuthHandler>(AuthenticatedAuthHandler.AuthenticationScheme, op => { });
 
                 services.AddScoped(_ => claimsProvider);
             });
@@ -30,8 +25,8 @@ namespace Zion.Testing.Integration.Extensions
         {
             return builder.ConfigureTestServices(services =>
             {
-                services.AddAuthentication("Test")
-                        .AddScheme<AuthenticationSchemeOptions, UnauthenticatedAuthHandler>("Test", op => { });
+                services.AddAuthentication(AuthenticatedAuthHandler.AuthenticationScheme)
+                        .AddScheme<AuthenticationSchemeOptions, UnauthenticatedAuthHandler>(AuthenticatedAuthHandler.AuthenticationScheme, op => { });
             });
         }
 
@@ -42,7 +37,7 @@ namespace Zion.Testing.Integration.Extensions
                 AllowAutoRedirect = false
             });
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Test");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticatedAuthHandler.AuthenticationScheme);
 
             return client;
         }
