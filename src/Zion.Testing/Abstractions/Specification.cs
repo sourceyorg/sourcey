@@ -9,6 +9,8 @@ namespace Zion.Testing.Abstractions
     {
         private ExceptionMode _exceptionMode;
 
+        protected readonly ITestOutputHelper _testOutputHelper;
+
         protected abstract Task<TResult> Given();
 
         protected abstract Task When();
@@ -16,7 +18,7 @@ namespace Zion.Testing.Abstractions
         protected Exception? Exception { get; private set; }
         protected TResult? Result { get; private set; }
 
-        protected readonly IServiceProvider _serviceProvider;
+        protected IServiceProvider ServiceProvider { get; private set; }
 
         protected void RecordExceptions() => _exceptionMode = ExceptionMode.Record;
         protected virtual void BuildServices(IServiceCollection services)
@@ -24,13 +26,8 @@ namespace Zion.Testing.Abstractions
         }
 
         public Specification(ITestOutputHelper testOutputHelper)
-        {
-            var services = new ServiceCollection();
-            services.AddXunitLogging(testOutputHelper);
-
-            BuildServices(services);
-
-            _serviceProvider = services.BuildServiceProvider();
+        { 
+            _testOutputHelper = testOutputHelper;
         }
 
         public virtual Task DisposeAsync()
@@ -40,6 +37,13 @@ namespace Zion.Testing.Abstractions
 
         public virtual async Task InitializeAsync()
         {
+            var services = new ServiceCollection();
+            services.AddXunitLogging(_testOutputHelper);
+
+            BuildServices(services);
+
+            ServiceProvider = services.BuildServiceProvider();
+
             await When();
 
             try
@@ -59,13 +63,16 @@ namespace Zion.Testing.Abstractions
     public abstract class Specification : IAsyncLifetime
     {
         private ExceptionMode _exceptionMode;
+
+        protected readonly ITestOutputHelper _testOutputHelper;
+
         protected abstract Task Given();
 
         protected abstract Task When();
 
         protected Exception? Exception { get; private set; }
 
-        protected readonly IServiceProvider _serviceProvider;
+        protected IServiceProvider ServiceProvider { get; private set; }
         protected void RecordExceptions() => _exceptionMode = ExceptionMode.Record;
 
         protected virtual void BuildServices(IServiceCollection services)
@@ -74,11 +81,7 @@ namespace Zion.Testing.Abstractions
 
         public Specification(ITestOutputHelper testOutputHelper)
         {
-            var services = new ServiceCollection();
-            services.AddXunitLogging(testOutputHelper);
-            BuildServices(services);
-
-            _serviceProvider = services.BuildServiceProvider();
+            _testOutputHelper = testOutputHelper;
         }
 
         public virtual Task DisposeAsync()
@@ -88,6 +91,13 @@ namespace Zion.Testing.Abstractions
 
         public virtual async Task InitializeAsync()
         {
+            var services = new ServiceCollection();
+            services.AddXunitLogging(_testOutputHelper);
+
+            BuildServices(services);
+
+            ServiceProvider = services.BuildServiceProvider();
+
             await When();
 
             try

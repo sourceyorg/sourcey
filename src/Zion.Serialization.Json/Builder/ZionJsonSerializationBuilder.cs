@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json;
+using Zion.Aggregates.Serialization;
 using Zion.Commands.Serialization;
 using Zion.Events.Serialization;
 using Zion.Queries.Serialization;
+using Zion.Serialization.Json.Aggregates;
 using Zion.Serialization.Json.Commands;
 using Zion.Serialization.Json.Converters;
 using Zion.Serialization.Json.Events;
@@ -58,6 +60,13 @@ namespace Zion.Serialization.Json.Builder
         {
             _services.TryAddSingleton<IQuerySerializer, QuerySerializer>();
             _services.TryAddSingleton<IQueryDeserializer, QueryDeserializer>();
+            return this;
+        }
+
+        public IZionJsonSerializationBuilder AddAggregateSerialization()
+        {
+            _services.TryAddSingleton<IAggregateSerializer, AggregateSerializer>();
+            _services.TryAddSingleton<IAggregateDeserializer, AggregateDeserializer>();
             return this;
         }
     }
