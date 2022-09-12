@@ -93,7 +93,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zion.Redis", "src\Zion.Redi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "redis", "redis", "{4A6A31FE-B610-4C07-BFF0-C6C23C96887E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zion.Redis.Aggregates.Tests", "tests\Zion.Redis.Aggregates.Tests\Zion.Redis.Aggregates.Tests.csproj", "{C9B58443-43D5-4F72-958D-EEE323205887}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zion.Redis.Aggregates.Tests", "tests\Zion.Redis.Aggregates.Tests\Zion.Redis.Aggregates.Tests.csproj", "{C9B58443-43D5-4F72-958D-EEE323205887}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zion.Azure.Encryption", "src\Zion.Azure.Encryption\Zion.Azure.Encryption.csproj", "{D750BEA8-2ACF-4B02-8E03-F2273982F22C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -221,6 +223,10 @@ Global
 		{C9B58443-43D5-4F72-958D-EEE323205887}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9B58443-43D5-4F72-958D-EEE323205887}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9B58443-43D5-4F72-958D-EEE323205887}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D750BEA8-2ACF-4B02-8E03-F2273982F22C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D750BEA8-2ACF-4B02-8E03-F2273982F22C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D750BEA8-2ACF-4B02-8E03-F2273982F22C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D750BEA8-2ACF-4B02-8E03-F2273982F22C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -266,6 +272,7 @@ Global
 		{88D24440-F3C6-43FB-B116-BBA5E5092B3E} = {9D5A0495-A08B-4E7D-8368-7925AD37E73D}
 		{4A6A31FE-B610-4C07-BFF0-C6C23C96887E} = {B90D8DB0-BEAA-473F-AA75-9CBA71EC1ABC}
 		{C9B58443-43D5-4F72-958D-EEE323205887} = {4A6A31FE-B610-4C07-BFF0-C6C23C96887E}
+		{D750BEA8-2ACF-4B02-8E03-F2273982F22C} = {BF257CE2-14E6-4206-8515-2F10F742BD67}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6CD256CE-A8F8-4D99-A2CB-9515CAA6F31D}

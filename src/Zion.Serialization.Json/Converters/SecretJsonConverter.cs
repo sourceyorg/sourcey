@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text;
+using Newtonsoft.Json;
 using Zion.Encryption;
 
 namespace Zion.Serialization.Json.Converters
@@ -7,14 +8,14 @@ namespace Zion.Serialization.Json.Converters
     {
         public override void WriteJson(JsonWriter writer, Secret value, JsonSerializer serializer)
         {
-            serializer.Serialize(writer, value.ToString());
+            serializer.Serialize(writer, Encoding.UTF8.GetString(value));
         }
 
         public override Secret ReadJson(JsonReader reader, Type objectType, Secret existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
-            var value = serializer.Deserialize<byte[]>(reader);
-            return Secret.From(value ?? Array.Empty<byte>());
+            var value = serializer.Deserialize<string>(reader);
+            return Secret.From(Encoding.UTF8.GetBytes(value ?? string.Empty) ?? Array.Empty<byte>());
         }
     }
 }
