@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Zion.Testing.Extensions;
-using Zion.Testing.Fixtures;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
+using Zion.Extensions;
+using Zion.Testing.Fixtures;
 
 namespace Zion.Testing.Abstractions
 {

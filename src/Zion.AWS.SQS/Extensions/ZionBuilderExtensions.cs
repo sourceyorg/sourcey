@@ -1,8 +1,9 @@
-﻿using Zion.Core.Builder;
+﻿using Zion.AWS.SQS;
+using Zion.Core.Builder;
 
-namespace Zion.AWS.SQS.Extensions
+namespace Zion.Extensions
 {
-    public static class IZionBuilderExtensions
+    public static class ZionBuilderExtensions
     {
         public static IZionBuilder AddAWSSQS(this IZionBuilder builder, Action<SQSOptions> optionsAction)
         {

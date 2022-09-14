@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zion.AWS.DynamoDB.Projections.Factories;
 
-namespace Zion.AWS.DynamoDB.Extensions
+namespace Zion.Extensions
 {
     public static class ServiceCollectionExtensions
     {

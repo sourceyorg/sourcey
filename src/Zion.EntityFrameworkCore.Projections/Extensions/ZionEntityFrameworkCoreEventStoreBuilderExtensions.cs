@@ -3,7 +3,7 @@ using Zion.EntityFrameworkCore.Events.Builder;
 using Zion.EntityFrameworkCore.Events.DbContexts;
 using Zion.EntityFrameworkCore.Projections.Builder;
 
-namespace Zion.EntityFrameworkCore.Extensions
+namespace Zion.Extensions
 {
     public static class ZionEntityFrameworkCoreEventStoreBuilderExtensions
     {

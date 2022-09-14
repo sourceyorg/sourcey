@@ -4,7 +4,7 @@ using Zion.EntityFrameworkCore.Events.ValueConversion;
 using Zion.Events;
 using Zion.Events.Streams;
 
-namespace Zion.EntityFrameworkCore.Events.Extensions
+namespace Zion.EntityFrameworkCore.Extensions
 {
     public static class PropertyBuilderExtensions
     {

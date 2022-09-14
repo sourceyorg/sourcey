@@ -5,12 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json;
 using Xunit.Abstractions;
-using Zion.AWS.DynamoDB.Projections.Extensions;
 using Zion.AWS.DynamoDB.Projections.Factories;
 using Zion.Core.Keys;
+using Zion.Extensions;
 using Zion.Projections;
 using Zion.Projections.Serialization;
-using Zion.Testing.Extensions;
 
 namespace Zion.AWS.DynamoDB.Projections.Tests.ProjectionWriter
 {

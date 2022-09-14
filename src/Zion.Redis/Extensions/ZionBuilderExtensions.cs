@@ -1,6 +1,6 @@
 ﻿using Zion.Core.Builder;
 
-namespace Zion.Redis.Extensions
+namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {

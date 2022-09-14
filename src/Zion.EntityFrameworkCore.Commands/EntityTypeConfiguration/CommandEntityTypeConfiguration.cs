@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Zion.EntityFrameworkCore.Commands.Entities;
-using Zion.EntityFrameworkCore.Commands.Extensions;
 using Zion.EntityFrameworkCore.Extensions;
 
 namespace Zion.EntityFrameworkCore.Commands.EntityTypeConfiguration

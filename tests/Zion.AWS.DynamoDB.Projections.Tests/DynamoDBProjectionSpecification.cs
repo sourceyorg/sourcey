@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
-using Zion.AWS.DynamoDB.Projections.Extensions;
+using Zion.Extensions;
 using Zion.Projections;
 using Zion.Testing.Abstractions;
 

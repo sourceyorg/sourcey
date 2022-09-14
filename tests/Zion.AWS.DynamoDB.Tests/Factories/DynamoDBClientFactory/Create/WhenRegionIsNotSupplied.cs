@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit.Abstractions;
-using Zion.AWS.DynamoDB.Extensions;
+using Zion.Extensions;
 using Zion.Testing.Attributes;
 
 namespace Zion.AWS.DynamoDB.Tests.Factories.DynamoDBClientFactory.Create

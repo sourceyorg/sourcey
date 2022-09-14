@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Zion.EntityFrameworkCore.Extensions;
 using Zion.EntityFrameworkCore.Queries.Entities;
-using Zion.EntityFrameworkCore.Queries.Extensions;
 
 namespace Zion.EntityFrameworkCore.Queries.EntityTypeConfigurations
 {

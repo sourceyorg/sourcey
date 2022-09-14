@@ -9,7 +9,7 @@ using Zion.EntityFrameworkCore.Commands.Factories;
 using Zion.EntityFrameworkCore.Commands.Initializers;
 using Zion.EntityFrameworkCore.Commands.Stores;
 
-namespace Zion.EntityFrameworkCore.Extensions
+namespace Zion.Extensions
 {
     public static class ZionEntityFrameworkCoreBuilderExtensions
     {

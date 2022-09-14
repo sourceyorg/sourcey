@@ -1,4 +1,4 @@
-﻿namespace Zion.EntityFrameworkCore.Extensions
+﻿namespace Zion.Extensions
 {
     public enum QueryStoreType
     {

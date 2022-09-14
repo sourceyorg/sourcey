@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Zion.EntityFrameworkCore.Events.Entities;
-using Zion.EntityFrameworkCore.Events.Extensions;
 using Zion.EntityFrameworkCore.Extensions;
 
 namespace Zion.EntityFrameworkCore.Events.EntityTypeConfigurations

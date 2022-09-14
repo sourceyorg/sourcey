@@ -3,7 +3,7 @@ using Zion.EntityFrameworkCore.Queries.ChangeTracking;
 using Zion.EntityFrameworkCore.Queries.ValueConversion;
 using Zion.Queries;
 
-namespace Zion.EntityFrameworkCore.Queries.Extensions
+namespace Zion.EntityFrameworkCore.Extensions
 {
     public static class PropertyBuilderExtensions
     {

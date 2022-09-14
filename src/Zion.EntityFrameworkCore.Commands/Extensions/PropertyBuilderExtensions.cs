@@ -3,7 +3,7 @@ using Zion.Commands;
 using Zion.EntityFrameworkCore.Commands.ChangeTracking;
 using Zion.EntityFrameworkCore.Commands.ValueConversion;
 
-namespace Zion.EntityFrameworkCore.Commands.Extensions
+namespace Zion.EntityFrameworkCore.Extensions
 {
     public static class PropertyBuilderExtensions
     {

@@ -9,7 +9,7 @@ using Zion.EntityFrameworkCore.Queries.Initializers;
 using Zion.EntityFrameworkCore.Queries.Stores;
 using Zion.Queries.Stores;
 
-namespace Zion.EntityFrameworkCore.Extensions
+namespace Zion.Extensions
 {
     public static class ZionEntityFrameworkCoreBuilderExtensions
     {

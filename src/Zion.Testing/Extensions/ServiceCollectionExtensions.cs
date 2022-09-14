@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 using Zion.Testing.Abstractions;
 
-namespace Zion.Testing.Extensions
+namespace Zion.Extensions
 {
     public static class ServiceCollectionExtensions
     {

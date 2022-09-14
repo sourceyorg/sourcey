@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Zion.Core.Initialization;
 
-namespace Zion.Core.Extensions
+namespace Zion.Extensions
 {
     public static class HostExtensions
     {

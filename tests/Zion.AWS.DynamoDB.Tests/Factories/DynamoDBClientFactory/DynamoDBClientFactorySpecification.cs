@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
-using Zion.AWS.DynamoDB.Extensions;
 using Zion.AWS.DynamoDB.Projections.Factories;
+using Zion.Extensions;
 using Zion.Testing.Abstractions;
-using Microsoft.Extensions.Configuration;
 
 namespace Zion.AWS.DynamoDB.Tests.Factories.DynamoDBClientFactory
 {

@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zion.Aggregates.Stores;
 using Zion.Events.Stores;
 
-namespace Zion.Aggregates.Extensions
+namespace Zion.Extensions
 {
     public static class ServiceCollectionExtensions
     {

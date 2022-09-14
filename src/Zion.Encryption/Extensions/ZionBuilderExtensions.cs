@@ -5,7 +5,7 @@ namespace Zion.Extensions
 {
     public static class ZionBuilderExtensions
     {
-        public static IZionBuilder AddEncryption(IZionBuilder builder, Action<IZionEncryptionBuilder> configure)
+        public static IZionBuilder AddEncryption(this IZionBuilder builder, Action<IZionEncryptionBuilder> configure)
         {
             var encryptionBuilder = new ZionEncryptionBuilder(builder.Services);
             configure(encryptionBuilder);

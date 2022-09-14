@@ -4,7 +4,7 @@ using Zion.EntityFrameworkCore.Projections.Builder;
 using Zion.Projections;
 using Zion.Projections.Builder;
 
-namespace Zion.EntityFrameworkCore.Extensions
+namespace Zion.Extensions
 {
     public static class ZionProjectionBuilderExtensions
     {

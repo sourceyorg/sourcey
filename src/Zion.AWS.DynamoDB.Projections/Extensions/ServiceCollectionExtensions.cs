@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Zion.AWS.DynamoDB.Extensions;
+using Zion.AWS.DynamoDB.Projections;
 using Zion.AWS.DynamoDB.Projections.Factories;
 using Zion.AWS.DynamoDB.Projections.Initializers;
 using Zion.Core.Initialization;
 using Zion.Projections;
 
-namespace Zion.AWS.DynamoDB.Projections.Extensions
+namespace Zion.Extensions
 {
     public static class ServiceCollectionExtensions
     {

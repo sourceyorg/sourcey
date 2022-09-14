@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
-using Zion.Testing.Extensions;
+using Zion.Extensions;
 
 namespace Zion.Testing.Abstractions
 {

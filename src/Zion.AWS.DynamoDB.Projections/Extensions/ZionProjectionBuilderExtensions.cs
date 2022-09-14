@@ -2,7 +2,7 @@
 using Zion.Projections;
 using Zion.Projections.Builder;
 
-namespace Zion.AWS.DynamoDB.Projections.Extensions
+namespace Zion.Extensions
 {
     public static class ZionProjectionBuilderExtensions
     {

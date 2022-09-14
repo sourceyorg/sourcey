@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Zion.Testing.Integration.Abstractions;
 
-namespace Zion.Testing.Integration.Extensions
+namespace Zion.Extensions
 {
     internal static class WebHostBuilderExtensions
     {

@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Zion.Aggregates.Extensions;
 using Zion.EntityFrameworkCore.Events.Builder;
 using Zion.EntityFrameworkCore.Events.DbContexts;
 
-namespace Zion.EntityFrameworkCore.Extensions
+namespace Zion.Extensions
 {
     public static class ZionEntityFrameworkCoreEventStoreBuilderExtensions
     {

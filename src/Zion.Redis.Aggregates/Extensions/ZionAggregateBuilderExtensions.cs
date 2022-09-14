@@ -2,7 +2,7 @@
 using Zion.Aggregates;
 using Zion.Aggregates.Builder;
 using Zion.Redis.Aggregates.Snapshots;
-using Zion.Redis.Extensions;
+using Zion.Extensions;
 
 namespace Zion.Extensions
 {
