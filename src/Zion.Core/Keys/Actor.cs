@@ -24,6 +24,8 @@
             return new Actor(value);
         }
 
+        public static readonly Actor Unknown = new("Unknown");
+
         public bool Equals(Actor other) => _value == other._value;
         public override bool Equals(object? obj) => obj is Actor other && Equals(other);
         public override int GetHashCode() => _value.GetHashCode();
