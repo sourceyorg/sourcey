@@ -8,8 +8,6 @@ namespace Zion.Azure.ServiceBus.Topics
 {
     internal sealed class DefaultTopicMessageSender : ITopicMessageSender
     {
-        // NOTE(Dan): The max size is actually 256k (for tiers less than premium), but that doesn't take into account the message headers, 
-        //            so we're being conservative here.
         private const int MAX_SERVICE_BUS_MESSAGE_SIZE = 192000;
 
         private readonly ITopicClientFactory _topicClientFactory;

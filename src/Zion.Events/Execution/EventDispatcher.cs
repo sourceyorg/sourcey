@@ -42,7 +42,6 @@ namespace Zion.Events.Execution
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            // TODO(Dan): Cache these generic methods. The Event dispatcher is scoped generally, so that would require consideration.
             var methodInfos = GetType().GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             var match = methodInfos.First(info => info.Name == nameof(DispatchAsync) && info.IsGenericMethod);
             var method = match.MakeGenericMethod(context.Payload.GetType());

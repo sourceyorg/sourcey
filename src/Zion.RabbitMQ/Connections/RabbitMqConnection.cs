@@ -114,7 +114,6 @@ namespace Zion.RabbitMQ.Connections
             }
             catch (OperationInterruptedException)
             {
-                // NOTE(Dan): If we get here is means that the exhange doesn't exist.
                 throw new ExchangeNotFoundException(queue);
             }
 
@@ -124,7 +123,6 @@ namespace Zion.RabbitMQ.Connections
             }
             catch (OperationInterruptedException)
             {
-                // NOTE(Dan): If we get here is means that the queue doesn't exist.
                 throw new QueueNotFoundException(queue);
             }
 
@@ -144,8 +142,6 @@ namespace Zion.RabbitMQ.Connections
             }
             catch (OperationInterruptedException)
             {
-                // NOTE(Dan): If we get here is means that the exhange doesn't exist, so we want to create it.
-                //            However we now need to create a new channel, as our current one will be closed.
                 ReturnChannel(channel);
                 throw new ExchangeNotFoundException(name);
             }
@@ -164,8 +160,6 @@ namespace Zion.RabbitMQ.Connections
             }
             catch (OperationInterruptedException)
             {
-                // NOTE(Dan): If we get here is means that the queue doesn't exist, so we can't remove it.
-                //            However we now need to create a new channel, as our current one will be closed.
                 ReturnChannel(channel);
                 throw new QueueNotFoundException(name);
             }
@@ -186,7 +180,6 @@ namespace Zion.RabbitMQ.Connections
             }
             catch (OperationInterruptedException)
             {
-                // NOTE(Dan): If we get here is means that the exhange doesn't exist.
                 throw new ExchangeNotFoundException(queue);
             }
 
@@ -196,7 +189,6 @@ namespace Zion.RabbitMQ.Connections
             }
             catch (OperationInterruptedException)
             {
-                // NOTE(Dan): If we get here is means that the queue doesn't exist.
                 throw new QueueNotFoundException(queue);
             }
 
@@ -308,8 +300,5 @@ namespace Zion.RabbitMQ.Connections
         {
             _pool?.ReturnConnection(this, reRegisterForFinalization: true);
         }
-
-        // TODO(Dan): Deal with the underlying connection events: `ConnectionShutdown`, `CallbackException` and `ConnectionBlocked`
-        //            
     }
 }
