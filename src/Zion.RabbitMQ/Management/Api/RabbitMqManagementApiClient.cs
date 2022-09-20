@@ -36,13 +36,13 @@ namespace Zion.RabbitMQ.Management.Api
 
             var results = await response.Content.ReadAsAsync<IEnumerable<RabbitMqSubscriptionResponse>>();
 
-            return results.Where(r => r.source == _options.Value.Exchange.Name && r.destination_type == "queue")
+            return results?.Where(r => r.source == _options.Value.Exchange.Name && r.destination_type == "queue")
                           .Select(r => new RabbitMqBinding
                           {
                               Exchange = r.source,
                               Queue = r.destination,
                               RoutingKey = r.routing_key,
-                          });
+                          }) ?? Enumerable.Empty<RabbitMqBinding>();
         }
     }
 }

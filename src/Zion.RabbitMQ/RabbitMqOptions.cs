@@ -2,7 +2,7 @@
 
 namespace Zion.RabbitMQ
 {
-    public class RabbitMqOptions : IPostConfigureOptions<RabbitMqOptions>
+    public class RabbitMqOptions
     {
         internal string ConnectionString { get; private set; }
         internal RabbitMqExchangeOptions Exchange { get; private set; }
@@ -57,12 +57,6 @@ namespace Zion.RabbitMQ
             Subscriptions.Add(options);
 
             return this;
-        }
-
-        public void PostConfigure(string name, RabbitMqOptions options)
-        {
-            if (string.IsNullOrEmpty(options.ConnectionString))
-                throw new InvalidOperationException("A valid connection string must be provided for Rabbit MQ, please call `UseConnection()` to set a valid connection string");
         }
     }
 }

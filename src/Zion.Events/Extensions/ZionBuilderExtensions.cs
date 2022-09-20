@@ -24,13 +24,15 @@ namespace Zion.Extensions
         public static IZionBuilder RegisterEventCache<TEvent>(this IZionBuilder builder)
             where TEvent : IEvent
         {
+            builder.AddEvents();
             builder.Services.AddSingleton(new EventTypeCacheRecord(typeof(TEvent)));
             return builder;
         }
 
         public static IZionBuilder RegisterEventCache(this IZionBuilder builder, params Type[] types)
         {
-            foreach(var type in types)
+            builder.AddEvents();
+            foreach (var type in types)
                 builder.Services.AddSingleton(new EventTypeCacheRecord(type));
 
             return builder;
@@ -38,6 +40,7 @@ namespace Zion.Extensions
 
         public static IZionBuilder RegisterEventCache(this IZionBuilder builder)
         {
+            builder.AddEvents();
             var eventType = typeof(IEvent);
 
             var assemblies = DependencyContext.Default.RuntimeLibraries

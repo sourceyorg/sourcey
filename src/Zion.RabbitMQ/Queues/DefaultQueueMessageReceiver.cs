@@ -86,12 +86,6 @@ namespace Zion.RabbitMQ.Queues
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            using (var scope = _serviceScopeFactory.CreateScope())
-            {
-                var manager = scope.ServiceProvider.GetRequiredService<ISubscriptionManager>();
-                await manager.ConfigureAsync();
-            }
-
             var tasks = new List<Task>();
 
             foreach (var subscription in _options.Value.Subscriptions)

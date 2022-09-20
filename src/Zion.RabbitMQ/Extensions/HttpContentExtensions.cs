@@ -1,17 +1,17 @@
-﻿using Utf8Json;
+﻿using System.Text.Json;
 
 namespace Zion.RabbitMQ.Extensions
 {
     internal static class HttpContentExtensions
     {
-        public static async Task<T> ReadAsAsync<T>(this HttpContent content)
+        public static async Task<T?> ReadAsAsync<T>(this HttpContent content)
         {
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
 
-            var value = await content.ReadAsStringAsync();
+            var value = await content.ReadAsStreamAsync();
 
-            return JsonSerializer.Deserialize<T>(value);
+            return await JsonSerializer.DeserializeAsync<T>(value);
         }
     }
 }

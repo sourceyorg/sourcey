@@ -6,7 +6,7 @@ namespace Zion.Events.Cache
     {
         public EventTypeCacheRecord(Type type)
         {
-            Key = type.FriendlyFullName();
+            Key = type.FriendlyName();
             Type = type;
         }
 

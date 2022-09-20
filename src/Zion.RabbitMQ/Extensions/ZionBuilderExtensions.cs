@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Zion.Core.Builder;
+using Zion.Core.Initialization;
 using Zion.Events.Bus;
 using Zion.RabbitMQ;
 using Zion.RabbitMQ.Connections;
+using Zion.RabbitMQ.Initializers;
 using Zion.RabbitMQ.Management;
 using Zion.RabbitMQ.Management.Api;
 using Zion.RabbitMQ.Messages;
@@ -18,15 +20,15 @@ namespace Zion.Extensions
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
 
-
             var options = new RabbitMqOptions();
             optionsAction(options);
 
             foreach (var sub in options.Subscriptions)
                 builder.RegisterEventCache(sub.Events.ToArray());
 
-            builder.Services.ConfigureOptions(options);
+            builder.Services.Configure(optionsAction);
 
+            builder.Services.AddScoped<IZionInitializer, ConfigureSubscriptions>();
             builder.Services.AddScoped<IMessageFactory, DefaultMessageFactory>();
             builder.Services.AddScoped<IEventBusPublisher, RabbitMqEventBusPublisher>();
             builder.Services.AddSingleton<IEventBusConsumer, RabbitMqEventBusConsumer>();
