@@ -25,7 +25,7 @@ namespace Zion.Extensions
             foreach(var sub in options.Subscriptions)
                 builder.RegisterEventCache(sub.Events.ToArray());
 
-            builder.Services.ConfigureOptions(options);
+            builder.Services.Configure(optionsAction);
 
             builder.Services.AddScoped<IEventBusPublisher, AzureServiceBusPublisher>();
             builder.Services.AddSingleton<IEventBusConsumer, AzureServiceBusConsumer>();

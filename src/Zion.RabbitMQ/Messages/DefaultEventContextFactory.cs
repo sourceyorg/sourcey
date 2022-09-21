@@ -15,18 +15,18 @@ namespace Zion.RabbitMQ.Messages
     {
         private readonly ConcurrentDictionary<Type, Activator<IEventContext<IEvent>>> _cache;
         private readonly IEventTypeCache _eventTypeCache;
-        private readonly IBodyDeserializer _bodyDeseralizer;
+        private readonly IEventNotificationDeserializer _eventNotificationDeserializer;
 
         public DefaultEventContextFactory(IEventTypeCache eventTypeCache,
-                                          IBodyDeserializer bodyDeserializer)
+                                          IEventNotificationDeserializer eventNotificationDeserializer)
         {
             if (eventTypeCache == null)
                 throw new ArgumentNullException(nameof(eventTypeCache));
-            if (bodyDeserializer == null)
-                throw new ArgumentNullException(nameof(bodyDeserializer));
+            if (eventNotificationDeserializer == null)
+                throw new ArgumentNullException(nameof(eventNotificationDeserializer));
 
             _eventTypeCache = eventTypeCache;
-            _bodyDeseralizer = bodyDeserializer;
+            _eventNotificationDeserializer = eventNotificationDeserializer;
             _cache = new ConcurrentDictionary<Type, Activator<IEventContext<IEvent>>>();
         }
 
@@ -38,7 +38,7 @@ namespace Zion.RabbitMQ.Messages
             if (!_eventTypeCache.TryGet(message.RoutingKey, out var type))
                 throw new ArgumentException($"Could not find event type for '{message.RoutingKey}'");
 
-            var eventNotification = _bodyDeseralizer.Deserialize(message.Body, type);
+            var eventNotification = _eventNotificationDeserializer.Deserialize(message.Body, type);
 
             if (_cache.TryGetValue(type, out var activator))
                 return activator(eventNotification.StreamId, eventNotification.Payload, eventNotification.Correlation, eventNotification.Causation, eventNotification.Payload.Timestamp, eventNotification.Actor, null);

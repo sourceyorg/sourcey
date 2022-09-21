@@ -1,22 +1,22 @@
-﻿using Utf8Json;
+﻿using System.Text.Json;
 using Zion.Events;
 using Zion.Events.Bus;
 using Zion.Events.Serialization;
 
-namespace Zion.RabbitMQ.Messages
+namespace Zion.Serialization.Json.Events
 {
-    internal class BodySerializer : IBodySerializer
+    internal class EventNotificationSerializer : IEventNotificationSerializer
     {
         private readonly IEventSerializer _eventSerializer;
 
-        public BodySerializer(IEventSerializer eventSerializer)
+        public EventNotificationSerializer(IEventSerializer eventSerializer)
         {
             _eventSerializer = eventSerializer;
         }
 
         public byte[] Serialize<T>(IEventNotification<T> data) where T : IEvent
         {
-            var body = new RabbitMqBody
+            var body = new EventNotificationPayload
             {
                 Actor = data.Actor,
                 Causation = data.Causation,
@@ -26,7 +26,7 @@ namespace Zion.RabbitMQ.Messages
                 Timestamp = data.Timestamp
             };
 
-            return JsonSerializer.Serialize(body);
+            return JsonSerializer.SerializeToUtf8Bytes(body);
         }
     }
 }

@@ -53,6 +53,8 @@ namespace Zion.Serialization.Json.Builder
         {
             _services.TryAddSingleton<IEventSerializer, EventSerializer>();
             _services.TryAddSingleton<IEventDeserializer, EventDeserializer>();
+            _services.TryAddSingleton<IEventNotificationSerializer, EventNotificationSerializer>();
+            _services.TryAddSingleton<IEventNotificationDeserializer, EventNotificationDeserializer>();
             return this;
         }
 

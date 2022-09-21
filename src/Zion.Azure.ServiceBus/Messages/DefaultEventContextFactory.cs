@@ -16,18 +16,18 @@ namespace Zion.Azure.ServiceBus.Messages
     {
         private readonly ConcurrentDictionary<Type, Activator<IEventContext<IEvent>>> _cache;
         private readonly IEventTypeCache _eventTypeCache;
-        private readonly IEventDeserializer _eventDeserializer;
+        private readonly IEventNotificationDeserializer _eventNotificationDeserializer;
 
         public DefaultEventContextFactory(IEventTypeCache eventTypeCache,
-                                          IEventDeserializer eventDeserializer)
+                                          IEventNotificationDeserializer eventNotificationDeserializer)
         {
             if (eventTypeCache == null)
                 throw new ArgumentNullException(nameof(eventTypeCache));
-            if (eventDeserializer == null)
-                throw new ArgumentNullException(nameof(eventDeserializer));
+            if (eventNotificationDeserializer == null)
+                throw new ArgumentNullException(nameof(eventNotificationDeserializer));
 
             _eventTypeCache = eventTypeCache;
-            _eventDeserializer = eventDeserializer;
+            _eventNotificationDeserializer = eventNotificationDeserializer;
             _cache = new ConcurrentDictionary<Type, Activator<IEventContext<IEvent>>>();
         }
 
@@ -39,41 +39,21 @@ namespace Zion.Azure.ServiceBus.Messages
             if (!_eventTypeCache.TryGet(message.Label, out var type))
                 throw new ArgumentException($"Could not find event type for '{message.Label}'");
 
-            var @event = (IEvent)_eventDeserializer.Deserialize(Encoding.UTF8.GetString(message.Body), type);
-
-            string streamId = null;
-            Correlation? correlationId = null;
-            Causation? causationId = null;
-            string actor = null;
-
-            if (!string.IsNullOrWhiteSpace(message.CorrelationId))
-                correlationId = Correlation.From(message.CorrelationId);
-
-            if (message.UserProperties.ContainsKey(nameof(IEventContext<IEvent>.StreamId)))
-                streamId = message.UserProperties[nameof(IEventContext<IEvent>.StreamId)]?.ToString();
-
-            if (message.UserProperties.ContainsKey(nameof(IEventContext<IEvent>.Causation)))
-            {
-                var value = message.UserProperties[nameof(IEventContext<IEvent>.Causation)]?.ToString();
-                causationId = value != null ? Causation.From(value) : (Causation?)null;
-            }
-
-            if (message.UserProperties.ContainsKey(nameof(IEventContext<IEvent>.Actor)))
-                actor = message.UserProperties[nameof(IEventContext<IEvent>.Actor)]?.ToString();
+            var eventNotification = _eventNotificationDeserializer.Deserialize(message.Body, type);
 
             if (_cache.TryGetValue(type, out var activator))
-                return activator(streamId, @event, correlationId, causationId, @event.Timestamp, Actor.From(actor ?? "<Unknown>"));
+                return activator(eventNotification.StreamId, eventNotification.Payload, eventNotification.Correlation, eventNotification.Causation, eventNotification.Payload.Timestamp, eventNotification.Actor, null);
 
             activator = BuildActivator(typeof(EventContext<>).MakeGenericType(type));
 
             _cache.TryAdd(type, activator);
 
-            return activator(streamId, @event, correlationId, causationId, @event.Timestamp, Actor.From(actor ?? "<Unknown>"));
+            return activator(eventNotification.StreamId, eventNotification.Payload, eventNotification.Correlation, eventNotification.Causation, eventNotification.Payload.Timestamp, eventNotification.Actor, null);
         }
 
         private Activator<IEventContext<IEvent>> BuildActivator(Type type)
         {
-            var expectedParameterTypes = new Type[] { typeof(StreamId), type.GenericTypeArguments[0], typeof(Correlation?), typeof(Causation?), typeof(DateTimeOffset), typeof(Actor) };
+            var expectedParameterTypes = new Type[] { typeof(StreamId), type.GenericTypeArguments[0], typeof(Correlation?), typeof(Causation?), typeof(DateTimeOffset), typeof(Actor), typeof(DateTimeOffset?) };
             var constructor = type.GetConstructor(expectedParameterTypes);
 
             if (constructor == null)

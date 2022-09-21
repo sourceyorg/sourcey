@@ -9,14 +9,14 @@ namespace Zion.Azure.ServiceBus.Messages
 {
     internal sealed class DefaultMessageFactory : IMessageFactory
     {
-        private readonly IEventSerializer _eventSerializer;
+        private readonly IEventNotificationSerializer _eventNotificationSerializer;
 
-        public DefaultMessageFactory(IEventSerializer eventSerializer)
+        public DefaultMessageFactory(IEventNotificationSerializer eventNotificationSerializer)
         {
-            if (eventSerializer == null)
-                throw new ArgumentNullException(nameof(eventSerializer));
+            if (eventNotificationSerializer == null)
+                throw new ArgumentNullException(nameof(eventNotificationSerializer));
 
-            _eventSerializer = eventSerializer;
+            _eventNotificationSerializer = eventNotificationSerializer;
         }
 
         public Message CreateMessage<TEvent>(IEventNotification<TEvent> context) where TEvent : IEvent
@@ -27,7 +27,7 @@ namespace Zion.Azure.ServiceBus.Messages
                 throw new ArgumentNullException($"{nameof(context)}.{nameof(context.Payload)}");
 
             var @event = context.Payload;
-            var eventName = @event.GetType().FriendlyFullName();
+            var eventName = @event.GetType().FriendlyName();
 
             return CreateMessage(eventName, (IEventNotification<IEvent>)context);
         }
@@ -39,25 +39,25 @@ namespace Zion.Azure.ServiceBus.Messages
                 throw new ArgumentNullException($"{nameof(context)}.{nameof(context.Payload)}");
 
             var @event = context.Payload;
-            var eventName = @event.GetType().FriendlyFullName();
+            var eventName = @event.GetType().FriendlyName();
 
             return CreateMessage(eventName, context);
         }
         private Message CreateMessage(string eventName, IEventNotification<IEvent> context)
         {
             var @event = context.Payload;
-            var body = _eventSerializer.Serialize(@event);
+            var body = _eventNotificationSerializer.Serialize(context);
             var message = new Message
             {
                 MessageId = @event.Id.ToString(),
-                Body = Encoding.UTF8.GetBytes(body),
+                Body = body,
                 Label = eventName,
                 CorrelationId = context.Correlation?.ToString(),
                 UserProperties =
                 {
                     { nameof(context.StreamId), context.StreamId.ToString() },
                     { nameof(context.Causation), context.Causation?.ToString() },
-                    { nameof(context.Actor), context.Actor },
+                    { nameof(context.Actor), context.Actor.ToString() },
                     { nameof(context.Timestamp), context.Timestamp },
                 },
             };

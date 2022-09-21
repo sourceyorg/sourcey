@@ -1,30 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MessagePack;
-using Utf8Json;
+﻿using System.Text.Json;
 using Zion.Core.Keys;
 using Zion.Events;
 using Zion.Events.Bus;
 using Zion.Events.Serialization;
 using Zion.Events.Streams;
 
-namespace Zion.RabbitMQ.Messages
+namespace Zion.Serialization.Json.Events
 {
-    internal sealed class BodyDeserializer : IBodyDeserializer
+    internal sealed class EventNotificationDeserializer : IEventNotificationDeserializer
     {
         private readonly IEventDeserializer _eventDeserializer;
 
-        public BodyDeserializer(IEventDeserializer eventDeserializer)
+        public EventNotificationDeserializer(IEventDeserializer eventDeserializer)
         {
             _eventDeserializer = eventDeserializer;
         }
 
         public IEventNotification<IEvent> Deserialize(byte[] data, Type eventType)
         {
-            var body = JsonSerializer.Deserialize<RabbitMqBody>(data);
+            var body = JsonSerializer.Deserialize<EventNotificationPayload>(data);
             return new EventNotification<IEvent>(
                 streamId: StreamId.From(body.StreamId),
                 @event: (IEvent)_eventDeserializer.Deserialize(body.Payload, eventType),
