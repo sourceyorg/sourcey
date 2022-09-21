@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zion.Core.Builder;
 using Zion.Core.Initialization;
 using Zion.Events.Bus;
@@ -35,6 +36,8 @@ namespace Zion.Extensions
             builder.Services.AddHostedService(sp => sp.GetRequiredService<IEventBusConsumer>());
             builder.Services.AddSingleton<RabbitMqConnectionPool>();
             builder.Services.AddSingleton<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
+            builder.Services.TryAddSingleton<IBodyDeserializer, BodyDeserializer>();
+            builder.Services.TryAddSingleton<IBodySerializer, BodySerializer>();
             builder.Services.AddScoped<IQueueMessageSender, DefaultQueueMessageSender>();
             builder.Services.AddSingleton<IQueueMessageReceiver, DefaultQueueMessageReceiver>();
             builder.Services.AddScoped<ISubscriptionManager, DefaultSubscriptionManager>();

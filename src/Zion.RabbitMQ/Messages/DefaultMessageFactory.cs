@@ -8,14 +8,14 @@ namespace Zion.RabbitMQ.Messages
 {
     internal sealed class DefaultMessageFactory : IMessageFactory
     {
-        private readonly IEventSerializer _eventSerializer;
+        private readonly IBodySerializer _bodySerializer;
 
-        public DefaultMessageFactory(IEventSerializer eventSerializer)
+        public DefaultMessageFactory(IBodySerializer bodySerializer)
         {
-            if (eventSerializer == null)
-                throw new ArgumentNullException(nameof(eventSerializer));
+            if (bodySerializer == null)
+                throw new ArgumentNullException(nameof(bodySerializer));
           
-            _eventSerializer = eventSerializer;
+            _bodySerializer = bodySerializer;
         }
 
         public Message CreateMessage<TEvent>(IEventNotification<TEvent> context) where TEvent : IEvent
@@ -40,7 +40,7 @@ namespace Zion.RabbitMQ.Messages
         private Message CreateMessage(string eventName, IEventNotification<IEvent> context)
         {
             var @event = context.Payload;
-            var body = _eventSerializer.Serialize(context.Payload);
+            var body = _bodySerializer.Serialize(context);
 
             return new Message
             {
@@ -48,8 +48,9 @@ namespace Zion.RabbitMQ.Messages
                 Type = eventName,
                 CorrelationId = context.Correlation,
                 CausationId = context.Causation,
-                UserId = context.Actor,
-                Body = Encoding.UTF8.GetBytes(body),
+                Actor = context.Actor,
+                Body = body,
+                StreamId = context.StreamId
             };
         }
     }

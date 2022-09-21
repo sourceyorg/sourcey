@@ -8,6 +8,8 @@
         public string MessageId { get; set; }
         public string CorrelationId { get; set; }
         public string CausationId { get; set; }
-        public string UserId { get; set; }
+        public string Actor { get; set; }
+        public string StreamId { get; set; }
+        public string ScheduledPublication { get; set; }
     }
 }

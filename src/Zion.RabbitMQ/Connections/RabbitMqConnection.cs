@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
+using Zion.Core.Keys;
 using Zion.RabbitMQ.Exceptions;
 using Zion.RabbitMQ.Messages;
 
@@ -285,13 +286,20 @@ namespace Zion.RabbitMQ.Connections
             properties.MessageId = message.MessageId.ToString();
             properties.Persistent = true;
             properties.Type = message.Type;
-            properties.UserId = message.UserId;
 
             if (properties.Headers == null)
                 properties.Headers = new Dictionary<string, object>();
 
             if (!string.IsNullOrWhiteSpace(message.CorrelationId))
-                properties.Headers.Add("correlation-id", message.CorrelationId);
+                properties.Headers.Add(nameof(Message.CorrelationId), message.CorrelationId);
+            if (!string.IsNullOrWhiteSpace(message.CausationId))
+                properties.Headers.Add(nameof(Message.CausationId), message.CausationId);
+            if (!string.IsNullOrWhiteSpace(message.ScheduledPublication))
+                properties.Headers.Add(nameof(Message.ScheduledPublication), message.ScheduledPublication);
+            if (!string.IsNullOrWhiteSpace(message.StreamId))
+                properties.Headers.Add(nameof(Message.StreamId), message.StreamId);
+            if (!string.IsNullOrWhiteSpace(message.Actor))
+                properties.Headers.Add(nameof(Message.Actor), message.Actor);
 
             return properties;
         }
