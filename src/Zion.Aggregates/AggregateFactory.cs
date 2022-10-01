@@ -19,5 +19,10 @@ namespace Zion.Aggregates
 
             return aggregate;
         }
+
+        public TAggregate Create<TAggregate, TState>()
+            where TAggregate : Aggregate<TState>
+            where TState : IAggregateState, new()
+            => FromHistory<TAggregate, TState>(null);
     }
 }

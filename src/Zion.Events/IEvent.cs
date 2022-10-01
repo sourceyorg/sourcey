@@ -7,6 +7,6 @@ namespace Zion.Events
         EventId Id { get; }
         StreamId StreamId { get; }
         DateTimeOffset Timestamp { get; }
-        int Version { get; }
+        int? Version { get; }
     }
 }

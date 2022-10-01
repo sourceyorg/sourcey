@@ -100,6 +100,11 @@ namespace Zion.Aggregates.Stores
 
             await SaveSnapshotAsync(aggregate, cancellationToken);
         }
+
+        public async Task SaveAsync<TState>(Aggregate<TState> aggregate, CancellationToken cancellationToken = default)
+            where TState : IAggregateState, new()
+            => await SaveAsync(aggregate, expectedVersion: null, cancellationToken);
+
         public async Task SaveAsync<TState>(Aggregate<TState> aggregate, ICommand causation, int? expectedVersion = null, CancellationToken cancellationToken = default)
             where TState : IAggregateState, new()
         {
@@ -138,6 +143,11 @@ namespace Zion.Aggregates.Stores
 
             await SaveSnapshotAsync(aggregate, cancellationToken);
         }
+
+        public async Task SaveAsync<TState>(Aggregate<TState> aggregate, ICommand causation, CancellationToken cancellationToken = default)
+            where TState : IAggregateState, new()
+            => await SaveAsync(aggregate, causation, causation.Version, cancellationToken);
+
         public async Task SaveAsync<TState>(Aggregate<TState> aggregate, IEventContext<IEvent> causation, int? expectedVersion = null, CancellationToken cancellationToken = default)
             where TState : IAggregateState, new()
         {
@@ -176,6 +186,10 @@ namespace Zion.Aggregates.Stores
 
             await SaveSnapshotAsync(aggregate, cancellationToken);
         }
+
+        public async Task SaveAsync<TState>(Aggregate<TState> aggregate, IEventContext<IEvent> causation, CancellationToken cancellationToken = default)
+            where TState : IAggregateState, new()
+            => await SaveAsync(aggregate, causation, null, cancellationToken);
 
         private async Task<bool> ResolveConflictAsync<TState>(Aggregate<TState> aggregate, int expectedVersion, long currentVersion, CancellationToken cancellationToken = default)
             where TState : IAggregateState, new()

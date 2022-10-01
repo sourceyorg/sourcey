@@ -116,6 +116,78 @@ namespace Zion.Core.Exceptions
             return _exceptions.OrderBy(e => e.Order)
                 .Select(e => e.Exception);
         }
+
+        public void ThrowAll(CancellationToken cancellationToken = default)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{nameof(ExceptionStream)}.{nameof(ThrowAll)} was cancelled before execution");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            if (_exceptions.Count < 1)
+                return;
+
+            if (_exceptions.Count < 2)
+                throw _exceptions.First().Exception;
+
+            throw new AggregateException(GetExceptions(cancellationToken));
+        }
+
+        public void ThrowFirst(CancellationToken cancellationToken = default)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{nameof(ExceptionStream)}.{nameof(ThrowFirst)} was cancelled before execution");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            if (_exceptions.Count < 1)
+                return;
+
+            throw _exceptions.First().Exception;
+        }
+
+        public void ThrowLast(CancellationToken cancellationToken = default)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{nameof(ExceptionStream)}.{nameof(ThrowLast)} was cancelled before execution");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            if (_exceptions.Count < 1)
+                return;
+
+            throw _exceptions.Last().Exception;
+        }
+
+        public void ThrowAll<TException>(CancellationToken cancellationToken = default)
+            where TException : Exception
+        {
+            if (!TryGetExceptionsByType<TException>(out var exceptions, cancellationToken) || exceptions is null)
+                return;
+
+            throw new AggregateException(exceptions);
+        }
+
+        public void ThrowFirst<TException>(CancellationToken cancellationToken = default)
+            where TException : Exception
+        {
+            if (!TryGetExceptionsByType<TException>(out var exceptions, cancellationToken) || exceptions is null)
+                return;
+
+            throw exceptions.First();
+        }
+
+        public void ThrowLast<TException>(CancellationToken cancellationToken = default)
+            where TException : Exception
+        {
+            if (!TryGetExceptionsByType<TException>(out var exceptions, cancellationToken) || exceptions is null)
+                return;
+
+            throw exceptions.Last();
+        }
     }
 
     internal record CachedException(string Key, int Order, Exception Exception);

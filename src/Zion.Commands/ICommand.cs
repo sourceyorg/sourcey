@@ -8,7 +8,7 @@ namespace Zion.Commands
         Subject Subject { get; }
         Correlation? Correlation { get; }
         DateTimeOffset Timestamp { get; }
-        int Version { get; }
+        int? Version { get; }
         Actor Actor { get; }
     }
 }

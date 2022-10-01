@@ -7,11 +7,11 @@ namespace Zion.Commands
         public CommandId Id { get; }
         public Subject Subject { get; }
         public Correlation? Correlation { get; }
-        public int Version { get; }
+        public int? Version { get; }
         public Actor Actor { get; }
         public DateTimeOffset Timestamp { get; }
 
-        public Command(Subject subject, Correlation? correlationId, int version, Actor actor)
+        public Command(Subject subject, Correlation? correlationId, int? version, Actor actor)
         {
             Id = CommandId.New();
             Subject = subject;
@@ -20,5 +20,7 @@ namespace Zion.Commands
             Actor = actor;
             Timestamp = DateTimeOffset.UtcNow;
         }
+
+        public Command(Subject subject, Correlation? correlationId, Actor actor) : this(subject, correlationId, null, actor ) { }
     }
 }

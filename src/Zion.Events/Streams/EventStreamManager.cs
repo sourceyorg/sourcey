@@ -32,7 +32,22 @@ namespace Zion.Events.Streams
             if (!streamId.HasValue)
                 return null;
 
-            return new EventStream(streamId.Value, _events[streamId.Value].ToArray());
+            if (!TryGet(streamId.Value, out var stream))
+                return null;
+
+            return stream;
+        }
+
+        public bool TryGet(StreamId streamId, out EventStream? eventStream)
+        {
+            eventStream = null;
+
+            if (!_events.TryGetValue(streamId, out var events))
+                return false;
+
+            eventStream = new EventStream(streamId, events.ToArray());
+
+            return true;
         }
 
         public StreamId? GetMostRecentStreamId()

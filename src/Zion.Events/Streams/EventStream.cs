@@ -2,11 +2,13 @@
 
 namespace Zion.Events.Streams
 {
-    public record EventStream : IEnumerable<IEvent>
+    public record EventStream : IReadOnlyCollection<IEvent>
     {
-        private readonly IEnumerable<IEvent> _events;
+        private readonly IReadOnlyCollection<IEvent> _events;
 
         public StreamId StreamId { get; }
+
+        public int Count => _events.Count;
 
         public EventStream(StreamId streamId, params IEvent[] events)
         {
@@ -20,7 +22,28 @@ namespace Zion.Events.Streams
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
+        public bool TryGetLast<TEvent>(out TEvent? @event)
+        {
+            @event = GetLastOrDefault<TEvent>();
+            return @event is not null;
+        }
+
+        public bool TryGetFirst<TEvent>(out TEvent? @event)
+        {
+            @event = GetFirstOrDefault<TEvent>();
+            return @event is not null;
+        }
+
+        public TEvent? GetFirstOrDefault<TEvent>()
+        {
+            var type = typeof(TEvent);
+            return (TEvent?)_events?.FirstOrDefault(e => e.GetType() == type);
+        }
+
         public TEvent? GetLastOrDefault<TEvent>()
-            => (TEvent?)_events?.LastOrDefault();
+        {
+            var type = typeof(TEvent);
+            return (TEvent?)_events?.LastOrDefault(e => e.GetType() == type);
+        }
     }
 }

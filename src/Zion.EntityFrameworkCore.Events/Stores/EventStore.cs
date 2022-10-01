@@ -199,7 +199,7 @@ namespace Zion.EntityFrameworkCore.Events.Stores
             _eventStreamManager.Append(events.ToArray());
         }
 
-        public async Task<IEnumerable<IEventContext<IEvent>>> GetEventsBackwardsAsync(StreamId streamId, long version, long? position, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<IEventContext<IEvent>>> GetEventsBackwardsAsync(StreamId streamId, long? version, long? position, CancellationToken cancellationToken = default)
         {
             var results = new List<IEventContext<IEvent>>();
 
@@ -218,15 +218,17 @@ namespace Zion.EntityFrameworkCore.Events.Stores
             return results;
         }
 
-        private async Task<List<Entities.Event>> GetEventsBackwardsInternalAsync(StreamId streamId, long version, long? position, CancellationToken cancellationToken = default)
+        private async Task<List<Entities.Event>> GetEventsBackwardsInternalAsync(StreamId streamId, long? version, long? position, CancellationToken cancellationToken = default)
         {
             using var context = _dbContextFactory.Create();
-            
+
             var events = context.Events
                 .AsNoTracking()
                 .OrderByDescending(e => e.SequenceNo)
-                .Where(e => e.StreamId == streamId)
-                .Where(e => e.Version > version);
+                .Where(e => e.StreamId == streamId);
+
+            if(version.HasValue)
+                events = events.Where(e => e.Version > version);
 
             if (position.HasValue)
                 events = events.Where(e => e.SequenceNo <= position.Value);

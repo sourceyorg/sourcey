@@ -11,7 +11,7 @@ namespace Zion.Aggregates
         protected readonly TState _state;
 
         public StreamId Id { get; protected set; }
-        public int Version { get; protected set; }
+        public int? Version { get; protected set; }
 
         protected Aggregate(TState state)
         {
@@ -36,6 +36,7 @@ namespace Zion.Aggregates
         {
             return _uncommitedEvents.AsReadOnly();
         }
+
         public void ClearUncommittedEvents()
         {
             _uncommitedEvents.Clear();
