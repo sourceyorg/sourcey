@@ -8,6 +8,7 @@ using Zion.EntityFrameworkCore.Commands.DbContexts;
 using Zion.EntityFrameworkCore.Commands.Factories;
 using Zion.EntityFrameworkCore.Commands.Initializers;
 using Zion.EntityFrameworkCore.Commands.Stores;
+using BufferedCommandStore = Zion.EntityFrameworkCore.Commands.Stores.BufferedCommandStore;
 
 namespace Zion.Extensions
 {
@@ -31,9 +32,9 @@ namespace Zion.Extensions
 
         private static void RegisterBufferedCommandStore(this IZionEntityFrameworkCoreBuilder builder)
         {
-            builder.Services.TryAddSingleton<Commands.Stores.BufferedCommandStore>();
-            builder.Services.TryAddSingleton<ICommandStore>(sp => sp.GetRequiredService<Commands.Stores.BufferedCommandStore>());
-            builder.Services.AddHostedService(sp => sp.GetRequiredService<Commands.Stores.BufferedCommandStore>());
+            builder.Services.TryAddSingleton<BufferedCommandStore>();
+            builder.Services.TryAddSingleton<ICommandStore>(sp => sp.GetRequiredService<BufferedCommandStore>());
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<BufferedCommandStore>());
         }
     }
 }

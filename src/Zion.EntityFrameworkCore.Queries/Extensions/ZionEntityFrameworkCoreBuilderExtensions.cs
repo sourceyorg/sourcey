@@ -8,6 +8,7 @@ using Zion.EntityFrameworkCore.Queries.Factories;
 using Zion.EntityFrameworkCore.Queries.Initializers;
 using Zion.EntityFrameworkCore.Queries.Stores;
 using Zion.Queries.Stores;
+using BufferedQueryStore = Zion.EntityFrameworkCore.Queries.Stores.BufferedQueryStore;
 
 namespace Zion.Extensions
 {
@@ -31,9 +32,9 @@ namespace Zion.Extensions
 
         private static void RegisterBufferedQueryStore(this IZionEntityFrameworkCoreBuilder builder)
         {
-            builder.Services.TryAddSingleton<Queries.Stores.BufferedQueryStore>();
-            builder.Services.TryAddSingleton<IQueryStore>(sp => sp.GetRequiredService<Queries.Stores.BufferedQueryStore>());
-            builder.Services.AddHostedService(sp => sp.GetRequiredService<Queries.Stores.BufferedQueryStore>());
+            builder.Services.TryAddSingleton<BufferedQueryStore>();
+            builder.Services.TryAddSingleton<IQueryStore>(sp => sp.GetRequiredService<BufferedQueryStore>());
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<BufferedQueryStore>());
         }
     }
 }
