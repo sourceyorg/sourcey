@@ -5,11 +5,21 @@ using Zion.EntityFrameworkCore.Extensions;
 
 namespace Zion.EntityFrameworkCore.Commands.EntityTypeConfiguration
 {
-    internal class CommandEntityTypeConfiguration : IEntityTypeConfiguration<Command>
+    internal sealed class CommandEntityTypeConfiguration : IEntityTypeConfiguration<Command>
     {
+        private readonly string _schema;
+
+        public CommandEntityTypeConfiguration(string schema)
+        {
+            if (string.IsNullOrWhiteSpace(schema))
+                throw new ArgumentNullException(nameof(schema));
+
+            _schema = schema;
+        }
+
         public void Configure(EntityTypeBuilder<Command> builder)
         {
-            builder.ToTable(name: nameof(Command), schema: "log");
+            builder.ToTable(name: nameof(Command), schema: _schema);
 
             builder.HasKey(c => c.SequenceNo);
             builder.HasIndex(c => c.Id);

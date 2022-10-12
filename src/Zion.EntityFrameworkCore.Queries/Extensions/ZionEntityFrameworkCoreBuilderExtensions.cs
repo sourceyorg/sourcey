@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Zion.Core.Initialization;
 using Zion.EntityFrameworkCore.Builder;
 using Zion.EntityFrameworkCore.Queries.DbContexts;
-using Zion.EntityFrameworkCore.Queries.Factories;
 using Zion.EntityFrameworkCore.Queries.Initializers;
 using Zion.EntityFrameworkCore.Queries.Stores;
 using Zion.Queries.Stores;
@@ -14,11 +13,23 @@ namespace Zion.Extensions
 {
     public static class ZionEntityFrameworkCoreBuilderExtensions
     {
-        public static IZionEntityFrameworkCoreBuilder AddQueries(this IZionEntityFrameworkCoreBuilder builder, Action<DbContextOptionsBuilder> options, QueryStoreType type = QueryStoreType.Buffered, bool autoMigrate = true)
+        public static IZionEntityFrameworkCoreBuilder AddQueries(
+            this IZionEntityFrameworkCoreBuilder builder,
+            Action<DbContextOptionsBuilder> options,
+            QueryStoreType type = QueryStoreType.Buffered,
+            bool autoMigrate = true)
+            => AddQueries<DefaultQueryStoreDbContext>(builder, options, type, autoMigrate);
+
+        public static IZionEntityFrameworkCoreBuilder AddQueries<TQueryStoreDbContext>(
+            this IZionEntityFrameworkCoreBuilder builder,
+            Action<DbContextOptionsBuilder> options,
+            QueryStoreType type = QueryStoreType.Buffered,
+            bool autoMigrate = true)
+            where TQueryStoreDbContext : QueryStoreDbContext
         {
             builder.Services.RemoveAll<IQueryStore>();
-            builder.Services.TryAddScoped<IQueryStoreDbContextFactory, QueryStoreDbContextFactory>();
-            builder.Services.AddDbContext<QueryStoreDbContext>(options);
+            builder.Services.AddDbContext<TQueryStoreDbContext>(options);
+            builder.Services.TryAddScoped<QueryStoreDbContext>(sp => sp.GetRequiredService<TQueryStoreDbContext>());
             builder.Services.AddScoped<IZionInitializer, QueryStoreInitializer>();
             builder.Services.AddSingleton(new QueryStoreOptions(autoMigrate));
 
@@ -26,7 +37,7 @@ namespace Zion.Extensions
                 builder.RegisterBufferedQueryStore();
             else
                 builder.Services.TryAddSingleton<IQueryStore, QueryStore>();
-            
+
             return builder;
         }
 

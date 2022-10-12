@@ -7,9 +7,19 @@ namespace Zion.EntityFrameworkCore.Events.EntityTypeConfigurations
 {
     internal sealed class EventEntityTypeConfiguration : IEntityTypeConfiguration<Event>
     {
+        private readonly string _schema;
+
+        public EventEntityTypeConfiguration(string schema)
+        {
+            if(string.IsNullOrWhiteSpace(schema))
+                throw new ArgumentNullException(nameof(schema));
+
+            _schema = schema;
+        }
+
         public void Configure(EntityTypeBuilder<Event> builder)
         {
-            builder.ToTable(name: nameof(Event), schema: "log");
+            builder.ToTable(name: nameof(Event), schema: _schema);
 
             builder.HasKey(c => c.SequenceNo);
             builder.HasIndex(c => c.Id);

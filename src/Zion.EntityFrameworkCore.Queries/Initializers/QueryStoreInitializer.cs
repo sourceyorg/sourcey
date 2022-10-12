@@ -1,31 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Zion.Core.Initialization;
-using Zion.EntityFrameworkCore.Queries.Factories;
+using Zion.EntityFrameworkCore.Queries.DbContexts;
 
 namespace Zion.EntityFrameworkCore.Queries.Initializers
 {
-    internal class QueryStoreInitializer : IZionInitializer
+    internal sealed class QueryStoreInitializer : IZionInitializer
     {
         public bool ParallelEnabled => false;
-        private readonly IQueryStoreDbContextFactory _dbContextFactory;
         private readonly QueryStoreOptions _options;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
 
-        public QueryStoreInitializer(IQueryStoreDbContextFactory dbContextFactory,
+        public QueryStoreInitializer(IServiceScopeFactory serviceScopeFactory,
             QueryStoreOptions options)
         {
-            if (dbContextFactory is null)
-                throw new ArgumentNullException(nameof(dbContextFactory));
+            if (serviceScopeFactory is null)
+                throw new ArgumentNullException(nameof(serviceScopeFactory));
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            _dbContextFactory = dbContextFactory;
+            _serviceScopeFactory = serviceScopeFactory;
             _options = options;
         }
 
@@ -34,7 +30,9 @@ namespace Zion.EntityFrameworkCore.Queries.Initializers
             if (!_options.AutoMigrate)
                 return;
 
-            using var context = _dbContextFactory.Create();
+            using var scope = _serviceScopeFactory.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<QueryStoreDbContext>();
+
             await context.Database.MigrateAsync();
         }
     }

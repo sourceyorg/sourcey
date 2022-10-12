@@ -4,17 +4,18 @@ using Zion.EntityFrameworkCore.Queries.EntityTypeConfigurations;
 
 namespace Zion.EntityFrameworkCore.Queries.DbContexts
 {
-    public sealed class QueryStoreDbContext : DbContext
+    public abstract class QueryStoreDbContext : DbContext
     {
+        protected virtual string Schema => "log";
+
         public DbSet<Query> Queries { get; set; }
 
-        public QueryStoreDbContext(DbContextOptions<QueryStoreDbContext> options) : base(options)
-        {
-        }
+        protected QueryStoreDbContext(DbContextOptions options) 
+            : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.ApplyConfiguration(new QueryEntityTypeConfiguration());
+            builder.ApplyConfiguration(new QueryEntityTypeConfiguration(Schema));
 
             base.OnModelCreating(builder);
         }

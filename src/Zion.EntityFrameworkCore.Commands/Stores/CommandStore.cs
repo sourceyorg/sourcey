@@ -3,7 +3,7 @@ using Zion.Commands;
 using Zion.Commands.Serialization;
 using Zion.Commands.Stores;
 using Zion.Core.Extensions;
-using Zion.EntityFrameworkCore.Commands.Factories;
+using Zion.EntityFrameworkCore.Commands.DbContexts;
 
 namespace Zion.EntityFrameworkCore.Commands.Stores
 {
@@ -33,9 +33,8 @@ namespace Zion.EntityFrameworkCore.Commands.Stores
             var data = _commandSerializer.Serialize(command);
 
             using var scope = _serviceScopeFactory.CreateScope();
-            var dbContextFactory = scope.ServiceProvider.GetRequiredService<ICommandStoreDbContextFactory>();
+            using var context = scope.ServiceProvider.GetRequiredService<CommandStoreDbContext>();
 
-            using var context = dbContextFactory.Create();
             await context.Commands.AddAsync(new Entities.Command
             {
                 Name = type.Name,

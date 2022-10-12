@@ -5,11 +5,21 @@ using Zion.EntityFrameworkCore.Queries.Entities;
 
 namespace Zion.EntityFrameworkCore.Queries.EntityTypeConfigurations
 {
-    internal class QueryEntityTypeConfiguration : IEntityTypeConfiguration<Query>
+    internal sealed class QueryEntityTypeConfiguration : IEntityTypeConfiguration<Query>
     {
+        private readonly string _schema;
+
+        public QueryEntityTypeConfiguration(string schema)
+        {
+            if (string.IsNullOrWhiteSpace(schema))
+                throw new ArgumentNullException(nameof(schema));
+
+            _schema = schema;
+        }
+
         public void Configure(EntityTypeBuilder<Query> builder)
         {
-            builder.ToTable(name: nameof(Query), schema: "log");
+            builder.ToTable(name: nameof(Query), schema: _schema);
 
             builder.HasKey(c => c.SequenceNo);
             builder.HasIndex(c => c.Id);

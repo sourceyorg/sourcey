@@ -1,26 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Zion.Core.Initialization;
-using Zion.EntityFrameworkCore.Commands.Factories;
+using Zion.EntityFrameworkCore.Commands.DbContexts;
 
 namespace Zion.EntityFrameworkCore.Commands.Initializers
 {
     internal sealed class CommandStoreInitializer : IZionInitializer
     {
         public bool ParallelEnabled => false;
-        private readonly ICommandStoreDbContextFactory _dbContextFactory;
         private readonly CommandStoreOptions _options;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
 
-        public CommandStoreInitializer(ICommandStoreDbContextFactory dbContextFactory,
+        public CommandStoreInitializer(IServiceScopeFactory serviceScopeFactory,
             CommandStoreOptions options)
         {
-            if (dbContextFactory is null)
-                throw new ArgumentNullException(nameof(dbContextFactory));
+            if (serviceScopeFactory is null)
+                throw new ArgumentNullException(nameof(serviceScopeFactory));
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            _dbContextFactory = dbContextFactory;
+            _serviceScopeFactory = serviceScopeFactory;
             _options = options;
         }
 
@@ -29,7 +30,9 @@ namespace Zion.EntityFrameworkCore.Commands.Initializers
             if (!_options.AutoMigrate)
                 return;
 
-            using var context = _dbContextFactory.Create();
+            using var scope = _serviceScopeFactory.CreateScope();
+            using var context = scope.ServiceProvider.GetRequiredService<CommandStoreDbContext>();
+
             await context.Database.MigrateAsync();
         }
     }

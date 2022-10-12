@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Zion.Core.Extensions;
+using Zion.EntityFrameworkCore.Queries.DbContexts;
 using Zion.EntityFrameworkCore.Queries.Entities;
-using Zion.EntityFrameworkCore.Queries.Factories;
 using Zion.Queries;
 using Zion.Queries.Serialization;
-using Zion.Queries.Stores;
 
 namespace Zion.EntityFrameworkCore.Queries.Stores
 {
@@ -34,9 +33,8 @@ namespace Zion.EntityFrameworkCore.Queries.Stores
             var data = _querySerializer.Serialize(query);
             
             using var scope = _serviceScopeFactory.CreateScope();
-            var dbContextFactory = scope.ServiceProvider.GetRequiredService<IQueryStoreDbContextFactory>();
+            using var context = scope.ServiceProvider.GetRequiredService<QueryStoreDbContext>();
 
-            using var context = dbContextFactory.Create();
             await context.Queries.AddAsync(new Query
             {
                 Name = type.Name,

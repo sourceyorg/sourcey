@@ -7,6 +7,8 @@ namespace Zion.EntityFrameworkCore.Events.DbContexts
     public class EventStoreDbContextBase<TStoreDbContext> : DbContext, IEventStoreDbContext
         where TStoreDbContext : DbContext, IEventStoreDbContext
     {
+        protected virtual string Schema => "log";
+
         public DbSet<Event> Events { get; set; }
 
         public EventStoreDbContextBase(DbContextOptions<TStoreDbContext> options)
@@ -14,7 +16,7 @@ namespace Zion.EntityFrameworkCore.Events.DbContexts
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.ApplyConfiguration(new EventEntityTypeConfiguration());
+            builder.ApplyConfiguration(new EventEntityTypeConfiguration(Schema));
 
             base.OnModelCreating(builder);
         }
