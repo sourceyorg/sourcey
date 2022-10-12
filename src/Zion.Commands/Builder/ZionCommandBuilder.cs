@@ -33,9 +33,9 @@ namespace Zion.Commands.Builder
             return this;
         }
 
-        public IZionCommandBuilder<TCommand> WithCommandStoreLogging()
+        public IZionCommandBuilder<TCommand> WithCommandStoreLogging<TCommandStoreContext>()
         {
-            _services.AddScoped<IPostCommandMiddleware<TCommand>, CommandStoreMiddleware<TCommand>>();
+            _services.AddScoped<IPostCommandMiddleware<TCommand>, CommandStoreMiddleware<TCommand, TCommandStoreContext>>();
             return this;
         }
 

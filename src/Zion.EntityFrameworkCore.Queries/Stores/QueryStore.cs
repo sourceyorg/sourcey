@@ -8,7 +8,8 @@ using Zion.Queries.Stores;
 
 namespace Zion.EntityFrameworkCore.Queries.Stores
 {
-    internal sealed class QueryStore : IQueryStore
+    internal sealed class QueryStore<TQueryStoreDbContext> : IQueryStore<TQueryStoreDbContext>
+        where TQueryStoreDbContext : QueryStoreDbContext
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IQuerySerializer _querySerializer;
@@ -34,7 +35,7 @@ namespace Zion.EntityFrameworkCore.Queries.Stores
             var data = _querySerializer.Serialize(query);
             
             using var scope = _serviceScopeFactory.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<QueryStoreDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<TQueryStoreDbContext>();
 
             await context.Queries.AddAsync(new Query
             {

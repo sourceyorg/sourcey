@@ -11,8 +11,7 @@ namespace Zion.Queries.Execution
         private readonly IServiceProvider _serviceProvider;
 
         public QueryDispatcher(ILogger<QueryDispatcher> logger,
-            IServiceProvider serviceProvider,
-            IQueryStore queryStore)
+            IServiceProvider serviceProvider)
         {
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));

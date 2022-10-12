@@ -11,6 +11,6 @@ namespace Zion.Commands.Builder
             where TMiddleWare : class, ICommandHandlerMiddleware<TCommand>;
         IZionCommandBuilder<TCommand> AfterHandler<TMiddleWare>()
             where TMiddleWare : class, ICommandHandlerMiddleware<TCommand>;
-        IZionCommandBuilder<TCommand> WithCommandStoreLogging();
+        IZionCommandBuilder<TCommand> WithCommandStoreLogging<TCommandStoreContext>();
     }
 }

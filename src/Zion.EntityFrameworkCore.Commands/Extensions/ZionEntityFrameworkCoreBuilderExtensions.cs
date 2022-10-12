@@ -7,7 +7,6 @@ using Zion.EntityFrameworkCore.Builder;
 using Zion.EntityFrameworkCore.Commands.DbContexts;
 using Zion.EntityFrameworkCore.Commands.Initializers;
 using Zion.EntityFrameworkCore.Commands.Stores;
-using BufferedCommandStore = Zion.EntityFrameworkCore.Commands.Stores.BufferedCommandStore;
 
 namespace Zion.Extensions
 {
@@ -27,25 +26,25 @@ namespace Zion.Extensions
             bool autoMigrate = true)
             where TCommandStoreDbContext : CommandStoreDbContext
         {
-            builder.Services.RemoveAll<ICommandStore>();
+            builder.Services.RemoveAll<ICommandStore<TCommandStoreDbContext>>();
             builder.Services.AddDbContext<TCommandStoreDbContext>(options);
-            builder.Services.TryAddScoped<CommandStoreDbContext>(s => s.GetRequiredService<TCommandStoreDbContext>());
-            builder.Services.AddScoped<IZionInitializer, CommandStoreInitializer>();
-            builder.Services.AddSingleton(new CommandStoreOptions(autoMigrate));
+            builder.Services.AddScoped<IZionInitializer, CommandStoreInitializer<TCommandStoreDbContext>>();
+            builder.Services.AddSingleton(new CommandStoreOptions<TCommandStoreDbContext>(autoMigrate));
 
             if (storeType == CommandStoreType.Buffered)
-                builder.RegisterBufferedCommandStore();
+                builder.RegisterBufferedCommandStore<TCommandStoreDbContext>();
             else
-                builder.Services.TryAddSingleton<ICommandStore, CommandStore>();
+                builder.Services.TryAddSingleton<ICommandStore<TCommandStoreDbContext>, CommandStore<TCommandStoreDbContext>>();
 
             return builder;
         }
 
-        private static void RegisterBufferedCommandStore(this IZionEntityFrameworkCoreBuilder builder)
+        private static void RegisterBufferedCommandStore<TCommandStoreDbContext>(this IZionEntityFrameworkCoreBuilder builder)
+            where TCommandStoreDbContext : CommandStoreDbContext
         {
-            builder.Services.TryAddSingleton<BufferedCommandStore>();
-            builder.Services.TryAddSingleton<ICommandStore>(sp => sp.GetRequiredService<BufferedCommandStore>());
-            builder.Services.AddHostedService(sp => sp.GetRequiredService<BufferedCommandStore>());
+            builder.Services.TryAddSingleton<EntityFrameworkCore.Commands.Stores.BufferedCommandStore<TCommandStoreDbContext>>();
+            builder.Services.TryAddSingleton<ICommandStore<TCommandStoreDbContext>>(sp => sp.GetRequiredService<EntityFrameworkCore.Commands.Stores.BufferedCommandStore<TCommandStoreDbContext>>());
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<EntityFrameworkCore.Commands.Stores.BufferedCommandStore<TCommandStoreDbContext>>());
         }
     }
 }

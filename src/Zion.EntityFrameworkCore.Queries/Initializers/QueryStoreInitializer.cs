@@ -6,15 +6,16 @@ using Zion.EntityFrameworkCore.Queries.DbContexts;
 
 namespace Zion.EntityFrameworkCore.Queries.Initializers
 {
-    internal sealed class QueryStoreInitializer : IZionInitializer
+    internal sealed class QueryStoreInitializer<TQueryStoreDbContext> : IZionInitializer
+        where TQueryStoreDbContext : QueryStoreDbContext
     {
         public bool ParallelEnabled => false;
-        private readonly QueryStoreOptions _options;
+        private readonly QueryStoreOptions<TQueryStoreDbContext> _options;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
 
         public QueryStoreInitializer(IServiceScopeFactory serviceScopeFactory,
-            QueryStoreOptions options)
+            QueryStoreOptions<TQueryStoreDbContext> options)
         {
             if (serviceScopeFactory is null)
                 throw new ArgumentNullException(nameof(serviceScopeFactory));
@@ -31,7 +32,7 @@ namespace Zion.EntityFrameworkCore.Queries.Initializers
                 return;
 
             using var scope = _serviceScopeFactory.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<QueryStoreDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<TQueryStoreDbContext>();
 
             await context.Database.MigrateAsync();
         }

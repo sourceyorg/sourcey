@@ -7,7 +7,6 @@ using Zion.EntityFrameworkCore.Queries.DbContexts;
 using Zion.EntityFrameworkCore.Queries.Initializers;
 using Zion.EntityFrameworkCore.Queries.Stores;
 using Zion.Queries.Stores;
-using BufferedQueryStore = Zion.EntityFrameworkCore.Queries.Stores.BufferedQueryStore;
 
 namespace Zion.Extensions
 {
@@ -27,25 +26,25 @@ namespace Zion.Extensions
             bool autoMigrate = true)
             where TQueryStoreDbContext : QueryStoreDbContext
         {
-            builder.Services.RemoveAll<IQueryStore>();
+            builder.Services.RemoveAll<IQueryStore<TQueryStoreDbContext>>();
             builder.Services.AddDbContext<TQueryStoreDbContext>(options);
-            builder.Services.TryAddScoped<QueryStoreDbContext>(sp => sp.GetRequiredService<TQueryStoreDbContext>());
-            builder.Services.AddScoped<IZionInitializer, QueryStoreInitializer>();
-            builder.Services.AddSingleton(new QueryStoreOptions(autoMigrate));
+            builder.Services.AddScoped<IZionInitializer, QueryStoreInitializer<TQueryStoreDbContext>>();
+            builder.Services.AddSingleton(new QueryStoreOptions<TQueryStoreDbContext>(autoMigrate));
 
             if (type == QueryStoreType.Buffered)
-                builder.RegisterBufferedQueryStore();
+                builder.RegisterBufferedQueryStore<TQueryStoreDbContext>();
             else
-                builder.Services.TryAddSingleton<IQueryStore, QueryStore>();
+                builder.Services.TryAddSingleton<IQueryStore<TQueryStoreDbContext>, QueryStore<TQueryStoreDbContext>>();
 
             return builder;
         }
 
-        private static void RegisterBufferedQueryStore(this IZionEntityFrameworkCoreBuilder builder)
+        private static void RegisterBufferedQueryStore<TQueryStoreDbContext>(this IZionEntityFrameworkCoreBuilder builder)
+            where TQueryStoreDbContext : QueryStoreDbContext
         {
-            builder.Services.TryAddSingleton<BufferedQueryStore>();
-            builder.Services.TryAddSingleton<IQueryStore>(sp => sp.GetRequiredService<BufferedQueryStore>());
-            builder.Services.AddHostedService(sp => sp.GetRequiredService<BufferedQueryStore>());
+            builder.Services.TryAddSingleton<EntityFrameworkCore.Queries.Stores.BufferedQueryStore<TQueryStoreDbContext>>();
+            builder.Services.TryAddSingleton<IQueryStore<TQueryStoreDbContext>>(sp => sp.GetRequiredService<EntityFrameworkCore.Queries.Stores.BufferedQueryStore<TQueryStoreDbContext>>());
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<EntityFrameworkCore.Queries.Stores.BufferedQueryStore<TQueryStoreDbContext>>());
         }
     }
 }

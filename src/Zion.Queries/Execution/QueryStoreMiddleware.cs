@@ -2,12 +2,12 @@
 
 namespace Zion.Queries.Execution
 {
-    internal class QueryStoreMiddleware<TQuery, TResult> : IPostQueryMiddleware<TQuery, TResult>
+    internal class QueryStoreMiddleware<TQuery, TResult, TQueryStoreContext> : IPostQueryMiddleware<TQuery, TResult>
         where TQuery : IQuery<TResult>
     {
-        private readonly IQueryStore _queryStore;
+        private readonly IQueryStore<TQueryStoreContext> _queryStore;
 
-        public QueryStoreMiddleware(IQueryStore queryStore)
+        public QueryStoreMiddleware(IQueryStore<TQueryStoreContext> queryStore)
         {
             if (queryStore is null)
                 throw new ArgumentNullException(nameof(queryStore));

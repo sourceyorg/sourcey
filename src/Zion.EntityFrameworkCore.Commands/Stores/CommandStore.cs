@@ -7,7 +7,8 @@ using Zion.EntityFrameworkCore.Commands.DbContexts;
 
 namespace Zion.EntityFrameworkCore.Commands.Stores
 {
-    internal sealed class CommandStore : ICommandStore
+    internal sealed class CommandStore<TCommandStoreDbContext> : ICommandStore<TCommandStoreDbContext>
+        where TCommandStoreDbContext : CommandStoreDbContext
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ICommandSerializer _commandSerializer;
@@ -33,7 +34,7 @@ namespace Zion.EntityFrameworkCore.Commands.Stores
             var data = _commandSerializer.Serialize(command);
 
             using var scope = _serviceScopeFactory.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<CommandStoreDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<TCommandStoreDbContext>();
 
             await context.Commands.AddAsync(new Entities.Command
             {

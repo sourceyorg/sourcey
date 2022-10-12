@@ -2,7 +2,7 @@
 
 namespace Zion.Commands.Stores
 {
-    public abstract class BufferedCommandStore : BufferedStore<ICommand>, ICommandStore
+    public abstract class BufferedCommandStore<TCommandStoreContext> : BufferedStore<ICommand>, ICommandStore<TCommandStoreContext>
     {
     }
 }

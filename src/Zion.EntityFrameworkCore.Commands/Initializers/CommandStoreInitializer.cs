@@ -6,15 +6,16 @@ using Zion.EntityFrameworkCore.Commands.DbContexts;
 
 namespace Zion.EntityFrameworkCore.Commands.Initializers
 {
-    internal sealed class CommandStoreInitializer : IZionInitializer
+    internal sealed class CommandStoreInitializer<TCommandStoreDbContext> : IZionInitializer
+        where TCommandStoreDbContext : CommandStoreDbContext
     {
         public bool ParallelEnabled => false;
-        private readonly CommandStoreOptions _options;
+        private readonly CommandStoreOptions<TCommandStoreDbContext> _options;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
 
         public CommandStoreInitializer(IServiceScopeFactory serviceScopeFactory,
-            CommandStoreOptions options)
+            CommandStoreOptions<TCommandStoreDbContext> options)
         {
             if (serviceScopeFactory is null)
                 throw new ArgumentNullException(nameof(serviceScopeFactory));
@@ -31,7 +32,7 @@ namespace Zion.EntityFrameworkCore.Commands.Initializers
                 return;
 
             using var scope = _serviceScopeFactory.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<CommandStoreDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<TCommandStoreDbContext>();
 
             await context.Database.MigrateAsync();
         }

@@ -33,9 +33,9 @@ namespace Zion.Queries.Builder
             return this;
         }
 
-        public IZionQueryBuilder<TQuery, TResult> WithQueryStoreLogging()
+        public IZionQueryBuilder<TQuery, TResult> WithQueryStoreLogging<TQueryStoreContext>()
         {
-            _services.AddScoped<IPostQueryMiddleware<TQuery, TResult>, QueryStoreMiddleware<TQuery, TResult>>();
+            _services.AddScoped<IPostQueryMiddleware<TQuery, TResult>, QueryStoreMiddleware<TQuery, TResult, TQueryStoreContext>>();
             return this;
         }
 

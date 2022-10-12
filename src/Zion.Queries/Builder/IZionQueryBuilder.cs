@@ -11,6 +11,6 @@ namespace Zion.Queries.Builder
             where TMiddleWare : class, IQueryHandlerMiddleware<TQuery, TResult>;
         IZionQueryBuilder<TQuery, TResult> AfterHandler<TMiddleWare>()
             where TMiddleWare : class, IQueryHandlerMiddleware<TQuery, TResult>;
-        IZionQueryBuilder<TQuery, TResult> WithQueryStoreLogging();
+        IZionQueryBuilder<TQuery, TResult> WithQueryStoreLogging<TQueryStoreContext>();
     }
 }

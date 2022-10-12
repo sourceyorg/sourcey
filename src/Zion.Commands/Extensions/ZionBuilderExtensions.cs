@@ -12,7 +12,6 @@ namespace Zion.Extensions
         public static IZionBuilder AddCommand<TCommand>(this IZionBuilder builder, Action<IZionCommandBuilder<TCommand>> configuration)
             where TCommand : ICommand
         {
-            builder.Services.TryAddScoped<ICommandStore, NoOpCommandStore>();
             builder.Services.TryAddScoped<ICommandDispatcher, CommandDispatcher>();
 
             var zionCommandBuilder = new ZionCommandBuilder<TCommand>(builder.Services);

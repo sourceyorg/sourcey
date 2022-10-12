@@ -2,12 +2,12 @@
 
 namespace Zion.Commands.Execution
 {
-    internal sealed class CommandStoreMiddleware<TCommand> : IPostCommandMiddleware<TCommand>
+    internal sealed class CommandStoreMiddleware<TCommand, TCommandStoreContext> : IPostCommandMiddleware<TCommand>
         where TCommand : ICommand
     {
-        private readonly ICommandStore _commandStore;
+        private readonly ICommandStore<TCommandStoreContext> _commandStore;
 
-        public CommandStoreMiddleware(ICommandStore commandStore)
+        public CommandStoreMiddleware(ICommandStore<TCommandStoreContext> commandStore)
         {
             if (commandStore is null)
                 throw new ArgumentNullException(nameof(commandStore));

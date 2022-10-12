@@ -7,7 +7,8 @@ using Zion.Queries.Serialization;
 
 namespace Zion.EntityFrameworkCore.Queries.Stores
 {
-    internal sealed class BufferedQueryStore : Zion.Queries.Stores.BufferedQueryStore
+    internal sealed class BufferedQueryStore<TQueryStoreDbContext> : Zion.Queries.Stores.BufferedQueryStore<TQueryStoreDbContext>
+        where TQueryStoreDbContext : QueryStoreDbContext
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IQuerySerializer _querySerializer;
@@ -33,7 +34,7 @@ namespace Zion.EntityFrameworkCore.Queries.Stores
             var data = _querySerializer.Serialize(query);
             
             using var scope = _serviceScopeFactory.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<QueryStoreDbContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<TQueryStoreDbContext>();
 
             await context.Queries.AddAsync(new Query
             {
