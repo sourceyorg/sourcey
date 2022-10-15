@@ -36,7 +36,7 @@ namespace Zion.EntityFrameworkCore.Events.Factories
                 Data = _eventSerializer.Serialize(@event),
                 Id = @event.Id,
                 Name = type.Name,
-                Type = type.FriendlyFullName(),
+                Type = type.FriendlyName(),
                 Timestamp = @event.Timestamp,
                 Actor = context.Actor,
                 ScheduledPublication = context.ScheduledPublication,
