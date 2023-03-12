@@ -6,8 +6,9 @@ namespace Zion.Serialization.Json.ValueProviders
     public sealed class ImmutablePropertyValueProvider : IValueProvider
     {
         private readonly MemberInfo _member;
+        private readonly FieldInfo _compilerField;
 
-        public ImmutablePropertyValueProvider(MemberInfo member)
+        public ImmutablePropertyValueProvider(MemberInfo member, FieldInfo compilerField)
         {
             if (member == null)
                 throw new ArgumentNullException(nameof(member));
@@ -15,6 +16,7 @@ namespace Zion.Serialization.Json.ValueProviders
                 throw new ArgumentException($"MemberInfo '{member.Name}' must be of type {nameof(FieldInfo)} or {nameof(PropertyInfo)}");
 
             _member = member;
+            _compilerField = compilerField;
         }
 
         public object GetValue(object target)
@@ -35,15 +37,10 @@ namespace Zion.Serialization.Json.ValueProviders
         }
         public void SetValue(object target, object value)
         {
-            var type = target.GetType();
+            if (_compilerField == null)
+                throw new InvalidOperationException($"Cannot set value for '{_member.Name}' for '{target.GetType()}'. Compiler generated backing field '<{_member.Name}>k__BackingField' is missing.");
 
-            var memberName = _member.Name;
-            var compilerField = target.GetType().GetField($"<{memberName}>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-
-            if (compilerField == null)
-                throw new InvalidOperationException($"Cannot set value for '{memberName}' for '{type.Name}'. Compiler generated backing field '<{memberName}>k__BackingField' is missing.");
-
-            compilerField.SetValue(target, value);
+            _compilerField.SetValue(target, value);
         }
     }
 }

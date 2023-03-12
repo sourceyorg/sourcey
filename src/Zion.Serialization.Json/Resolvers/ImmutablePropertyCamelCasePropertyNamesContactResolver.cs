@@ -30,7 +30,7 @@ namespace Zion.Serialization.Json.Resolvers
                 if (compilerField != null)
                 {
                     prop.Writable = true;
-                    prop.ValueProvider = new ImmutablePropertyValueProvider(member);
+                    prop.ValueProvider = new ImmutablePropertyValueProvider(member, compilerField);
                 }
             }
 

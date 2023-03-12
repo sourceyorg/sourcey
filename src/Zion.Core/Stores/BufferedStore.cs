@@ -1,32 +1,32 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Threading.Channels;
 using Microsoft.Extensions.Hosting;
 
 namespace Zion.Core.Stores
 {
     public abstract class BufferedStore<TItem> : BackgroundService
     {
-        private readonly PeriodicTimer _periodicTimer = new(TimeSpan.FromSeconds(5));
-        private readonly ConcurrentQueue<TItem> _itemQueue = new();
+        private readonly Channel<TItem> _itemQueue = Channel.CreateUnbounded<TItem>(new UnboundedChannelOptions
+        {
+            SingleWriter = false,
+            SingleReader = true
+        });
 
         public Task SaveAsync(TItem item, CancellationToken cancellationToken = default)
             => InternalSaveAsync(item, cancellationToken);
 
-        protected Task InternalSaveAsync(TItem item, CancellationToken cancellationToken = default)
+        protected async Task InternalSaveAsync(TItem item, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            _itemQueue.Enqueue(item);
-            return Task.CompletedTask;
+            await _itemQueue.Writer.WriteAsync(item, cancellationToken);
         }
 
         protected abstract Task ConsumeAsync(TItem item, CancellationToken cancellationToken);
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (await _periodicTimer.WaitForNextTickAsync(stoppingToken))
-                while(_itemQueue.Any())
-                    if (_itemQueue.TryDequeue(out var item))
-                        await ConsumeAsync(item, stoppingToken);
+            await foreach(var item in _itemQueue.Reader.ReadAllAsync(stoppingToken))
+                await ConsumeAsync(item, stoppingToken);
         }
     }
 }
