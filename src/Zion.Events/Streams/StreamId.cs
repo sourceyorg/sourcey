@@ -13,7 +13,7 @@ namespace Zion.Events.Streams
 
         public static StreamId New()
         {
-            var value = Base64UrlIdGenerator.New();
+            var value = ZionIdGenerator.New();
 
             return new StreamId(value);
         }

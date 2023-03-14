@@ -13,7 +13,7 @@ namespace Zion.RabbitMQ.Connections
 
         public static ConnectionId New()
         {
-            var value = Base64UrlIdGenerator.New();
+            var value = ZionIdGenerator.New();
 
             return new ConnectionId(value);
         }

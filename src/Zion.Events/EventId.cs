@@ -13,7 +13,7 @@ namespace Zion.Events
 
         public static EventId New()
         {
-            var value = Base64UrlIdGenerator.New();
+            var value = ZionIdGenerator.New();
 
             return new EventId(value);
         }

@@ -11,7 +11,7 @@
 
         public static Actor New()
         {
-            var value = Base64UrlIdGenerator.New();
+            var value = ZionIdGenerator.New();
 
             return new Actor(value);
         }

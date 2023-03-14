@@ -13,7 +13,7 @@ namespace Zion.Commands
 
         public static CommandId New()
         {
-            var value = Base64UrlIdGenerator.New();
+            var value = ZionIdGenerator.New();
 
             return new CommandId(value);
         }

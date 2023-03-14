@@ -13,7 +13,7 @@ namespace Zion.AWS.SQS
 
         public static SQSQueue New()
         {
-            var value = Base64UrlIdGenerator.New();
+            var value = ZionIdGenerator.New();
 
             return new SQSQueue(value);
         }

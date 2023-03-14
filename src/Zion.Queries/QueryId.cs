@@ -13,7 +13,7 @@ namespace Zion.Queries
 
         public static QueryId New()
         {
-            var value = Base64UrlIdGenerator.New();
+            var value = ZionIdGenerator.New();
 
             return new QueryId(value);
         }
