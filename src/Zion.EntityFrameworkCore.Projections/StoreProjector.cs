@@ -25,6 +25,7 @@ namespace Zion.EntityFrameworkCore.Projections
         private readonly IOptionsMonitor<StoreProjectorOptions<TProjection>> _options;
         private readonly IProjectionDbContextFactory _projectionDbContextFactory;
         private readonly string _name;
+        private int _retries;
 
         public StoreProjector(IServiceScopeFactory serviceScopeFactory,
             ILogger<StoreProjector<TProjection, TDbContextStore>> logger)
@@ -89,13 +90,27 @@ namespace Zion.EntityFrameworkCore.Projections
                         {
                             state.Position = page.Offset;
                             state.LastModifiedDate = DateTimeOffset.UtcNow;
+                            state.Error = "";
+                            state.ErrorStackTrace = "";
                         }, cancellationToken);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogCritical(ex, $"Process '{typeof(TProjection).Name}' failed at postion '{state.Position}' due to an unexpected error. See exception details for more information.");
-                    break;
+                    _logger.LogCritical(ex, "Process '{Process}' failed at postion '{Position}' due to an unexpected error. See exception details for more information.", typeof(TProjection).Name, state?.Position ?? 0);
+
+                    if(_retries++ > _options.CurrentValue.RetryCount)
+                    {
+                        _logger.LogCritical("Process '{Process}' stopped executed due to hitting maximum retries of: {Retries}", typeof(TProjection).Name, _options.CurrentValue.RetryCount);
+
+                        await _projectionStateManager.UpdateAsync(state =>
+                        {
+                            state.Error = ex.Message;
+                            state.ErrorStackTrace = ex.StackTrace;
+                        }, cancellationToken);
+
+                        break;
+                    }
                 }
             }
         }

@@ -10,6 +10,7 @@
             where TException : Exception;
         bool TryGetExceptionsByType<TException>(out IEnumerable<TException>? exceptions, CancellationToken cancellationToken = default)
             where TException : Exception;
+        bool Any(CancellationToken cancellationToken);
         Exception? GetLastException(CancellationToken cancellationToken = default);
         Exception? GetFirstException(CancellationToken cancellationToken = default);
         IEnumerable<Exception> GetExceptions(CancellationToken cancellationToken = default);

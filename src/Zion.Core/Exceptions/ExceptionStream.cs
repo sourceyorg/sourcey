@@ -188,6 +188,9 @@ namespace Zion.Core.Exceptions
 
             throw exceptions.Last();
         }
+
+        public bool Any(CancellationToken cancellationToken)
+            => _exceptions.Any();
     }
 
     internal record CachedException(string Key, int Order, Exception Exception);
