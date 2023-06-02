@@ -8,5 +8,6 @@ namespace Zion.Projections.Builder
         IServiceCollection Services { get; }
         IZionProjectionBuilder<TProjection> WithManager<TProjectionManager>()
             where TProjectionManager : class, IProjectionManager<TProjection>;
+        IZionProjectionBuilder<TProjection> WithDistributedCache(Func<IServiceProvider, IProjectionWriter<TProjection>[], IProjectionManager<TProjection>> factory);
     }
 }
