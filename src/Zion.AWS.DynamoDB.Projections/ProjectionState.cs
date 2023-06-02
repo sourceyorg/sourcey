@@ -11,5 +11,7 @@ namespace Zion.AWS.DynamoDB.Projections
         public long Position { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset? LastModifiedDate { get; set; }
+        public string? Error { get; set; }
+        public string? ErrorStackTrace { get; set; }
     }
 }
