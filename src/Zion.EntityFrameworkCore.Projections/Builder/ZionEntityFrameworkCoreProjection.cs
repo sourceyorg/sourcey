@@ -8,6 +8,7 @@ namespace Zion.EntityFrameworkCore.Projections.Builder
     {
         private int? _interval;
         private int? _pageSize;
+        private int? _retryCount;
 
         public IZionEntityFrameworkCoreProjection<TProjection> WithInterval(int interval)
         {
@@ -17,7 +18,13 @@ namespace Zion.EntityFrameworkCore.Projections.Builder
 
         public IZionEntityFrameworkCoreProjection<TProjection> WithPageSize(int pageSize)
         {
-            _interval = pageSize;
+            _pageSize = pageSize;
+            return this;
+        }
+
+        public IZionEntityFrameworkCoreProjection<TProjection> WithRetries(int retryCount)
+        {
+            _retryCount = retryCount;
             return this;
         }
 
@@ -26,6 +33,7 @@ namespace Zion.EntityFrameworkCore.Projections.Builder
             {
                 o.Interval = _interval ?? StoreProjectorOptions<TProjection>.Default.Interval;
                 o.PageSize = _pageSize ?? StoreProjectorOptions<TProjection>.Default.PageSize;
+                o.RetryCount = _retryCount ?? StoreProjectorOptions<TProjection>.Default.RetryCount;
             };
     }
 }

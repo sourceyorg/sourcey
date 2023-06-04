@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Zion.EntityFrameworkCore.Projections.DbContexts;
-using Zion.Projections;
+﻿using Zion.Projections;
 
 namespace Zion.EntityFrameworkCore.Projections.Builder
 {
@@ -8,5 +6,7 @@ namespace Zion.EntityFrameworkCore.Projections.Builder
         where TProjection : class, IProjection
     {
         IZionEntityFrameworkCoreProjection<TProjection> WithInterval(int interval);
+        IZionEntityFrameworkCoreProjection<TProjection> WithPageSize(int pageSize);
+        IZionEntityFrameworkCoreProjection<TProjection> WithRetries(int retryCount);
     }
 }
