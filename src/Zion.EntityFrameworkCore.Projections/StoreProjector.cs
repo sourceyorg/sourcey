@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,7 @@ namespace Zion.EntityFrameworkCore.Projections
         private readonly IOptionsMonitor<StoreProjectorOptions<TProjection>> _options;
         private readonly IProjectionDbContextFactory _projectionDbContextFactory;
         private readonly string _name;
-        private int _retries;
+        private int _retries = 0;
 
         public StoreProjector(IServiceScopeFactory serviceScopeFactory,
             ILogger<StoreProjector<TProjection, TDbContextStore>> logger)
@@ -97,22 +98,44 @@ namespace Zion.EntityFrameworkCore.Projections
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogCritical(ex, "Process '{Process}' failed at postion '{Position}' due to an unexpected error. See exception details for more information.", typeof(TProjection).Name, state?.Position ?? 0);
+                    _retries++;
+                    _logger.LogCritical("Process '{process}', retries: {retries} of {max}", _name, _retries, _options.CurrentValue.RetryCount);
 
-                    if(_retries++ > _options.CurrentValue.RetryCount)
+                    if(_retries == _options.CurrentValue.RetryCount)
                     {
-                        _logger.LogCritical("Process '{Process}' stopped executed due to hitting maximum retries of: {Retries}", typeof(TProjection).Name, _options.CurrentValue.RetryCount);
+                        _logger.LogCritical("Process '{Process}' stopped executed due to hitting maximum retries of: {Retries}", _name, _options.CurrentValue.RetryCount);
+
+                        var (error, errorStackTrace) = GetError(ex);
 
                         await _projectionStateManager.UpdateAsync(state =>
                         {
-                            state.Error = ex.Message;
-                            state.ErrorStackTrace = ex.StackTrace;
+                            state.Error = error.ToString();
+                            state.ErrorStackTrace = errorStackTrace.ToString();
                         }, cancellationToken);
 
                         break;
                     }
                 }
             }
+        }
+
+        private (StringBuilder error, StringBuilder errorStackTrace) GetError(Exception ex, StringBuilder? error = null, StringBuilder? errorStackTrace = null)
+        {
+            error ??= new StringBuilder();
+            errorStackTrace ??= new StringBuilder();
+
+            error.AppendLine();
+            error.AppendLine(ex.Message);
+
+            errorStackTrace.AppendLine();
+            errorStackTrace.AppendLine(ex.StackTrace);
+
+            if (ex.InnerException is not null)
+            {
+                return GetError(ex.InnerException, error, errorStackTrace);
+            }
+
+            return (error, errorStackTrace);
         }
 
         private async Task ProjectStreamAsync(IEnumerable<IEventContext<IEvent>> events, CancellationToken cancellationToken = default)
