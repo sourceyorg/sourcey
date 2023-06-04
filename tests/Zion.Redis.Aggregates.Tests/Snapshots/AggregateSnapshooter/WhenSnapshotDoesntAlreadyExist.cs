@@ -24,7 +24,7 @@ namespace Zion.Redis.Aggregates.Tests.Snapshots.AggregateSnapshooter
         public async Task ThenSnapshotShouldBeSaved()
         {
             var connectionMultiplexer = ServiceProvider.GetRequiredService<IConnectionMultiplexerFactory>();
-            var connection = connectionMultiplexer.Create(_redisContainer.ConnectionString);
+            var connection = connectionMultiplexer.Create(_redisContainer.GetConnectionString());
             var db = connection.GetDatabase();
 
             string? redisCache = await db.StringGetAsync(_aggregate.Id.ToString());
