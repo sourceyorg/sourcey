@@ -39,13 +39,13 @@ namespace Zion.Azure.ServiceBus.Queues
             if (_running)
                 return;
 
-            _logger.LogInformation($"Starting Azure Service bus");
+            _logger.LogInformation("Starting Azure Service bus queue: {queue}", _queueName);
 
             _client = await _queueClientManager.RegisterClientAsync(_queueName);
 
             _running = true;
 
-            _logger.LogInformation($"Successfully started Azure Service bus");
+            _logger.LogInformation("Successfully started Azure Service bus queue: {queue}", _queueName);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken = default)
@@ -53,14 +53,14 @@ namespace Zion.Azure.ServiceBus.Queues
             if (!_running)
                 return;
 
-            _logger.LogInformation($"Stopping Azure Service bus");
+            _logger.LogInformation("Stopping Azure Service bus queue: {queue}", _queueName);
 
             if (_client is not null)
                 await _client.CloseAsync();
 
             _running = false;
 
-            _logger.LogInformation($"Successfully stopped Azure Service bus");
+            _logger.LogInformation("Successfully stopped Azure Service bus queue: {queue}", _queueName);
         }
     }
 }

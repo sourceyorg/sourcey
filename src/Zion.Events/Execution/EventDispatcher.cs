@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Zion.Core.Extensions;
 using Zion.Events.Stores;
 using Zion.Extensions;
@@ -31,7 +32,7 @@ namespace Zion.Events.Execution
 
             _logger.LogInformation($"Dispatching event '{typeof(TEvent).FriendlyName()}'.");
 
-            var handlers = _serviceProvider.GetRequiredServices<IEventHandler<TEvent>>();
+            var handlers = _serviceProvider.GetServices<IEventHandler<TEvent>>();
 
             _logger.LogInformation($"Resolved {handlers.Count()} handlers for event '{typeof(TEvent).FriendlyName()}'.");
 

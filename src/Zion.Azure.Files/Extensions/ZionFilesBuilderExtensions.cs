@@ -12,7 +12,7 @@ namespace Zion.Azure.Files.Extensions
             var options = new FileClientOptions();
             action(options);
 
-            builder.Services.TryAddSingleton<IFileClient, FileClient>();
+            builder.Services.TryAddScoped<IFileClient, FileClient>();
 
             builder.Services.AddAzureClients(clientBuilder 
                 => clientBuilder.AddBlobServiceClient(options.ConnectionString)

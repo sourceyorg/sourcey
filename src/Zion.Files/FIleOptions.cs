@@ -1,4 +1,4 @@
 ﻿namespace Zion.Files
 {
-    public record FileOptions(Root Root, Folder Folder, File File);
+    public record FileOptions(string Root, string Folder, string File);
 }

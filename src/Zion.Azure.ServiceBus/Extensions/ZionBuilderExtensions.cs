@@ -88,6 +88,7 @@ namespace Zion.Extensions
 
             builder.Services.TryAddScoped<IEventQueuePublisher, EventQueuePublisher>();
             builder.Services.TryAddScoped<IQueueClientFactory, QueueClientFactory>();
+            builder.Services.TryAddScoped<IQueueClientManager, QueueClientManager>();
             builder.Services.TryAddScoped<IQueueMessageReceiver, QueueMessageReceiver>();
             builder.Services.TryAddScoped<IQueueMessageSender, QueueMessageSender>();
             builder.Services.TryAddScoped<IMessageFactory, DefaultMessageFactory>();
