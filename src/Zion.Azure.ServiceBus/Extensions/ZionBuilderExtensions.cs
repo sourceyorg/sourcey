@@ -1,10 +1,14 @@
 ﻿using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Zion.Azure.ServiceBus;
 using Zion.Azure.ServiceBus.Management;
 using Zion.Azure.ServiceBus.Messages;
+using Zion.Azure.ServiceBus.Queues;
 using Zion.Azure.ServiceBus.Subscriptions;
 using Zion.Azure.ServiceBus.Topics;
 using Zion.Core.Builder;
@@ -61,6 +65,35 @@ namespace Zion.Extensions
 
                 return new ManagementClient(connectionStringBuilder);
             });
+
+            return builder;
+        }
+
+        public static IZionBuilder AddAzureServiceBusQueue(this IZionBuilder builder, Action<ServiceBusQueueOptions> optionsAction)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            var options = new ServiceBusQueueOptions();
+            optionsAction(options);
+
+            builder.Services.Configure(optionsAction);
+            builder.Services.AddSingleton(options);
+
+            if (options.EnableConsumer)
+                builder.Services.AddSingleton<IHostedService>(sp =>
+                    new EventQueueConsumer(options.EntityPath,
+                        sp.GetRequiredService<ILogger<EventQueueConsumer>>(),
+                        sp.GetRequiredService<IServiceScopeFactory>()));
+
+            builder.Services.TryAddScoped<IEventQueuePublisher, EventQueuePublisher>();
+            builder.Services.TryAddScoped<IQueueClientFactory, QueueClientFactory>();
+            builder.Services.TryAddScoped<IQueueClientManager, QueueClientManager>();
+            builder.Services.TryAddScoped<IQueueMessageReceiver, QueueMessageReceiver>();
+            builder.Services.TryAddScoped<IQueueMessageSender, QueueMessageSender>();
+            builder.Services.TryAddScoped<IMessageFactory, DefaultMessageFactory>();
+            builder.Services.TryAddScoped<IEventContextFactory, DefaultEventContextFactory>();
+            builder.Services.TryAddScoped<IServiceBusManagementClient, ServiceBusManagementClient>();
 
             return builder;
         }
