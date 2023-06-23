@@ -20,6 +20,19 @@ namespace Zion.EntityFrameworkCore.Extensions
             return builder;
         }
 
+        public static PropertyBuilder<T?> HasNullableJsonValueConversion<T>(this PropertyBuilder<T?> builder)
+            where T : class
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            builder.HasConversion(new NullableJsonValueConverter<T>())
+                   .Metadata
+                   .SetValueComparer(new NullableJsonValueComparer<T>());
+
+            return builder;
+        }
+
         public static PropertyBuilder<Causation> HasCausationValueConversion(this PropertyBuilder<Causation> builder)
         {
             if (builder == null)

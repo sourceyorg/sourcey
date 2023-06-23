@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Azure;
 using Zion.Core.Exceptions;
 using Zion.Files;
@@ -9,6 +10,7 @@ namespace Zion.Azure.Files
 {
     internal sealed class FileClient : IFileClient
     {
+        private const string ContentTypeKey = "ContentType";
         private readonly IAzureClientFactory<BlobServiceClient> _azureClientFactory;
         private readonly IExceptionStream _exceptionStream;
 
@@ -23,7 +25,29 @@ namespace Zion.Azure.Files
             _exceptionStream = exceptionStream;
         }
 
-        public async ValueTask<Stream?> DownloadAsync(FileOptions options, CancellationToken cancellationToken = default)
+        public async ValueTask DeleteAsync(FileOptions options, CancellationToken cancellationToken = default)
+        {
+            var client = _azureClientFactory.CreateClient(options.Root);
+
+            if (client is null)
+            {
+                _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
+                return;
+            }
+
+            var container = client.GetBlobContainerClient(options.Folder);
+
+            if (container is null || !await container.ExistsAsync(cancellationToken))
+            {
+                _exceptionStream.AddException(new UnableToFindContainerException($"Unable to find conatiner for: {options.Folder}"), cancellationToken);
+                return;
+            }
+
+            var blob = container.GetBlobClient(options.File);
+            await blob.DeleteAsync(cancellationToken: cancellationToken);
+        }
+
+        public async ValueTask<(Stream stream, string contentType)?> DownloadAsync(FileOptions options, CancellationToken cancellationToken = default)
         {
             var client = _azureClientFactory.CreateClient(options.Root);
 
@@ -49,10 +73,13 @@ namespace Zion.Azure.Files
                 return null;
             }
 
-            return await blob.OpenReadAsync(cancellationToken: cancellationToken);
+            var stream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
+            var properties = await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+                
+            return (stream, string.IsNullOrWhiteSpace(properties.Value.ContentType) ? "application/octet-stream" : properties.Value.ContentType);
         }
 
-        public async ValueTask UploadAsync(FileOptions options, Stream data, CancellationToken cancellationToken = default)
+        public async ValueTask UploadAsync(FileOptions options, Stream data, string contentType = "application/octet-stream", CancellationToken cancellationToken = default)
         {
             var client = _azureClientFactory.CreateClient(options.Root);
 
@@ -67,9 +94,10 @@ namespace Zion.Azure.Files
 
             var blob = container.GetBlobClient(options.File);
             await blob.UploadAsync(data, cancellationToken: cancellationToken);
+            await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
         }
 
-        public async ValueTask UploadAsync(FileOptions options, byte[] data, CancellationToken cancellationToken = default)
+        public async ValueTask UploadAsync(FileOptions options, byte[] data, string contentType = "application/octet-stream", CancellationToken cancellationToken = default)
         {
             var client = _azureClientFactory.CreateClient(options.Root);
 
@@ -86,9 +114,10 @@ namespace Zion.Azure.Files
             using var stream = await blob.OpenWriteAsync(true, cancellationToken: cancellationToken);
             await stream.WriteAsync(data, cancellationToken: cancellationToken);
             await stream.FlushAsync(cancellationToken);
+            await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
         }
 
-        public async ValueTask UploadAsync(FileOptions options, Memory<byte> data, CancellationToken cancellationToken = default)
+        public async ValueTask UploadAsync(FileOptions options, Memory<byte> data, string contentType = "application/octet-stream", CancellationToken cancellationToken = default)
         {
             var client = _azureClientFactory.CreateClient(options.Root);
 
@@ -105,9 +134,10 @@ namespace Zion.Azure.Files
             using var stream = await blob.OpenWriteAsync(true, cancellationToken: cancellationToken);
             await stream.WriteAsync(data, cancellationToken: cancellationToken);
             await stream.FlushAsync(cancellationToken);
+            await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
         }
 
-        public async ValueTask UploadAsync(FileOptions options, string data, CancellationToken cancellationToken = default)
+        public async ValueTask UploadAsync(FileOptions options, string data, string contentType = "application/octet-stream", CancellationToken cancellationToken = default)
         {
             var client = _azureClientFactory.CreateClient(options.Root);
 
@@ -124,9 +154,10 @@ namespace Zion.Azure.Files
             using var stream = await blob.OpenWriteAsync(true, cancellationToken: cancellationToken);
             await stream.WriteAsync(Encoding.Unicode.GetBytes(data), cancellationToken: cancellationToken);
             await stream.FlushAsync(cancellationToken);
+            await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
         }
 
-        public async ValueTask UploadAsync(FileOptions options, Memory<char> data, CancellationToken cancellationToken = default)
+        public async ValueTask UploadAsync(FileOptions options, Memory<char> data, string contentType = "application/octet-stream", CancellationToken cancellationToken = default)
         {
             var client = _azureClientFactory.CreateClient(options.Root);
 
@@ -143,6 +174,7 @@ namespace Zion.Azure.Files
             using var stream = await blob.OpenWriteAsync(true, cancellationToken: cancellationToken);
             await stream.WriteAsync(Encoding.Unicode.GetBytes(data.ToArray()), cancellationToken: cancellationToken);
             await stream.FlushAsync(cancellationToken);
+            await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
         }
     }
 }
