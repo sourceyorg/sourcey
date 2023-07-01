@@ -110,6 +110,24 @@ namespace Zion.EntityFrameworkCore.Projections
             return view;
         }
 
+        public async Task<TProjection> AddOrUpdateAsync(string subject, Action<TProjection> update, CancellationToken cancellationToken = default)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogInformation($"{nameof(ProjectionWriter<TProjection>)}.{nameof(UpdateAsync)} was cancelled before execution");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            
+            using var context = _projectionDbContextFactory.Create<TProjection>();
+
+            var entity = await context.Set<TProjection>().FindAsync(subject) ??= new();
+            update(entity);
+            context.Set<TProjection>().Update(entity);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return entity;
+        }
+
         public async Task ResetAsync(CancellationToken cancellationToken = default)
         {
             if (cancellationToken.IsCancellationRequested)

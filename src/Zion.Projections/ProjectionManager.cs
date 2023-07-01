@@ -50,6 +50,8 @@ namespace Zion.Projections
 
         protected virtual async Task AddAsync(string subject, Func<TProjection> add, CancellationToken cancellationToken = default)
             => await Task.WhenAll(_projectionWriters.Select(pw => pw.AddAsync(subject, add, cancellationToken)));
+        protected virtual async Task AddOrUpdateAsync(string subject, Action<TProjection> update, CancellationToken cancellationToken = default)
+            => await Task.WhenAll(_projectionWriters.Select(pw => pw.AddOrUpdateAsync(subject, update, cancellationToken)));
         protected virtual async Task UpdateAsync(string subject, Func<TProjection, TProjection> update, CancellationToken cancellationToken = default)
             => await Task.WhenAll(_projectionWriters.Select(pw => pw.UpdateAsync(subject, update, cancellationToken)));
         protected virtual async Task UpdateAsync(string subject, Action<TProjection> update, CancellationToken cancellationToken = default)
