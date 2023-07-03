@@ -6,7 +6,7 @@ using Zion.Projections;
 namespace Zion.EntityFrameworkCore.Projections
 {
     internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProjection>
-        where TProjection : class, IProjection
+        where TProjection : class, IProjection, new()
     {
         private readonly IProjectionDbContextFactory _projectionDbContextFactory;
         private readonly ILogger<ProjectionWriter<TProjection>> _logger;
@@ -120,7 +120,8 @@ namespace Zion.EntityFrameworkCore.Projections
             
             using var context = _projectionDbContextFactory.Create<TProjection>();
 
-            var entity = await context.Set<TProjection>().FindAsync(subject) ??= new();
+            var entity = await context.Set<TProjection>().FindAsync(subject);
+            entity ??= new();
             update(entity);
             context.Set<TProjection>().Update(entity);
             await context.SaveChangesAsync(cancellationToken);
