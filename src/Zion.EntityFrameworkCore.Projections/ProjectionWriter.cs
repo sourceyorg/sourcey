@@ -6,7 +6,7 @@ using Zion.Projections;
 namespace Zion.EntityFrameworkCore.Projections
 {
     internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProjection>
-        where TProjection : class, IProjection, new()
+        where TProjection : class, IProjection
     {
         private readonly IProjectionDbContextFactory _projectionDbContextFactory;
         private readonly ILogger<ProjectionWriter<TProjection>> _logger;
@@ -36,11 +36,11 @@ namespace Zion.EntityFrameworkCore.Projections
 
             var entity = add();
 
-            using (var context = _projectionDbContextFactory.Create<TProjection>())
-            {
-                await context.Set<TProjection>().AddAsync(entity);
-                await context.SaveChangesAsync(cancellationToken);
-            }
+            using var context = _projectionDbContextFactory.Create<TProjection>();
+
+            await context.Set<TProjection>().AddAsync(entity, cancellationToken: cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+
 
             return entity;
         }
@@ -53,17 +53,17 @@ namespace Zion.EntityFrameworkCore.Projections
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            using (var context = _projectionDbContextFactory.Create<TProjection>())
-            {
-                var entity = await context.Set<TProjection>().FindAsync(subject);
+            using var context = _projectionDbContextFactory.Create<TProjection>();
 
-                if (entity == null)
-                    return;
+            var entity = await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken);
 
-                context.Set<TProjection>().Remove(entity);
+            if (entity == null)
+                return;
 
-                await context.SaveChangesAsync(cancellationToken);
-            }
+            context.Set<TProjection>().Remove(entity);
+
+            await context.SaveChangesAsync(cancellationToken);
+
         }
 
         public async Task<TProjection> UpdateAsync(string subject, Func<TProjection, TProjection> update, CancellationToken cancellationToken = default)
@@ -76,19 +76,19 @@ namespace Zion.EntityFrameworkCore.Projections
 
             TProjection entity;
 
-            using (var context = _projectionDbContextFactory.Create<TProjection>())
-            {
-                entity = await context.Set<TProjection>().FindAsync(subject);
+            var context = _projectionDbContextFactory.Create<TProjection>();
 
-                if (entity == null)
-                    return null;
+            entity = await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken);
 
-                update(entity);
+            if (entity == null)
+                return null;
 
-                context.Set<TProjection>().Update(entity);
+            update(entity);
 
-                await context.SaveChangesAsync(cancellationToken);
-            }
+            context.Set<TProjection>().Update(entity);
+
+            await context.SaveChangesAsync(cancellationToken);
+
 
             return entity;
         }
@@ -110,20 +110,27 @@ namespace Zion.EntityFrameworkCore.Projections
             return view;
         }
 
-        public async Task<TProjection> AddOrUpdateAsync(string subject, Action<TProjection> update, CancellationToken cancellationToken = default)
+        public async Task<TProjection> AddOrUpdateAsync(string subject, Action<TProjection> update, Func<TProjection> create, CancellationToken cancellationToken = default)
         {
             if (cancellationToken.IsCancellationRequested)
             {
                 _logger.LogInformation($"{nameof(ProjectionWriter<TProjection>)}.{nameof(UpdateAsync)} was cancelled before execution");
                 cancellationToken.ThrowIfCancellationRequested();
             }
-            
+
             using var context = _projectionDbContextFactory.Create<TProjection>();
 
-            var entity = await context.Set<TProjection>().FindAsync(subject);
-            entity ??= new();
-            update(entity);
-            context.Set<TProjection>().Update(entity);
+            var entity = await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken);
+            if (entity is not null)
+            {
+                update(entity);
+                context.Set<TProjection>().Update(entity);
+            }
+            else
+            {
+                entity = create();
+                await context.Set<TProjection>().AddAsync(entity, cancellationToken: cancellationToken);
+            }
             await context.SaveChangesAsync(cancellationToken);
 
             return entity;
@@ -137,13 +144,11 @@ namespace Zion.EntityFrameworkCore.Projections
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            using (var context = _projectionDbContextFactory.Create<TProjection>())
-            {
-                var projections = context.Set<TProjection>().ToArray();
-                context.Set<TProjection>().RemoveRange(projections);
+            using var context = _projectionDbContextFactory.Create<TProjection>();
+            var projections = context.Set<TProjection>().ToArray();
+            context.Set<TProjection>().RemoveRange(projections);
 
-                await context.SaveChangesAsync(cancellationToken);
-            }
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<TProjection> RetrieveAsync(string subject, CancellationToken cancellationToken = default)
@@ -154,10 +159,8 @@ namespace Zion.EntityFrameworkCore.Projections
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            using (var context = _projectionDbContextFactory.Create<TProjection>())
-            {
-                return await context.Set<TProjection>().FindAsync(subject);
-            }
+            using var context = _projectionDbContextFactory.Create<TProjection>();
+            return await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken);
         }
     }
 }
