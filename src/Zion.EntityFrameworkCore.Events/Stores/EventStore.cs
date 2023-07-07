@@ -88,7 +88,10 @@ namespace Zion.EntityFrameworkCore.Events.Stores
             foreach (var task in eventsByStreamId)
                 results.Add(await task);
 
-            return new Page(offset + events.Count, offset, results);
+
+            var sequenceNumbers = events.Select(e => e.SequenceNo);
+
+            return new Page(sequenceNumbers.Any() ? sequenceNumbers.Max() + 1 : offset, offset, results);
         }
 
         private Task<KeyValuePair<StreamId, IEnumerable<IEventContext<IEvent>>>> GetValuesAsync(StreamId streamId, IEnumerable<Entities.Event> events)
