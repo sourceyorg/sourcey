@@ -10,7 +10,6 @@ namespace Zion.Azure.Files
 {
     internal sealed class FileClient : IFileClient
     {
-        private const string ContentTypeKey = "ContentType";
         private readonly IAzureClientFactory<BlobServiceClient> _azureClientFactory;
         private readonly IExceptionStream _exceptionStream;
 
@@ -27,154 +26,122 @@ namespace Zion.Azure.Files
 
         public async ValueTask DeleteAsync(FileOptions options, CancellationToken cancellationToken = default)
         {
-            var client = _azureClientFactory.CreateClient(options.Root);
-
-            if (client is null)
+            try
             {
-                _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
-                return;
+
+                var client = _azureClientFactory.CreateClient(options.Root);
+
+                if (client is null)
+                {
+                    _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
+                    return;
+                }
+
+                var container = client.GetBlobContainerClient(options.Folder);
+
+                if (container is null || !await container.ExistsAsync(cancellationToken))
+                {
+                    _exceptionStream.AddException(new UnableToFindContainerException($"Unable to find conatiner for: {options.Folder}"), cancellationToken);
+                    return;
+                }
+
+                var blob = container.GetBlobClient(options.File);
+                await blob.DeleteAsync(cancellationToken: cancellationToken);
             }
-
-            var container = client.GetBlobContainerClient(options.Folder);
-
-            if (container is null || !await container.ExistsAsync(cancellationToken))
+            catch (Exception ex)
             {
-                _exceptionStream.AddException(new UnableToFindContainerException($"Unable to find conatiner for: {options.Folder}"), cancellationToken);
-                return;
+                _exceptionStream.AddException(ex, cancellationToken);
             }
-
-            var blob = container.GetBlobClient(options.File);
-            await blob.DeleteAsync(cancellationToken: cancellationToken);
         }
 
         public async ValueTask<(Stream stream, string contentType)?> DownloadAsync(FileOptions options, CancellationToken cancellationToken = default)
         {
-            var client = _azureClientFactory.CreateClient(options.Root);
-
-            if (client is null)
+            try
             {
-                _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
+                var client = _azureClientFactory.CreateClient(options.Root);
+
+                if (client is null)
+                {
+                    _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
+                    return null;
+                }
+
+                var container = client.GetBlobContainerClient(options.Folder);
+
+                if (container is null || !await container.ExistsAsync(cancellationToken))
+                {
+                    _exceptionStream.AddException(new UnableToFindContainerException($"Unable to find conatiner for: {options.Folder}"), cancellationToken);
+                    return null;
+                }
+
+                var blob = container.GetBlobClient(options.File);
+
+                if (blob is null || !await blob.ExistsAsync(cancellationToken))
+                {
+                    _exceptionStream.AddException(new UnableToFindBlobException($"Unable to find blob for: {options.File}"), cancellationToken);
+                    return null;
+                }
+
+                var stream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
+                var properties = await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
+
+                return (stream, string.IsNullOrWhiteSpace(properties.Value.ContentType) ? "application/octet-stream" : properties.Value.ContentType);
+            }
+            catch (Exception ex)
+            {
+                _exceptionStream.AddException(ex, cancellationToken);
                 return null;
             }
-
-            var container = client.GetBlobContainerClient(options.Folder);
-
-            if (container is null || !await container.ExistsAsync(cancellationToken))
-            {
-                _exceptionStream.AddException(new UnableToFindContainerException($"Unable to find conatiner for: {options.Folder}"), cancellationToken);
-                return null;
-            }
-
-            var blob = container.GetBlobClient(options.File);
-
-            if(blob is null || !await blob.ExistsAsync(cancellationToken))
-            {
-                _exceptionStream.AddException(new UnableToFindBlobException($"Unable to find blob for: {options.File}"), cancellationToken);
-                return null;
-            }
-
-            var stream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
-            var properties = await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
-                
-            return (stream, string.IsNullOrWhiteSpace(properties.Value.ContentType) ? "application/octet-stream" : properties.Value.ContentType);
         }
 
         public async ValueTask UploadAsync(FileOptions options, Stream data, string contentType = "application/octet-stream", CancellationToken cancellationToken = default)
         {
-            var client = _azureClientFactory.CreateClient(options.Root);
-
-            if (client is null)
+            try
             {
-                _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
-                return;
+                var client = _azureClientFactory.CreateClient(options.Root);
+
+                if (client is null)
+                {
+                    _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
+                    return;
+                }
+
+                var container = client.GetBlobContainerClient(options.Folder);
+                await container.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+
+                var blob = container.GetBlobClient(options.File);
+                await blob.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+                await blob.UploadAsync(data, cancellationToken: cancellationToken);
+                await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
             }
-
-            var container = client.GetBlobContainerClient(options.Folder);
-            await container.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
-
-            var blob = container.GetBlobClient(options.File);
-            await blob.UploadAsync(data, cancellationToken: cancellationToken);
-            await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
+            catch (Exception ex)
+            {
+                _exceptionStream.AddException(ex, cancellationToken);
+            }
         }
 
         public async ValueTask UploadAsync(FileOptions options, byte[] data, string contentType = "application/octet-stream", CancellationToken cancellationToken = default)
         {
-            var client = _azureClientFactory.CreateClient(options.Root);
-
-            if (client is null)
-            {
-                _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
-                return;
-            }
-
-            var container = client.GetBlobContainerClient(options.Folder);
-            await container.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
-
-            var blob = container.GetBlobClient(options.File);
-            using var stream = await blob.OpenWriteAsync(true, cancellationToken: cancellationToken);
-            await stream.WriteAsync(data, cancellationToken: cancellationToken);
-            await stream.FlushAsync(cancellationToken);
-            await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
+            using var ms = new MemoryStream(data);
+            await UploadAsync(options, ms, contentType, cancellationToken);
         }
 
         public async ValueTask UploadAsync(FileOptions options, Memory<byte> data, string contentType = "application/octet-stream", CancellationToken cancellationToken = default)
         {
-            var client = _azureClientFactory.CreateClient(options.Root);
-
-            if (client is null)
-            {
-                _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
-                return;
-            }
-
-            var container = client.GetBlobContainerClient(options.Folder);
-            await container.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
-
-            var blob = container.GetBlobClient(options.File);
-            using var stream = await blob.OpenWriteAsync(true, cancellationToken: cancellationToken);
-            await stream.WriteAsync(data, cancellationToken: cancellationToken);
-            await stream.FlushAsync(cancellationToken);
-            await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
+            using var ms = new MemoryStream(data.ToArray());
+            await UploadAsync(options, ms, contentType, cancellationToken);
         }
 
         public async ValueTask UploadAsync(FileOptions options, string data, string contentType = "application/octet-stream", CancellationToken cancellationToken = default)
         {
-            var client = _azureClientFactory.CreateClient(options.Root);
-
-            if (client is null)
-            {
-                _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
-                return;
-            }
-
-            var container = client.GetBlobContainerClient(options.Folder);
-            await container.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
-
-            var blob = container.GetBlobClient(options.File);
-            using var stream = await blob.OpenWriteAsync(true, cancellationToken: cancellationToken);
-            await stream.WriteAsync(Encoding.Unicode.GetBytes(data), cancellationToken: cancellationToken);
-            await stream.FlushAsync(cancellationToken);
-            await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
+            using var ms = new MemoryStream(Encoding.Unicode.GetBytes(data));
+            await UploadAsync(options, ms, contentType, cancellationToken);
         }
 
         public async ValueTask UploadAsync(FileOptions options, Memory<char> data, string contentType = "application/octet-stream", CancellationToken cancellationToken = default)
         {
-            var client = _azureClientFactory.CreateClient(options.Root);
-
-            if (client is null)
-            {
-                _exceptionStream.AddException(new UnableToFindBlobServiceClientException($"No BlobServiceClient has been registered for: {options.Root}"), cancellationToken);
-                return;
-            }
-
-            var container = client.GetBlobContainerClient(options.Folder);
-            await container.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
-
-            var blob = container.GetBlobClient(options.File);
-            using var stream = await blob.OpenWriteAsync(true, cancellationToken: cancellationToken);
-            await stream.WriteAsync(Encoding.Unicode.GetBytes(data.ToArray()), cancellationToken: cancellationToken);
-            await stream.FlushAsync(cancellationToken);
-            await blob.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
+            using var ms = new MemoryStream(Encoding.Unicode.GetBytes(data.ToArray()));
+            await UploadAsync(options, ms, contentType, cancellationToken);
         }
     }
 }
