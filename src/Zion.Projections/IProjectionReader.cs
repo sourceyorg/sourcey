@@ -5,7 +5,10 @@ namespace Zion.Projections
     public interface IProjectionReader<TProjection>
         where TProjection : class, IProjection
     {
-        Task<TProjection?> RetrieveAsync(Subject subject, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TProjection>> RetrieveAsync(CancellationToken cancellationToken = default);
+        ValueTask<TProjection?> ReadAsync(Subject subject, CancellationToken cancellationToken = default);
+        ValueTask<TProjection?> ReadWithConsistencyAsync(Subject subject, Func<TProjection?, bool> consistencyCheck, int retryCount = 2, TimeSpan? delay = null, CancellationToken cancellationToken = default);
+        ValueTask<IQueryableProjection<TProjection>> ReadAllAsync(CancellationToken cancellationToken = default);
+        ValueTask<IQueryableProjection<TProjection>> ReadAllWithConsistencyAsync(Subject subject, Func<TProjection?, bool> consistencyCheck, int retryCount = 2, TimeSpan? delay = null, CancellationToken cancellationToken = default);
+        ValueTask<IQueryableProjection<TProjection>> ReadAllWithConsistencyAsync(Func<IQueryable<TProjection>, ValueTask<bool>> consistencyCheckAsync, int retryCount = 2, TimeSpan? delay = null, CancellationToken cancellationToken = default);
     }
 }
