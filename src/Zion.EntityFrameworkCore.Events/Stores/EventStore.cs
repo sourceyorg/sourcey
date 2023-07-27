@@ -13,7 +13,7 @@ namespace Zion.EntityFrameworkCore.Events.Stores
     internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
         where TStoreDbContext : DbContext, IEventStoreDbContext
     {
-        private static readonly int DefaultReloadInterval = 2000;
+        private static readonly int DefaultReloadInterval = 50;
         private static readonly int DefaultPageSize = 500;
 
         private readonly IEventStoreDbContextFactory<TStoreDbContext> _dbContextFactory;
@@ -62,22 +62,6 @@ namespace Zion.EntityFrameworkCore.Events.Stores
             var results = new List<KeyValuePair<StreamId, IEnumerable<IEventContext<IEvent>>>>();
 
             var events = await GetAllEventsForwardsInternalAsync(offset, pageSize, cancellationToken).ConfigureAwait(false);
-
-            if (events.Count > 0 && events[0].SequenceNo != offset + 1)
-            {
-                _logger.LogInformation("Gap detected in stream. Expecting sequence no {ExpectedSequenceNo} but found sequence no {ActualSequenceNo}. Reloading events after {DefaultReloadInterval}ms.", offset + 1, events[0].SequenceNo, DefaultReloadInterval);
-                events = await GetAllEventsAfterDelayInternalAsync(offset, pageSize, cancellationToken).ConfigureAwait(false);
-            }
-
-            for (var i = 0; i < events.Count - 1; i++)
-            {
-                if (events[i].SequenceNo + 1 != events[i + 1].SequenceNo)
-                {
-                    _logger.LogInformation("Gap detected in stream. Expecting sequence no {ExpectedSequenceNo} but found sequence no {ActualSequenceNo}. Reloading events after {DefaultReloadInterval}ms.", events[i].SequenceNo + 1, events[i + 1].SequenceNo, DefaultReloadInterval);
-                    events = await GetAllEventsAfterDelayInternalAsync(offset, pageSize, cancellationToken).ConfigureAwait(false);
-                    break;
-                }
-            }
 
             var eventsByStreamId = events.GroupBy(@event => @event.StreamId)
                 .Select(g => GetValuesAsync(g.Key, g.ToArray()))

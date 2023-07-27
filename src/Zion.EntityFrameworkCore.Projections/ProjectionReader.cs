@@ -41,7 +41,7 @@ namespace Zion.EntityFrameworkCore.Projections
         public async ValueTask<TProjection?> ReadWithConsistencyAsync(
             Subject subject,
             Func<TProjection?, bool> consistencyCheck,
-            int retryCount = 2,
+            int retryCount = 3,
             TimeSpan? delay = null,
             CancellationToken cancellationToken = default)
         {
@@ -92,7 +92,7 @@ namespace Zion.EntityFrameworkCore.Projections
         public async ValueTask<IQueryableProjection<TProjection>> ReadAllWithConsistencyAsync(
             Subject subject,
             Func<TProjection?, bool> consistencyCheck,
-            int retryCount = 2,
+            int retryCount = 3,
             TimeSpan? delay = null,
             CancellationToken cancellationToken = default)
         {
@@ -108,7 +108,7 @@ namespace Zion.EntityFrameworkCore.Projections
 
         public async ValueTask<IQueryableProjection<TProjection>> ReadAllWithConsistencyAsync(
             Func<IQueryable<TProjection>, ValueTask<bool>> consistencyCheckAsync,
-            int retryCount = 2,
+            int retryCount = 3,
             TimeSpan? delay = null,
             CancellationToken cancellationToken = default)
         {
