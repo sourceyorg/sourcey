@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIcon>images\logo.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\logo.png" Pack="true" Visible="false" PackagePath="images\logo.png" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sourcey.Aggregates\Sourcey.Aggregates.csproj" />
+    <ProjectReference Include="..\Sourcey.Commands\Sourcey.Commands.csproj" />
+    <ProjectReference Include="..\Sourcey.Encryption\Sourcey.Encryption.csproj" />
+    <ProjectReference Include="..\Sourcey.Events\Sourcey.Events.csproj" />
+    <ProjectReference Include="..\Sourcey.Queries\Sourcey.Queries.csproj" />
+  </ItemGroup>
+
+</Project>

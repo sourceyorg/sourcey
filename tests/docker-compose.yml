@@ -1,7 +1,7 @@
 ﻿version: '3.8'
 services:
-  zion-dynamodb:
+  sourcey-dynamodb:
     image: "amazon/dynamodb-local:latest"
-    container_name: zion-dynamodb
+    container_name: sourcey-dynamodb
     ports:
       - "8000:8000"
