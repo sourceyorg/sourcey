@@ -1,7 +1,0 @@
-﻿version: '3.8'
-services:
-  sourcey-dynamodb:
-    image: "amazon/dynamodb-local:latest"
-    container_name: sourcey-dynamodb
-    ports:
-      - "8000:8000"
