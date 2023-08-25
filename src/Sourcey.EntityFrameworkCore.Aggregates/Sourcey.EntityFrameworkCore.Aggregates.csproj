@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sourcey.Aggregates\Sourcey.Aggregates.csproj" />
-    <ProjectReference Include="..\Sourcey.EntityFrameworkCore.Commands\Sourcey.EntityFrameworkCore.Commands.csproj" />
     <ProjectReference Include="..\Sourcey.EntityFrameworkCore.Events\Sourcey.EntityFrameworkCore.Events.csproj" />
     <ProjectReference Include="..\Sourcey.EntityFrameworkCore\Sourcey.EntityFrameworkCore.csproj" />
   </ItemGroup>

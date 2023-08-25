@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sourcey.Aggregates.Concurrency;
 using Sourcey.Aggregates.Snapshots;
-using Sourcey.Commands;
 using Sourcey.Core.Exceptions;
 using Sourcey.Core.Keys;
 using Sourcey.Events;
@@ -104,49 +103,6 @@ namespace Sourcey.Aggregates.Stores
         public async Task SaveAsync<TState>(Aggregate<TState> aggregate, CancellationToken cancellationToken = default)
             where TState : IAggregateState, new()
             => await SaveAsync(aggregate, expectedVersion: null, cancellationToken);
-
-        public async Task SaveAsync<TState>(Aggregate<TState> aggregate, ICommand causation, int? expectedVersion = null, CancellationToken cancellationToken = default)
-            where TState : IAggregateState, new()
-        {
-            if (aggregate == null)
-                throw new ArgumentNullException(nameof(aggregate));
-            if (causation == null)
-                throw new ArgumentNullException(nameof(causation));
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var events = aggregate.GetUncommittedEvents();
-
-            if (!events.Any())
-                return;
-
-            var currentVersion = await _eventStore.CountAsync(aggregate.Id);
-
-            if (expectedVersion.HasValue && expectedVersion.Value != currentVersion
-                && !await ResolveConflictAsync(aggregate, expectedVersion.Value, currentVersion, cancellationToken))
-                return;
-
-            events = aggregate.GetUncommittedEvents();
-
-            var contexts = events.Select(@event => new EventContext<IEvent>(
-                streamId: aggregate.Id,
-                @event: @event,
-                correlation: causation.Correlation,
-                causation: Causation.From(causation.Id),
-                timestamp: @event.Timestamp,
-                actor: causation.Actor,
-                scheduledPublication: null));
-
-            await _eventStore.SaveAsync(StreamId.From(aggregate.Id), contexts);
-
-            aggregate.ClearUncommittedEvents();
-
-            await SaveSnapshotAsync(aggregate, cancellationToken);
-        }
-
-        public async Task SaveAsync<TState>(Aggregate<TState> aggregate, ICommand causation, CancellationToken cancellationToken = default)
-            where TState : IAggregateState, new()
-            => await SaveAsync(aggregate, causation, causation.Version, cancellationToken);
 
         public async Task SaveAsync<TState>(Aggregate<TState> aggregate, IEventContext<IEvent> causation, int? expectedVersion = null, CancellationToken cancellationToken = default)
             where TState : IAggregateState, new()
