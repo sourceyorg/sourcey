@@ -1,11 +1,10 @@
 ﻿using Sourcey.Projections;
 
-namespace Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts
+namespace Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts;
+
+public interface IDbTypeFactory<TDbType>
+    where TDbType : DbType
 {
-    public interface IDbTypeFactory<TDbType>
-        where TDbType : DbType
-    {
-        TDbType Create<TProjection>()
-            where TProjection : class, IProjection;
-    }
+    TDbType Create<TProjection>()
+        where TProjection : class, IProjection;
 }

@@ -1,51 +1,50 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Sourcey.Core.Keys;
 
-namespace Sourcey.EntityFrameworkCore.ChangeTracking
+namespace Sourcey.EntityFrameworkCore.ChangeTracking;
+
+internal sealed class NullableSubjectValueComparer : ValueComparer<Subject?>
 {
-    internal sealed class NullableSubjectValueComparer : ValueComparer<Subject?>
+    public NullableSubjectValueComparer()
+        : base((a, b) => IsEqual(a, b), t => HashCode(t), t => CreateSnapshot(t)) { }
+
+    private static bool IsEqual(Subject? left, Subject? right)
     {
-        public NullableSubjectValueComparer()
-            : base((a, b) => IsEqual(a, b), t => HashCode(t), t => CreateSnapshot(t)) { }
+        if (left == null || right == null)
+            return false;
 
-        private static bool IsEqual(Subject? left, Subject? right)
-        {
-            if (left == null || right == null)
-                return false;
+        return left.Value.Equals(right.Value);
+    }
 
-            return left.Value.Equals(right.Value);
-        }
+    private static int HashCode(Subject? subject)
+    {
+        if (subject == null)
+            return 0;
 
-        private static int HashCode(Subject? subject)
-        {
-            if (subject == null)
-                return 0;
+        if (subject is IEquatable<Subject>)
+            return subject.GetHashCode();
 
-            if (subject is IEquatable<Subject>)
-                return subject.GetHashCode();
+        return ConvertTo(subject)?.GetHashCode() ?? 0;
+    }
 
-            return ConvertTo(subject)?.GetHashCode() ?? 0;
-        }
+    private static Subject? CreateSnapshot(Subject? subject)
+    {
+        return ConvertFrom(ConvertTo(subject));
+    }
 
-        private static Subject? CreateSnapshot(Subject? subject)
-        {
-            return ConvertFrom(ConvertTo(subject));
-        }
+    private static string? ConvertTo(Subject? subject)
+    {
+        if (subject == null)
+            return null;
 
-        private static string? ConvertTo(Subject? subject)
-        {
-            if (subject == null)
-                return null;
+        return (string)subject;
+    }
 
-            return (string)subject;
-        }
+    private static Subject? ConvertFrom(string? subject)
+    {
+        if (string.IsNullOrWhiteSpace(subject))
+            return null;
 
-        private static Subject? ConvertFrom(string? subject)
-        {
-            if (string.IsNullOrWhiteSpace(subject))
-                return null;
-
-            return Subject.From(subject);
-        }
+        return Subject.From(subject);
     }
 }

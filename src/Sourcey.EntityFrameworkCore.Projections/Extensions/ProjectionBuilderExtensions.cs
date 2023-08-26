@@ -4,22 +4,21 @@ using Sourcey.EntityFrameworkCore.Projections.Builder;
 using Sourcey.Projections;
 using Sourcey.Projections.Builder;
 
-namespace Sourcey.Extensions
+namespace Sourcey.Extensions;
+
+public static class ProjectionBuilderExtensions
 {
-    public static class ProjectionBuilderExtensions
+    public static IProjectionBuilder<TProjection> WithEntityFrameworkCoreWriter<TProjection>(this IProjectionBuilder<TProjection> builder,
+        Action<IEntityFrameworkCoreProjectionWriterBuilder<TProjection>> configuration)
+        
+        where TProjection : class, IProjection
     {
-        public static IProjectionBuilder<TProjection> WithEntityFrameworkCoreWriter<TProjection>(this IProjectionBuilder<TProjection> builder,
-            Action<IEntityFrameworkCoreProjectionWriterBuilder<TProjection>> configuration)
-            
-            where TProjection : class, IProjection
-        {
-            builder.Services.TryAddScoped<IProjectionWriter<TProjection>, ProjectionWriter<TProjection>>();
-            builder.Services.TryAddScoped<IProjectionReader<TProjection>, ProjectionReader<TProjection>>();
+        builder.Services.TryAddScoped<IProjectionWriter<TProjection>, ProjectionWriter<TProjection>>();
+        builder.Services.TryAddScoped<IProjectionReader<TProjection>, ProjectionReader<TProjection>>();
 
-            var entityFrameworkCoreProjectionWriterBuilder = new EntityFrameworkCoreProjectionWriterBuilder<TProjection>(builder.Services);
-            configuration(entityFrameworkCoreProjectionWriterBuilder);
+        var entityFrameworkCoreProjectionWriterBuilder = new EntityFrameworkCoreProjectionWriterBuilder<TProjection>(builder.Services);
+        configuration(entityFrameworkCoreProjectionWriterBuilder);
 
-            return builder;
-        }
+        return builder;
     }
 }

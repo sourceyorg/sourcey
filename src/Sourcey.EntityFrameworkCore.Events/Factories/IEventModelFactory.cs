@@ -2,10 +2,9 @@
 using Sourcey.Events.Stores;
 using Sourcey.Events.Streams;
 
-namespace Sourcey.EntityFrameworkCore.Events.Factories
+namespace Sourcey.EntityFrameworkCore.Events.Factories;
+
+public interface IEventModelFactory
 {
-    public interface IEventModelFactory
-    {
-        Entities.Event Create(StreamId streamId, IEventContext<IEvent> context);
-    }
+    Entities.Event Create(StreamId streamId, IEventContext<IEvent> context);
 }

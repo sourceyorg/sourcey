@@ -1,10 +1,9 @@
 ﻿using Sourcey.Events;
 using Sourcey.Events.Stores;
 
-namespace Sourcey.EntityFrameworkCore.Events.Factories
+namespace Sourcey.EntityFrameworkCore.Events.Factories;
+
+public interface IEventContextFactory
 {
-    public interface IEventContextFactory
-    {
-        IEventContext<IEvent> CreateContext(Entities.Event dbEvent);
-    }
+    IEventContext<IEvent> CreateContext(Entities.Event dbEvent);
 }

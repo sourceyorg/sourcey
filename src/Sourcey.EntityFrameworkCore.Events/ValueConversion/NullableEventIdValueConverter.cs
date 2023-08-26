@@ -1,19 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sourcey.Events;
 
-namespace Sourcey.EntityFrameworkCore.Events.ValueConversion
+namespace Sourcey.EntityFrameworkCore.Events.ValueConversion;
+
+internal sealed class NullableEventIdValueConverter : ValueConverter<EventId?, string>
 {
-    internal sealed class NullableEventIdValueConverter : ValueConverter<EventId?, string>
+    public NullableEventIdValueConverter(ConverterMappingHints mappingHints = default)
+        : base((m) => ConvertTo(m), (json) => ConvertFrom(json), mappingHints)
     {
-        public NullableEventIdValueConverter(ConverterMappingHints mappingHints = default)
-            : base((m) => ConvertTo(m), (json) => ConvertFrom(json), mappingHints)
-        {
-        }
-
-        private static string ConvertTo(EventId? eventId)
-            => eventId.HasValue ? (string)eventId.Value : string.Empty;
-
-        private static EventId? ConvertFrom(string eventId)
-            => string.IsNullOrWhiteSpace(eventId) ? null : EventId.From(eventId);
     }
+
+    private static string ConvertTo(EventId? eventId)
+        => eventId.HasValue ? (string)eventId.Value : string.Empty;
+
+    private static EventId? ConvertFrom(string eventId)
+        => string.IsNullOrWhiteSpace(eventId) ? null : EventId.From(eventId);
 }

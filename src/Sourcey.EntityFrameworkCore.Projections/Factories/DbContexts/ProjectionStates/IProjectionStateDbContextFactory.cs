@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts.ProjectionStates
+namespace Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts.ProjectionStates;
+
+public interface IProjectionStateDbContextFactory : IDbContextFactory<DbContext>
 {
-    public interface IProjectionStateDbContextFactory : IDbContextFactory<DbContext>
-    {
-    }
 }
