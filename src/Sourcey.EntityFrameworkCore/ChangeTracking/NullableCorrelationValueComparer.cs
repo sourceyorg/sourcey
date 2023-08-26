@@ -1,51 +1,50 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Sourcey.Core.Keys;
 
-namespace Sourcey.EntityFrameworkCore.ChangeTracking
+namespace Sourcey.EntityFrameworkCore.ChangeTracking;
+
+internal sealed class NullableCorrelationValueComparer : ValueComparer<Correlation?>
 {
-    internal sealed class NullableCorrelationValueComparer : ValueComparer<Correlation?>
+    public NullableCorrelationValueComparer()
+        : base((a, b) => IsEqual(a, b), t => HashCode(t), t => CreateSnapshot(t)) { }
+
+    private static bool IsEqual(Correlation? left, Correlation? right)
     {
-        public NullableCorrelationValueComparer()
-            : base((a, b) => IsEqual(a, b), t => HashCode(t), t => CreateSnapshot(t)) { }
+        if (left == null || right == null)
+            return false;
 
-        private static bool IsEqual(Correlation? left, Correlation? right)
-        {
-            if (left == null || right == null)
-                return false;
+        return left.Value.Equals(right.Value);
+    }
 
-            return left.Value.Equals(right.Value);
-        }
+    private static int HashCode(Correlation? correlation)
+    {
+        if (correlation == null)
+            return 0;
 
-        private static int HashCode(Correlation? correlation)
-        {
-            if (correlation == null)
-                return 0;
+        if (correlation is IEquatable<Correlation>)
+            return correlation.GetHashCode();
 
-            if (correlation is IEquatable<Correlation>)
-                return correlation.GetHashCode();
+        return ConvertTo(correlation)?.GetHashCode() ?? 0;
+    }
 
-            return ConvertTo(correlation)?.GetHashCode() ?? 0;
-        }
+    private static Correlation? CreateSnapshot(Correlation? correlation)
+    {
+        return ConvertFrom(ConvertTo(correlation));
+    }
 
-        private static Correlation? CreateSnapshot(Correlation? correlation)
-        {
-            return ConvertFrom(ConvertTo(correlation));
-        }
+    private static string? ConvertTo(Correlation? correlation)
+    {
+        if (correlation == null)
+            return null;
 
-        private static string? ConvertTo(Correlation? correlation)
-        {
-            if (correlation == null)
-                return null;
+        return (string)correlation;
+    }
 
-            return (string)correlation;
-        }
+    private static Correlation? ConvertFrom(string? correlation)
+    {
+        if (string.IsNullOrWhiteSpace(correlation))
+            return null;
 
-        private static Correlation? ConvertFrom(string? correlation)
-        {
-            if (string.IsNullOrWhiteSpace(correlation))
-                return null;
-
-            return Correlation.From(correlation);
-        }
+        return Correlation.From(correlation);
     }
 }
