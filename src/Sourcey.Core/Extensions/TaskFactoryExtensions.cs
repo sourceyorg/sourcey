@@ -1,4 +1,5 @@
-﻿namespace Sourcey.Core.Extensions;
+﻿namespace Sourcey.Extensions;
+
 public static class TaskFactoryExtensions
 {
     public static async ValueTask<(bool success, T? result)> WithRetryAsync<T>(

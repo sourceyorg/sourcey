@@ -1,8 +1,7 @@
-﻿namespace Sourcey.Aggregates.Builder
+﻿namespace Sourcey.Aggregates.Builder;
+
+public enum SnapshotExecution
 {
-    public enum SnapshotExecution
-    {
-        Sync,
-        Buffered
-    }
+    Sync,
+    Buffered
 }

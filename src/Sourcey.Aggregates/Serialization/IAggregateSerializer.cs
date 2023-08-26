@@ -1,7 +1,6 @@
-﻿namespace Sourcey.Aggregates.Serialization
+﻿namespace Sourcey.Aggregates.Serialization;
+
+public interface IAggregateSerializer
 {
-    public interface IAggregateSerializer
-    {
-        string Serialize<T>(T data);
-    }
+    string Serialize<T>(T data);
 }
