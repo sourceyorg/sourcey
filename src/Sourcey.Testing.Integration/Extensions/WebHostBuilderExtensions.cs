@@ -6,40 +6,39 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Sourcey.Testing.Integration.Abstractions;
 
-namespace Sourcey.Extensions
+namespace Sourcey.Extensions;
+
+internal static class WebHostBuilderExtensions
 {
-    internal static class WebHostBuilderExtensions
+    public static IWebHostBuilder WithAuthentication(this IWebHostBuilder builder, ClaimsProvider claimsProvider)
     {
-        public static IWebHostBuilder WithAuthentication(this IWebHostBuilder builder, ClaimsProvider claimsProvider)
+        return builder.ConfigureTestServices(services =>
         {
-            return builder.ConfigureTestServices(services =>
-            {
-                services.AddAuthentication(AuthenticatedAuthHandler.AuthenticationScheme)
-                        .AddScheme<AuthenticationSchemeOptions, AuthenticatedAuthHandler>(AuthenticatedAuthHandler.AuthenticationScheme, op => { });
+            services.AddAuthentication(AuthenticatedAuthHandler.AuthenticationScheme)
+                    .AddScheme<AuthenticationSchemeOptions, AuthenticatedAuthHandler>(AuthenticatedAuthHandler.AuthenticationScheme, op => { });
 
-                services.AddScoped(_ => claimsProvider);
-            });
-        }
+            services.AddScoped(_ => claimsProvider);
+        });
+    }
 
-        public static IWebHostBuilder WithAuthentication(this IWebHostBuilder builder)
+    public static IWebHostBuilder WithAuthentication(this IWebHostBuilder builder)
+    {
+        return builder.ConfigureTestServices(services =>
         {
-            return builder.ConfigureTestServices(services =>
-            {
-                services.AddAuthentication(AuthenticatedAuthHandler.AuthenticationScheme)
-                        .AddScheme<AuthenticationSchemeOptions, UnauthenticatedAuthHandler>(AuthenticatedAuthHandler.AuthenticationScheme, op => { });
-            });
-        }
+            services.AddAuthentication(AuthenticatedAuthHandler.AuthenticationScheme)
+                    .AddScheme<AuthenticationSchemeOptions, UnauthenticatedAuthHandler>(AuthenticatedAuthHandler.AuthenticationScheme, op => { });
+        });
+    }
 
-        public static HttpClient CreateClientWithTestAuth<T>(this WebApplicationFactory<T> factory) where T : class
+    public static HttpClient CreateClientWithTestAuth<T>(this WebApplicationFactory<T> factory) where T : class
+    {
+        var client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
-            var client = factory.CreateClient(new WebApplicationFactoryClientOptions
-            {
-                AllowAutoRedirect = false
-            });
+            AllowAutoRedirect = false
+        });
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticatedAuthHandler.AuthenticationScheme);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticatedAuthHandler.AuthenticationScheme);
 
-            return client;
-        }
+        return client;
     }
 }

@@ -1,22 +1,20 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
-namespace Sourcey.Testing.Fixtures
+namespace Sourcey.Testing.Fixtures;
+
+public class BaseConfigurationFixture
 {
-    public class BaseConfigurationFixture
+    public IConfiguration Configuration { get; }
+
+    public BaseConfigurationFixture()
     {
-        public IConfiguration Configuration { get; }
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddUserSecrets(GetType().Assembly, optional: true)
+            .AddEnvironmentVariables(prefix: "Sourcey_")
+            .Build();
 
-        public BaseConfigurationFixture()
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: true)
-                .AddUserSecrets(GetType().Assembly, optional: true)
-                .AddEnvironmentVariables(prefix: "Sourcey_")
-                .Build();
-
-            Configuration = configuration;
-        }
+        Configuration = configuration;
     }
 }

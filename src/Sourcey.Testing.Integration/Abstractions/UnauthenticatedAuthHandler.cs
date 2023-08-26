@@ -3,17 +3,15 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Sourcey.Testing.Integration.Abstractions
+namespace Sourcey.Testing.Integration.Abstractions;
+
+internal sealed class UnauthenticatedAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    internal sealed class UnauthenticatedAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+    public UnauthenticatedAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock) { }
+
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        public UnauthenticatedAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock) { }
-
-        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
-        {
-            var result = AuthenticateResult.Fail(new Exception("Unauthenticated"));
-            return Task.FromResult(result);
-        }
+        var result = AuthenticateResult.Fail(new Exception("Unauthenticated"));
+        return Task.FromResult(result);
     }
-
 }

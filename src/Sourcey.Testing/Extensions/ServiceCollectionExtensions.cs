@@ -3,15 +3,14 @@ using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 using Sourcey.Testing.Abstractions;
 
-namespace Sourcey.Extensions
+namespace Sourcey.Extensions;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddXunitLogging(this IServiceCollection services, ITestOutputHelper testOutputHelper)
     {
-        public static IServiceCollection AddXunitLogging(this IServiceCollection services, ITestOutputHelper testOutputHelper)
-        {
-            services.AddSingleton(testOutputHelper);
-            services.AddTransient(typeof(ILogger<>), typeof(XunitLogger<>));
-            return services;
-        }
+        services.AddSingleton(testOutputHelper);
+        services.AddTransient(typeof(ILogger<>), typeof(XunitLogger<>));
+        return services;
     }
 }

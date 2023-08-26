@@ -1,12 +1,11 @@
 ﻿using Sourcey.Events.Streams;
 
-namespace Sourcey.Events
+namespace Sourcey.Events;
+
+public interface IEvent
 {
-    public interface IEvent
-    {
-        EventId Id { get; }
-        StreamId StreamId { get; }
-        DateTimeOffset Timestamp { get; }
-        int? Version { get; }
-    }
+    EventId Id { get; }
+    StreamId StreamId { get; }
+    DateTimeOffset Timestamp { get; }
+    int? Version { get; }
 }

@@ -1,7 +1,6 @@
-﻿namespace Sourcey.Projections.Serialization
+﻿namespace Sourcey.Projections.Serialization;
+
+public interface IProjectionSerializer
 {
-    public interface IProjectionSerializer
-    {
-        string Serialize<T>(T data);
-    }
+    string Serialize<T>(T data);
 }

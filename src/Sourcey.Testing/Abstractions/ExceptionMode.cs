@@ -1,8 +1,7 @@
-﻿namespace Sourcey.Testing.Abstractions
+﻿namespace Sourcey.Testing.Abstractions;
+
+public enum ExceptionMode
 {
-    public enum ExceptionMode
-    {
-        Throw,
-        Record
-    }
+    Throw,
+    Record
 }

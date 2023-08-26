@@ -1,6 +1,5 @@
-﻿namespace Sourcey.Projections
+﻿namespace Sourcey.Projections;
+
+public interface IProjection
 {
-    public interface IProjection
-    {
-    }
 }

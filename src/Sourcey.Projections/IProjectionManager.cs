@@ -1,11 +1,10 @@
 ﻿using Sourcey.Events;
 
-namespace Sourcey.Projections
+namespace Sourcey.Projections;
+
+public interface IProjectionManager<TProjection>
+    where TProjection : class, IProjection
 {
-    public interface IProjectionManager<TProjection>
-        where TProjection : class, IProjection
-    {
-        Task HandleAsync(IEvent @event, CancellationToken cancellationToken = default);
-        Task ResetAsync(CancellationToken cancellationToken = default);
-    }
+    Task HandleAsync(IEvent @event, CancellationToken cancellationToken = default);
+    Task ResetAsync(CancellationToken cancellationToken = default);
 }

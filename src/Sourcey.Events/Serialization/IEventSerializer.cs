@@ -1,7 +1,6 @@
-﻿namespace Sourcey.Events.Serialization
+﻿namespace Sourcey.Events.Serialization;
+
+public interface IEventSerializer
 {
-    public interface IEventSerializer
-    {
-        string Serialize<T>(T data);
-    }
+    string Serialize<T>(T data);
 }

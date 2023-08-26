@@ -1,24 +1,23 @@
 ﻿using Newtonsoft.Json;
 using Sourcey.Core.Keys;
 
-namespace Sourcey.Serialization.Json.Converters
+namespace Sourcey.Serialization.Json.Converters;
+
+public sealed class NullableActorJsonConverter : JsonConverter<Actor?>
 {
-    public sealed class NullableActorJsonConverter : JsonConverter<Actor?>
+    public override void WriteJson(JsonWriter writer, Actor? value, JsonSerializer serializer)
     {
-        public override void WriteJson(JsonWriter writer, Actor? value, JsonSerializer serializer)
-        {
-            serializer.Serialize(writer, value.ToString());
-        }
+        serializer.Serialize(writer, value.ToString());
+    }
 
-        public override Actor? ReadJson(JsonReader reader, Type objectType, Actor? existingValue, bool hasExistingValue,
-            JsonSerializer serializer)
-        {
-            var value = serializer.Deserialize<string>(reader);
+    public override Actor? ReadJson(JsonReader reader, Type objectType, Actor? existingValue, bool hasExistingValue,
+        JsonSerializer serializer)
+    {
+        var value = serializer.Deserialize<string>(reader);
 
-            if (value == null)
-                return null;
+        if (value == null)
+            return null;
 
-            return Actor.From(value);
-        }
+        return Actor.From(value);
     }
 }

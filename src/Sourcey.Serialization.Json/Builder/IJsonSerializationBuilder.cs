@@ -1,10 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿namespace Sourcey.Serialization.Json.Builder;
 
-namespace Sourcey.Serialization.Json.Builder
+public interface IJsonSerializationBuilder
 {
-    public interface IJsonSerializationBuilder
-    {
-        IJsonSerializationBuilder AddEventSerialization();
-        IJsonSerializationBuilder AddAggregateSerialization();
-    }
+    IJsonSerializationBuilder AddEventSerialization();
+    IJsonSerializationBuilder AddAggregateSerialization();
 }
