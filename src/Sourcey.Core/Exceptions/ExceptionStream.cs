@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Sourcey.Core.Extensions;
+using Sourcey.Extensions;
 
 namespace Sourcey.Core.Exceptions;
 
