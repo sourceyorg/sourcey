@@ -20,10 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sourcey.Aggregates\Sourcey.Aggregates.csproj" />
-    <ProjectReference Include="..\Sourcey.Commands\Sourcey.Commands.csproj" />
-    <ProjectReference Include="..\Sourcey.Encryption\Sourcey.Encryption.csproj" />
     <ProjectReference Include="..\Sourcey.Events\Sourcey.Events.csproj" />
-    <ProjectReference Include="..\Sourcey.Queries\Sourcey.Queries.csproj" />
   </ItemGroup>
 
 </Project>

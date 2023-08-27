@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts;
 
-namespace Sourcey.EntityFrameworkCore.Projections.Factories.ProjecitonContexts
+namespace Sourcey.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
+
+internal sealed class ProjectionDbContextFactory : DbContextFactory<DbContext, ProjectionDbType>, IProjectionDbContextFactory
 {
-    internal sealed class ProjectionDbContextFactory : DbContextFactory<DbContext, ProjectionDbType>, IProjectionDbContextFactory
+    public ProjectionDbContextFactory(IServiceProvider serviceProvider, IDbTypeFactory<ProjectionDbType> dbTypeFactory) : base(serviceProvider, dbTypeFactory)
     {
-        public ProjectionDbContextFactory(IServiceProvider serviceProvider, IDbTypeFactory<ProjectionDbType> dbTypeFactory) : base(serviceProvider, dbTypeFactory)
-        {
-        }
     }
 }

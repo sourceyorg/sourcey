@@ -1,13 +1,10 @@
-﻿using System;
+﻿namespace Sourcey.Aggregates.Concurrency;
 
-namespace Sourcey.Aggregates.Concurrency
+public class ConcurrencyException : Exception
 {
-    public class ConcurrencyException : Exception
-    {
-        public ConcurrencyException(string streamId, long expectedVersion, long actualVersion)
-            : base(BuildErrorMessage(streamId, expectedVersion, actualVersion)) { }
+    public ConcurrencyException(string streamId, long expectedVersion, long actualVersion)
+        : base(BuildErrorMessage(streamId, expectedVersion, actualVersion)) { }
 
-        private static string BuildErrorMessage(string streamId, long expectedVersion, long actualVersion)
-            => $"Concurrency exception | Stream: '{streamId}' | Expected version: {expectedVersion} | Actual version: {actualVersion}";
-    }
+    private static string BuildErrorMessage(string streamId, long expectedVersion, long actualVersion)
+        => $"Concurrency exception | Stream: '{streamId}' | Expected version: {expectedVersion} | Actual version: {actualVersion}";
 }

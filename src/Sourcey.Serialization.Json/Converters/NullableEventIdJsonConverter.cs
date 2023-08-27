@@ -1,24 +1,23 @@
 ﻿using Newtonsoft.Json;
 using Sourcey.Events;
 
-namespace Sourcey.Serialization.Json.Converters
+namespace Sourcey.Serialization.Json.Converters;
+
+public sealed class NullableEventIdJsonConverter : JsonConverter<EventId?>
 {
-    public sealed class NullableEventIdJsonConverter : JsonConverter<EventId?>
+    public override void WriteJson(JsonWriter writer, EventId? value, JsonSerializer serializer)
     {
-        public override void WriteJson(JsonWriter writer, EventId? value, JsonSerializer serializer)
-        {
-            serializer.Serialize(writer, value.ToString());
-        }
+        serializer.Serialize(writer, value.ToString());
+    }
 
-        public override EventId? ReadJson(JsonReader reader, Type objectType, EventId? existingValue, bool hasExistingValue,
-            JsonSerializer serializer)
-        {
-            var value = serializer.Deserialize<string>(reader);
+    public override EventId? ReadJson(JsonReader reader, Type objectType, EventId? existingValue, bool hasExistingValue,
+        JsonSerializer serializer)
+    {
+        var value = serializer.Deserialize<string>(reader);
 
-            if (value == null)
-                return null;
+        if (value == null)
+            return null;
 
-            return EventId.From(value);
-        }
+        return EventId.From(value);
     }
 }

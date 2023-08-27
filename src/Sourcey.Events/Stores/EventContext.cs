@@ -1,31 +1,30 @@
 ﻿using Sourcey.Core.Keys;
 using Sourcey.Events.Streams;
 
-namespace Sourcey.Events.Stores
+namespace Sourcey.Events.Stores;
+
+public sealed record EventContext<TEvent> : IEventContext<TEvent>
+    where TEvent : IEvent
 {
-    public sealed record EventContext<TEvent> : IEventContext<TEvent>
-        where TEvent : IEvent
+    public StreamId StreamId { get; }
+    public Correlation? Correlation { get; }
+    public Causation? Causation { get; }
+    public TEvent Payload { get; }
+    public DateTimeOffset Timestamp { get; }
+    public Actor Actor { get; }
+    public DateTimeOffset? ScheduledPublication { get; }
+
+    public EventContext(StreamId streamId, TEvent @event, Correlation? correlation, Causation? causation, DateTimeOffset timestamp, Actor actor, DateTimeOffset? scheduledPublication = null)
     {
-        public StreamId StreamId { get; }
-        public Correlation? Correlation { get; }
-        public Causation? Causation { get; }
-        public TEvent Payload { get; }
-        public DateTimeOffset Timestamp { get; }
-        public Actor Actor { get; }
-        public DateTimeOffset? ScheduledPublication { get; }
+        if (@event == null)
+            throw new ArgumentNullException(nameof(@event));
 
-        public EventContext(StreamId streamId, TEvent @event, Correlation? correlation, Causation? causation, DateTimeOffset timestamp, Actor actor, DateTimeOffset? scheduledPublication = null)
-        {
-            if (@event == null)
-                throw new ArgumentNullException(nameof(@event));
-
-            StreamId = streamId;
-            Correlation = correlation;
-            Causation = causation;
-            Payload = @event;
-            Timestamp = timestamp;
-            Actor = actor;
-            ScheduledPublication = scheduledPublication;
-        }
+        StreamId = streamId;
+        Correlation = correlation;
+        Causation = causation;
+        Payload = @event;
+        Timestamp = timestamp;
+        Actor = actor;
+        ScheduledPublication = scheduledPublication;
     }
 }

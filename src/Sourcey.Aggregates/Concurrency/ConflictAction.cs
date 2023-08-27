@@ -1,8 +1,7 @@
-﻿namespace Sourcey.Aggregates.Concurrency
+﻿namespace Sourcey.Aggregates.Concurrency;
+
+public enum ConflictAction
 {
-    public enum ConflictAction
-    {
-        Throw,
-        Pass
-    }
+    Throw,
+    Pass
 }

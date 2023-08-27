@@ -2,16 +2,15 @@
 using Sourcey.Projections;
 using Sourcey.Projections.Builder;
 
-namespace Sourcey.Extensions
+namespace Sourcey.Extensions;
+
+public static class SourceyBuilderExtensions
 {
-    public static class SourceyBuilderExtensions
+    public static ISourceyBuilder AddProjection<TProjection>(this ISourceyBuilder source, Action<IProjectionBuilder<TProjection>> configure)
+        where TProjection : class, IProjection
     {
-        public static ISourceyBuilder AddProjection<TProjection>(this ISourceyBuilder source, Action<IProjectionBuilder<TProjection>> configure)
-            where TProjection : class, IProjection
-        {
-            var builder = new ProjectionBuilder<TProjection>(source.Services);
-            configure(builder);
-            return source;
-        }
+        var builder = new ProjectionBuilder<TProjection>(source.Services);
+        configure(builder);
+        return source;
     }
 }

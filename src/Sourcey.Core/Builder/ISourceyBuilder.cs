@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Sourcey.Core.Builder
+namespace Sourcey.Core.Builder;
+
+public interface ISourceyBuilder
 {
-    public interface ISourceyBuilder
-    {
-        IServiceCollection Services { get; }
-    }
+    IServiceCollection Services { get; }
 }

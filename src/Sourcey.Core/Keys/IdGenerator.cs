@@ -1,12 +1,11 @@
-﻿using Sourcey.Core.Extensions;
+﻿using Sourcey.Extensions;
 
-namespace Sourcey.Core.Keys
+namespace Sourcey.Core.Keys;
+
+public static class IdGenerator
 {
-    public static class IdGenerator
-    {
-        public static string New()
-            => Guid.NewGuid()
-                .ToSequentialGuid()
-                .ToString();
-    }
+    public static string New()
+        => Guid.NewGuid()
+            .ToSequentialGuid()
+            .ToString();
 }

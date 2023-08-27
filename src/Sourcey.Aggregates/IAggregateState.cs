@@ -1,6 +1,5 @@
-﻿namespace Sourcey.Aggregates
+﻿namespace Sourcey.Aggregates;
+
+public interface IAggregateState
 {
-    public interface IAggregateState
-    {
-    }
 }

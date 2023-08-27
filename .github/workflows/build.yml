@@ -8,11 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      zion-dynamodb:
-        image: "amazon/dynamodb-local:latest"
-        ports:
-          - "8000:8000"
     steps:
     - uses: actions/checkout@v2
 
@@ -32,9 +27,4 @@ jobs:
 
     # Run test projects
     - name: Run test projects
-      run: dotnet test Zion.sln --configuration Release --no-restore --no-build --verbosity normal --filter Category=Unit -- xunit.parallelizeAssembly=true
-      env: 
-        Zion_AWS__DynamoDB__Key: DUMMYIDEXAMPLE
-        Zion_AWS__DynamoDB__Secret: DUMMYIDEXAMPLE
-        Zion_AWS__DynamoDB__Region: eu-west
-        Zion_AWS__DynamoDB__Host: http://localhost:8000
+      run: dotnet test Sourcey.sln --configuration Release --no-restore --no-build --verbosity normal --filter "Category=Integration|Category=Unit" -- xunit.parallelizeAssembly=true

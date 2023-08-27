@@ -1,7 +1,6 @@
-﻿namespace Sourcey.Events.Cache
+﻿namespace Sourcey.Events.Cache;
+
+public interface IEventTypeCache
 {
-    public interface IEventTypeCache
-    {
-        bool TryGet(string name, out Type? type);
-    }
+    bool TryGet(string name, out Type? type);
 }

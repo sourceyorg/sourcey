@@ -1,21 +1,20 @@
 ﻿using Sourcey.Events.Streams;
 
-namespace Sourcey.Events.Stores
+namespace Sourcey.Events.Stores;
+
+public sealed class Page
 {
-    public sealed class Page
+    public long Offset { get; }
+    public long PreviousOffset { get; }
+    public IEnumerable<KeyValuePair<StreamId, IEnumerable<IEventContext<IEvent>>>> Events { get; }
+
+    public Page(long offset, long previousOffset, IEnumerable<KeyValuePair<StreamId, IEnumerable<IEventContext<IEvent>>>> events)
     {
-        public long Offset { get; }
-        public long PreviousOffset { get; }
-        public IEnumerable<KeyValuePair<StreamId, IEnumerable<IEventContext<IEvent>>>> Events { get; }
+        if (events == null)
+            throw new ArgumentNullException(nameof(events));
 
-        public Page(long offset, long previousOffset, IEnumerable<KeyValuePair<StreamId, IEnumerable<IEventContext<IEvent>>>> events)
-        {
-            if (events == null)
-                throw new ArgumentNullException(nameof(events));
-
-            Offset = offset;
-            PreviousOffset = previousOffset;
-            Events = events;
-        }
+        Offset = offset;
+        PreviousOffset = previousOffset;
+        Events = events;
     }
 }

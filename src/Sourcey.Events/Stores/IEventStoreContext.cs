@@ -1,6 +1,5 @@
-﻿namespace Sourcey.Events.Stores
+﻿namespace Sourcey.Events.Stores;
+
+public interface IEventStoreContext
 {
-    public interface IEventStoreContext
-    {
-    }
 }

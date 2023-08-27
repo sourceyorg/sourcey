@@ -14,7 +14,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Sourcey.Commands\Sourcey.Commands.csproj" />
     <ProjectReference Include="..\Sourcey.Events\Sourcey.Events.csproj" />
   </ItemGroup>
 

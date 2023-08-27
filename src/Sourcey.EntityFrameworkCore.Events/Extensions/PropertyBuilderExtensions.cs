@@ -4,56 +4,55 @@ using Sourcey.EntityFrameworkCore.Events.ValueConversion;
 using Sourcey.Events;
 using Sourcey.Events.Streams;
 
-namespace Sourcey.EntityFrameworkCore.Extensions
+namespace Sourcey.EntityFrameworkCore.Extensions;
+
+public static class PropertyBuilderExtensions
 {
-    public static class PropertyBuilderExtensions
+    public static PropertyBuilder<EventId> HasEventIdValueConversion(this PropertyBuilder<EventId> builder)
     {
-        public static PropertyBuilder<EventId> HasEventIdValueConversion(this PropertyBuilder<EventId> builder)
-        {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
+        if (builder == null)
+            throw new ArgumentNullException(nameof(builder));
 
-            builder.HasConversion(new EventIdValueConverter())
-                   .Metadata
-                   .SetValueComparer(new EventIdValueComparer());
+        builder.HasConversion(new EventIdValueConverter())
+               .Metadata
+               .SetValueComparer(new EventIdValueComparer());
 
-            return builder;
-        }
+        return builder;
+    }
 
-        public static PropertyBuilder<EventId?> HasNullableEventIdValueConversion(this PropertyBuilder<EventId?> builder)
-        {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
+    public static PropertyBuilder<EventId?> HasNullableEventIdValueConversion(this PropertyBuilder<EventId?> builder)
+    {
+        if (builder == null)
+            throw new ArgumentNullException(nameof(builder));
 
-            builder.HasConversion(new NullableEventIdValueConverter())
-                   .Metadata
-                   .SetValueComparer(new NullableEventIdValueComparer());
+        builder.HasConversion(new NullableEventIdValueConverter())
+               .Metadata
+               .SetValueComparer(new NullableEventIdValueComparer());
 
-            return builder;
-        }
+        return builder;
+    }
 
-        public static PropertyBuilder<StreamId> HasStreamIdValueConversion(this PropertyBuilder<StreamId> builder)
-        {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
+    public static PropertyBuilder<StreamId> HasStreamIdValueConversion(this PropertyBuilder<StreamId> builder)
+    {
+        if (builder == null)
+            throw new ArgumentNullException(nameof(builder));
 
-            builder.HasConversion(new StreamIdValueConverter())
-                   .Metadata
-                   .SetValueComparer(new StreamIdValueComparer());
+        builder.HasConversion(new StreamIdValueConverter())
+               .Metadata
+               .SetValueComparer(new StreamIdValueComparer());
 
-            return builder;
-        }
+        return builder;
+    }
 
-        public static PropertyBuilder<StreamId?> HasNullableStreamIdValueConversion(this PropertyBuilder<StreamId?> builder)
-        {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
+    public static PropertyBuilder<StreamId?> HasNullableStreamIdValueConversion(this PropertyBuilder<StreamId?> builder)
+    {
+        if (builder == null)
+            throw new ArgumentNullException(nameof(builder));
 
-            builder.HasConversion(new NullableStreamIdValueConverter())
-                   .Metadata
-                   .SetValueComparer(new NullableStreamIdValueComparer());
+        builder.HasConversion(new NullableStreamIdValueConverter())
+               .Metadata
+               .SetValueComparer(new NullableStreamIdValueComparer());
 
-            return builder;
-        }
+        return builder;
     }
 }

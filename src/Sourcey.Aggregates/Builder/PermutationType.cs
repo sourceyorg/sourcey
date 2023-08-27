@@ -1,9 +1,8 @@
-﻿namespace Sourcey.Aggregates.Builder
+﻿namespace Sourcey.Aggregates.Builder;
+
+public enum PermutationType
 {
-    public enum PermutationType
-    {
-        Multiple = 0,
-        Single = 2,
-        Duplicates = 4
-    }
+    Multiple = 0,
+    Single = 2,
+    Duplicates = 4
 }

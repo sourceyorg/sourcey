@@ -2,17 +2,19 @@
 using Sourcey.Aggregates.Builder;
 using Sourcey.Core.Builder;
 
-namespace Sourcey.Extensions
+namespace Sourcey.Extensions;
+
+public static class SourceyBuilderExtensions
 {
-    public static class SourceyBuilderExtensions
+    public static ISourceyBuilder AddAggregate<TAggregate, TAggregateState>(this ISourceyBuilder builder, Action<IAggregateBuilder<TAggregate, TAggregateState>>? configuration = null)
+        where TAggregate : Aggregate<TAggregateState>
+        where TAggregateState : IAggregateState, new()
     {
-        public static ISourceyBuilder AddAggregate<TAggregate, TAggregateState>(this ISourceyBuilder builder, Action<IAggregateBuilder<TAggregate, TAggregateState>> configuration)
-            where TAggregate : Aggregate<TAggregateState>
-            where TAggregateState : IAggregateState, new()
-        {
-            var sourceyAggregateBuilder = new AggregateBuilder<TAggregate, TAggregateState>(builder.Services);
+        var sourceyAggregateBuilder = new AggregateBuilder<TAggregate, TAggregateState>(builder.Services);
+        
+        if (configuration is not null)
             configuration(sourceyAggregateBuilder);
-            return builder;
-        }
+
+        return builder;
     }
 }

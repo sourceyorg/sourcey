@@ -2,22 +2,21 @@
 using Sourcey.EntityFrameworkCore.Projections.Entities;
 using Sourcey.EntityFrameworkCore.Projections.EntityTypeConfigurations;
 
-namespace Sourcey.EntityFrameworkCore.Projections.DbContexts
+namespace Sourcey.EntityFrameworkCore.Projections.DbContexts;
+
+public abstract class ProjectionStateDbContext : DbContext
 {
-    public abstract class ProjectionStateDbContext : DbContext
+    protected virtual string Schema => "log";
+
+    public DbSet<ProjectionState> ProjectionStates { get; set; }
+
+    protected ProjectionStateDbContext(DbContextOptions options)
+        : base(options) { }
+
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        protected virtual string Schema => "log";
+        builder.ApplyConfiguration(new ProjectionStateEntityTypeConfiguration(Schema));
 
-        public DbSet<ProjectionState> ProjectionStates { get; set; }
-
-        protected ProjectionStateDbContext(DbContextOptions options)
-            : base(options) { }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            builder.ApplyConfiguration(new ProjectionStateEntityTypeConfiguration(Schema));
-
-            base.OnModelCreating(builder);
-        }
+        base.OnModelCreating(builder);
     }
 }

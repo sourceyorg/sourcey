@@ -1,8 +1,7 @@
-﻿namespace Sourcey.Aggregates.Serialization
+﻿namespace Sourcey.Aggregates.Serialization;
+
+public interface IAggregateDeserializer
 {
-    public interface IAggregateDeserializer
-    {
-        object Deserialize(string data, Type type);
-        T Deserialize<T>(string data);
-    }
+    object Deserialize(string data, Type type);
+    T Deserialize<T>(string data);
 }
