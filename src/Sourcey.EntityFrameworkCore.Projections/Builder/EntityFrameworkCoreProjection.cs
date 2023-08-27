@@ -1,5 +1,5 @@
-﻿using Sourcey.EntityFrameworkCore.Projections.Configuration;
-using Sourcey.Projections;
+﻿using Sourcey.Projections;
+using Sourcey.Projections.Configuration;
 
 namespace Sourcey.EntityFrameworkCore.Projections.Builder;
 

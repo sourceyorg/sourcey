@@ -29,12 +29,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "serialization", "serializat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey.Serialization.Json", "src\Sourcey.Serialization.Json\Sourcey.Serialization.Json.csproj", "{FFA19A6A-2061-4F65-9A4C-9282BA9E4D4A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testing", "testing", "{181A7FB9-9529-4AE4-90DA-B13FBA87721C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey.Testing", "src\Sourcey.Testing\Sourcey.Testing.csproj", "{9CB810EB-464E-4E25-B0FC-95E613683110}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey.Testing.Integration", "src\Sourcey.Testing.Integration\Sourcey.Testing.Integration.csproj", "{6091A88C-B1C3-4C40-9938-30BA6B61FC7E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B90D8DB0-BEAA-473F-AA75-9CBA71EC1ABC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6983E6CA-2A82-4868-BC38-E7C40A64F97D}"
@@ -44,6 +38,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\build.yml = .github\workflows\build.yml
 		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.Testing", "tests\Sourcey.Testing\Sourcey.Testing.csproj", "{03C3A5EC-B951-4C5B-961A-39CB17BC2372}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.Testing.Integration", "tests\Sourcey.Testing.Integration\Sourcey.Testing.Integration.csproj", "{E562D581-08AA-4BDD-8DBC-2C36B880F8BA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "entityframeworkcore", "entityframeworkcore", "{60901F98-07ED-4DB6-8B3E-DEC25112C094}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.EntityFrameworkCore.Projections.Tests", "tests\Sourcey.EntityFrameworkCore.Projections.Tests\Sourcey.EntityFrameworkCore.Projections.Tests.csproj", "{9D1412EE-1F26-4600-AA81-B478983E52AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,14 +89,18 @@ Global
 		{FFA19A6A-2061-4F65-9A4C-9282BA9E4D4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFA19A6A-2061-4F65-9A4C-9282BA9E4D4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFA19A6A-2061-4F65-9A4C-9282BA9E4D4A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9CB810EB-464E-4E25-B0FC-95E613683110}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9CB810EB-464E-4E25-B0FC-95E613683110}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9CB810EB-464E-4E25-B0FC-95E613683110}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9CB810EB-464E-4E25-B0FC-95E613683110}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6091A88C-B1C3-4C40-9938-30BA6B61FC7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6091A88C-B1C3-4C40-9938-30BA6B61FC7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6091A88C-B1C3-4C40-9938-30BA6B61FC7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6091A88C-B1C3-4C40-9938-30BA6B61FC7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03C3A5EC-B951-4C5B-961A-39CB17BC2372}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03C3A5EC-B951-4C5B-961A-39CB17BC2372}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03C3A5EC-B951-4C5B-961A-39CB17BC2372}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03C3A5EC-B951-4C5B-961A-39CB17BC2372}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E562D581-08AA-4BDD-8DBC-2C36B880F8BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E562D581-08AA-4BDD-8DBC-2C36B880F8BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E562D581-08AA-4BDD-8DBC-2C36B880F8BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E562D581-08AA-4BDD-8DBC-2C36B880F8BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D1412EE-1F26-4600-AA81-B478983E52AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D1412EE-1F26-4600-AA81-B478983E52AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D1412EE-1F26-4600-AA81-B478983E52AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D1412EE-1F26-4600-AA81-B478983E52AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,9 +118,10 @@ Global
 		{74AB1540-B5F8-423B-BD07-8340045F3850} = {454FA71E-4D19-4F1F-A7A8-CC70250800FB}
 		{79C5D7CD-5C76-4E99-836F-B30AA31D2FB0} = {8854B81C-A9C5-4CFC-991D-903216738D39}
 		{FFA19A6A-2061-4F65-9A4C-9282BA9E4D4A} = {79C5D7CD-5C76-4E99-836F-B30AA31D2FB0}
-		{181A7FB9-9529-4AE4-90DA-B13FBA87721C} = {8854B81C-A9C5-4CFC-991D-903216738D39}
-		{9CB810EB-464E-4E25-B0FC-95E613683110} = {181A7FB9-9529-4AE4-90DA-B13FBA87721C}
-		{6091A88C-B1C3-4C40-9938-30BA6B61FC7E} = {181A7FB9-9529-4AE4-90DA-B13FBA87721C}
+		{03C3A5EC-B951-4C5B-961A-39CB17BC2372} = {B90D8DB0-BEAA-473F-AA75-9CBA71EC1ABC}
+		{E562D581-08AA-4BDD-8DBC-2C36B880F8BA} = {B90D8DB0-BEAA-473F-AA75-9CBA71EC1ABC}
+		{60901F98-07ED-4DB6-8B3E-DEC25112C094} = {B90D8DB0-BEAA-473F-AA75-9CBA71EC1ABC}
+		{9D1412EE-1F26-4600-AA81-B478983E52AD} = {60901F98-07ED-4DB6-8B3E-DEC25112C094}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6CD256CE-A8F8-4D99-A2CB-9515CAA6F31D}

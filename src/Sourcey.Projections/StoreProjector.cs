@@ -1,22 +1,18 @@
-﻿using System.Text;
-using Microsoft.EntityFrameworkCore;
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sourcey.Extensions;
-using Sourcey.EntityFrameworkCore.Events.DbContexts;
-using Sourcey.EntityFrameworkCore.Projections.Configuration;
-using Sourcey.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
 using Sourcey.Events;
 using Sourcey.Events.Stores;
-using Sourcey.Projections;
+using Sourcey.Projections.Configuration;
 
-namespace Sourcey.EntityFrameworkCore.Projections;
+namespace Sourcey.Projections;
 
 public sealed class StoreProjector<TProjection, TDbContextStore> : BackgroundService
     where TProjection : class, IProjection
-    where TDbContextStore : DbContext, IEventStoreDbContext
+    where TDbContextStore : IEventStoreContext
 {
     private readonly IProjectionManager<TProjection> _projectionManager;
     private readonly IProjectionStateManager<TProjection> _projectionStateManager;
@@ -24,7 +20,6 @@ public sealed class StoreProjector<TProjection, TDbContextStore> : BackgroundSer
     private readonly IEventStore<TDbContextStore> _eventStore;
     private readonly ILogger<StoreProjector<TProjection, TDbContextStore>> _logger;
     private readonly IOptionsMonitor<StoreProjectorOptions<TProjection>> _options;
-    private readonly IProjectionDbContextFactory _projectionDbContextFactory;
     private readonly string _name;
     private int _retries = 0;
 
@@ -43,7 +38,6 @@ public sealed class StoreProjector<TProjection, TDbContextStore> : BackgroundSer
         _projectionStateManager = _scope.ServiceProvider.GetRequiredService<IProjectionStateManager<TProjection>>();
         _eventStore = _scope.ServiceProvider.GetRequiredService<IEventStore<TDbContextStore>>();
         _options = _scope.ServiceProvider.GetRequiredService<IOptionsMonitor<StoreProjectorOptions<TProjection>>>();
-        _projectionDbContextFactory = _scope.ServiceProvider.GetRequiredService<IProjectionDbContextFactory>();
 
         _name = typeof(TProjection).FriendlyFullName();
     }

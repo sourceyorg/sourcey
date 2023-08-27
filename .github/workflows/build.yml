@@ -32,9 +32,9 @@ jobs:
 
     # Run test projects
     - name: Run test projects
-      run: dotnet test Zion.sln --configuration Release --no-restore --no-build --verbosity normal --filter Category=Unit -- xunit.parallelizeAssembly=true
+      run: dotnet test Sourcey.sln --configuration Release --no-restore --no-build --verbosity normal --filter Category=Unit -- xunit.parallelizeAssembly=true
       env: 
-        Zion_AWS__DynamoDB__Key: DUMMYIDEXAMPLE
-        Zion_AWS__DynamoDB__Secret: DUMMYIDEXAMPLE
-        Zion_AWS__DynamoDB__Region: eu-west
-        Zion_AWS__DynamoDB__Host: http://localhost:8000
+        Sourcey_AWS__DynamoDB__Key: DUMMYIDEXAMPLE
+        Sourcey_AWS__DynamoDB__Secret: DUMMYIDEXAMPLE
+        Sourcey_AWS__DynamoDB__Region: eu-west
+        Sourcey_AWS__DynamoDB__Host: http://localhost:8000

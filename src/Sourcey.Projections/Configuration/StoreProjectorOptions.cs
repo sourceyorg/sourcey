@@ -1,8 +1,6 @@
-﻿using Sourcey.Projections;
+﻿namespace Sourcey.Projections.Configuration;
 
-namespace Sourcey.EntityFrameworkCore.Projections.Configuration;
-
-internal sealed class StoreProjectorOptions<TProjection>
+public sealed class StoreProjectorOptions<TProjection>
     where TProjection : class, IProjection
 {
     public StoreProjectorOptions()
@@ -15,7 +13,7 @@ internal sealed class StoreProjectorOptions<TProjection>
     public int RetryCount { get; set; }
 
 
-    internal static StoreProjectorOptions<TProjection> Default = new()
+    public static StoreProjectorOptions<TProjection> Default = new()
     {
         Interval = 5000,
         PageSize = 500,
