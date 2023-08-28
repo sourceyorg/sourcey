@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.DependencyModel;
 using Sourcey.Builder;
 using Sourcey.Events;
+using Sourcey.Events.Builder;
 using Sourcey.Events.Cache;
 using Sourcey.Events.Streams;
 
@@ -11,14 +12,25 @@ namespace Sourcey.Extensions;
 
 public static partial class SourceyBuilderExtensions
 {
+    [Obsolete("Use AddEvents(Action<IEventsBuilder> options) instead")]
     public static ISourceyBuilder AddEvents(this ISourceyBuilder builder)
     {
-        builder.Services.TryAdd(GetStreamServices());
-        builder.Services.TryAdd(GetCacheServices());
+        builder.Services.TryAddScoped<IEventStreamManager, EventStreamManager>();
+        builder.Services.TryAddScoped<IEventTypeCache, EventTypeCache>();
 
         return builder;
     }
 
+    public static ISourceyBuilder AddEvents(this ISourceyBuilder builder, Action<IEventsBuilder> options)
+    {
+        builder.Services.TryAddScoped<IEventStreamManager, EventStreamManager>();
+        builder.Services.TryAddScoped<IEventTypeCache, EventTypeCache>();
+        options(new EventsBuilder(builder.Services));
+
+        return builder;
+    }
+
+    [Obsolete("Use IEventsBuilder.RegisterEventCache instead")]
     public static ISourceyBuilder RegisterEventCache<TEvent>(this ISourceyBuilder builder)
         where TEvent : IEvent
     {
@@ -27,6 +39,7 @@ public static partial class SourceyBuilderExtensions
         return builder;
     }
 
+    [Obsolete("Use IEventsBuilder.RegisterEventCache instead")]
     public static ISourceyBuilder RegisterEventCache(this ISourceyBuilder builder, params Type[] types)
     {
         builder.AddEvents();
@@ -36,6 +49,8 @@ public static partial class SourceyBuilderExtensions
         return builder;
     }
 
+
+    [Obsolete("Use IEventsBuilder.RegisterEventCache instead")]
     public static ISourceyBuilder RegisterEventCache(this ISourceyBuilder builder)
     {
         builder.AddEvents();
@@ -48,20 +63,10 @@ public static partial class SourceyBuilderExtensions
 
         var types = assemblies.SelectMany(assembly => assembly.DefinedTypes)
                               .Where(typeInfo => typeInfo.IsClass && !typeInfo.IsAbstract)
-                              .Where(typeInfo => eventType.IsAssignableFrom(typeInfo))
+                              .Where(eventType.IsAssignableFrom)
                               .Select(typeInfo => typeInfo.AsType())
                               .ToArray();
 
         return builder.RegisterEventCache(types);
-    }
-
-    private static IEnumerable<ServiceDescriptor> GetStreamServices()
-    {
-        yield return ServiceDescriptor.Scoped<IEventStreamManager, EventStreamManager>();
-    }
-
-    private static IEnumerable<ServiceDescriptor> GetCacheServices()
-    {
-        yield return ServiceDescriptor.Singleton<IEventTypeCache, EventTypeCache>();
     }
 }

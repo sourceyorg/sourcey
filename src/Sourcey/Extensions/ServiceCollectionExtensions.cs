@@ -13,6 +13,14 @@ public static partial class ServiceCollectionExtensions
         return new SourceyBuilder(services);
     }
 
+    public static IServiceCollection AddSourcey(this IServiceCollection services, Action<ISourceyBuilder> options)
+    {
+        services.TryAddScoped<IExceptionStream, ExceptionStream>();
+        options(new SourceyBuilder(services));
+
+        return services;
+    }
+
     public static IEnumerable<T> GetRequiredServices<T>(this IServiceProvider source)
     {
         if (source == null)
