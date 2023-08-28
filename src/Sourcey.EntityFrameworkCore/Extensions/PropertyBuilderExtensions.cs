@@ -3,9 +3,9 @@ using Sourcey.Core.Keys;
 using Sourcey.EntityFrameworkCore.ChangeTracking;
 using Sourcey.EntityFrameworkCore.ValueConversion;
 
-namespace Sourcey.EntityFrameworkCore.Extensions;
+namespace Sourcey.Extensions;
 
-public static class PropertyBuilderExtensions
+public static partial class PropertyBuilderExtensions
 {
 
     public static PropertyBuilder<Causation> HasCausationValueConversion(this PropertyBuilder<Causation> builder)

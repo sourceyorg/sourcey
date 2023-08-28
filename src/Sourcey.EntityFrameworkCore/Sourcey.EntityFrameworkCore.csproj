@@ -16,11 +16,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sourcey.Core\Sourcey.Core.csproj" />
+    <ProjectReference Include="..\Sourcey\Sourcey.csproj" />
   </ItemGroup>
 
 </Project>

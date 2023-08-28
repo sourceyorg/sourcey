@@ -19,8 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sourcey.Aggregates\Sourcey.Aggregates.csproj" />
-    <ProjectReference Include="..\Sourcey.Events\Sourcey.Events.csproj" />
+    <ProjectReference Include="..\Sourcey\Sourcey.csproj" />
   </ItemGroup>
 
 </Project>
