@@ -1,4 +1,4 @@
-﻿namespace Sourcey.Core.Keys;
+﻿namespace Sourcey.Keys;
 
 public readonly struct Correlation : IEquatable<Correlation>
 {

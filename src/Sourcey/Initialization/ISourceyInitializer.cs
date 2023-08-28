@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 
-namespace Sourcey.Core.Initialization;
+namespace Sourcey.Initialization;
 
 public interface ISourceyInitializer
 {

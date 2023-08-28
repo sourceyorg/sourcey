@@ -1,6 +1,4 @@
-﻿using Sourcey.Core.Keys;
-
-namespace Sourcey.Events.Streams;
+﻿namespace Sourcey.Keys;
 
 public readonly struct StreamId : IEquatable<StreamId>
 {

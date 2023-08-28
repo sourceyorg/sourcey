@@ -1,6 +1,6 @@
 ﻿using Sourcey.Aggregates;
 using Sourcey.Aggregates.Builder;
-using Sourcey.Core.Builder;
+using Sourcey.Builder;
 
 namespace Sourcey.Extensions;
 

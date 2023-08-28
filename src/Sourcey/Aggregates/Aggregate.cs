@@ -1,5 +1,5 @@
 ﻿using Sourcey.Events;
-using Sourcey.Events.Streams;
+using Sourcey.Keys;
 
 namespace Sourcey.Aggregates;
 

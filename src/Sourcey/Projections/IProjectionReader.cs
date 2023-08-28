@@ -1,4 +1,4 @@
-﻿using Sourcey.Core.Keys;
+﻿using Sourcey.Keys;
 
 namespace Sourcey.Projections;
 

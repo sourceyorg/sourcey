@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sourcey.Core.Keys;
+using Sourcey.Keys;
 using Sourcey.EntityFrameworkCore.Events.DbContexts;
 using Sourcey.EntityFrameworkCore.Events.Factories;
 using Sourcey.Events;

@@ -1,4 +1,4 @@
-﻿using Sourcey.Core.Keys;
+﻿using Sourcey.Keys;
 using Sourcey.Events;
 using Sourcey.Events.Stores;
 using Sourcey.Events.Streams;

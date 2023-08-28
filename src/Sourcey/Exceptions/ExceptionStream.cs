@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Sourcey.Extensions;
 
-namespace Sourcey.Core.Exceptions;
+namespace Sourcey.Exceptions;
 
 internal sealed class ExceptionStream : IExceptionStream
 {

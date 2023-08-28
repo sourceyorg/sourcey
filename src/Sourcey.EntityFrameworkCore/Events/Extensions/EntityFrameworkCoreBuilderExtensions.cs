@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Sourcey.Core.Initialization;
+using Sourcey.Initialization;
 using Sourcey.EntityFrameworkCore.Builder;
 using Sourcey.EntityFrameworkCore.Events.Builder;
 using Sourcey.EntityFrameworkCore.Events.DbContexts;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Sourcey.Core.Builder;
+namespace Sourcey.Builder;
 
 public interface ISourceyBuilder
 {

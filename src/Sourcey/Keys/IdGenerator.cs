@@ -1,6 +1,6 @@
 ﻿using Sourcey.Extensions;
 
-namespace Sourcey.Core.Keys;
+namespace Sourcey.Keys;
 
 public static class IdGenerator
 {

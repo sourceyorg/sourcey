@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
-using Sourcey.Core.Keys;
+using Sourcey.Keys;
 using Sourcey.Events;
 using Sourcey.Events.Cache;
 using Sourcey.Events.Serialization;

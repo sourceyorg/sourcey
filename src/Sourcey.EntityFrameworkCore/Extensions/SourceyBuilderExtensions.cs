@@ -1,4 +1,4 @@
-﻿using Sourcey.Core.Builder;
+﻿using Sourcey.Builder;
 using Sourcey.EntityFrameworkCore.Builder;
 
 namespace Sourcey.Extensions;

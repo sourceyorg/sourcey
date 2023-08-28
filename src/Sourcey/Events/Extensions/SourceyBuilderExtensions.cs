@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.DependencyModel;
-using Sourcey.Core.Builder;
+using Sourcey.Builder;
 using Sourcey.Events;
 using Sourcey.Events.Cache;
 using Sourcey.Events.Streams;

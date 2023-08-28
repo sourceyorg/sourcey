@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Sourcey.Core.Initialization;
+using Sourcey.Initialization;
 using Sourcey.EntityFrameworkCore.Projections.DbContexts;
 using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts;
 using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts.ProjectionStates;

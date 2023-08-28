@@ -1,6 +1,6 @@
 ﻿using Sourcey.Events;
 using Sourcey.Events.Stores;
-using Sourcey.Events.Streams;
+using Sourcey.Keys;
 
 namespace Sourcey.EntityFrameworkCore.Events.Factories;
 

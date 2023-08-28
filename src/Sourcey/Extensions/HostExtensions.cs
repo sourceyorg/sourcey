@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Sourcey.Core.Initialization;
+using Sourcey.Initialization;
 
 namespace Sourcey.Extensions;
 

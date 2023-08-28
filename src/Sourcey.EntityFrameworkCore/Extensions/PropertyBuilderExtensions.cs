@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Sourcey.Core.Keys;
+using Sourcey.Keys;
 using Sourcey.EntityFrameworkCore.ChangeTracking;
 using Sourcey.EntityFrameworkCore.ValueConversion;
 

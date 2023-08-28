@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Sourcey.Core.Keys;
+using Sourcey.Keys;
 using Sourcey.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
 using Sourcey.Projections;
 using Sourcey.Extensions;

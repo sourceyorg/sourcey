@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Sourcey.Core.Keys;
+using Sourcey.Keys;
 
 namespace Sourcey.Serialization.Json.Converters;
 

@@ -1,4 +1,4 @@
-﻿using Sourcey.Core.Builder;
+﻿using Sourcey.Builder;
 using Sourcey.Serialization.Json.Builder;
 
 namespace Sourcey.Extensions;

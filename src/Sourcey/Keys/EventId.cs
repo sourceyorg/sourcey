@@ -1,6 +1,4 @@
-﻿using Sourcey.Core.Keys;
-
-namespace Sourcey.Events;
+﻿namespace Sourcey.Keys;
 
 public readonly struct EventId : IEquatable<EventId>
 {

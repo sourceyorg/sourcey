@@ -1,4 +1,4 @@
-﻿namespace Sourcey.Core.Exceptions;
+﻿namespace Sourcey.Exceptions;
 
 public interface IExceptionStream
 {

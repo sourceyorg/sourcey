@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Hosting;
-using Sourcey.Events.Streams;
+using Sourcey.Keys;
 
 namespace Sourcey.Aggregates.Snapshots;
 

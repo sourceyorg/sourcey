@@ -1,4 +1,4 @@
-﻿namespace Sourcey.Core.Keys;
+﻿namespace Sourcey.Keys;
 
 public readonly struct Causation : IEquatable<Causation>
 {

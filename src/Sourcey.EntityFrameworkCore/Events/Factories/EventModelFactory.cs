@@ -1,8 +1,8 @@
 ﻿using Sourcey.Events;
 using Sourcey.Events.Serialization;
 using Sourcey.Events.Stores;
-using Sourcey.Events.Streams;
 using Sourcey.Extensions;
+using Sourcey.Keys;
 
 namespace Sourcey.EntityFrameworkCore.Events.Factories;
 

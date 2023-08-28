@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Sourcey.Core.Builder;
-using Sourcey.Core.Exceptions;
+using Sourcey.Builder;
+using Sourcey.Exceptions;
 
 namespace Sourcey.Extensions;
 

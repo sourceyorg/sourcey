@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sourcey.Aggregates.Concurrency;
 using Sourcey.Aggregates.Snapshots;
-using Sourcey.Core.Exceptions;
-using Sourcey.Core.Keys;
+using Sourcey.Exceptions;
+using Sourcey.Keys;
 using Sourcey.Events;
 using Sourcey.Events.Stores;
 using Sourcey.Events.Streams;

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Sourcey.Events.Streams;
+using Sourcey.Keys;
 
 namespace Sourcey.EntityFrameworkCore.Events.ChangeTracking;
 

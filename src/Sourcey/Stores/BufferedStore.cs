@@ -1,7 +1,7 @@
 ﻿using System.Threading.Channels;
 using Microsoft.Extensions.Hosting;
 
-namespace Sourcey.Core.Stores;
+namespace Sourcey.Stores;
 
 public abstract class BufferedStore<TItem> : BackgroundService
 {

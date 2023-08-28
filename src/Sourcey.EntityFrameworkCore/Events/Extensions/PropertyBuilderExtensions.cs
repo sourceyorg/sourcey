@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sourcey.EntityFrameworkCore.Events.ChangeTracking;
 using Sourcey.EntityFrameworkCore.Events.ValueConversion;
-using Sourcey.Events;
-using Sourcey.Events.Streams;
+using Sourcey.Keys;
 
 namespace Sourcey.Extensions;
 

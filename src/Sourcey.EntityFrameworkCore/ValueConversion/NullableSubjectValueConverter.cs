@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Sourcey.Core.Keys;
+using Sourcey.Keys;
 
 namespace Sourcey.EntityFrameworkCore.ValueConversion;
 
