@@ -2,8 +2,14 @@
 
 namespace Sourcey.Aggregates;
 
+/// <summary>
+/// <inheritdoc/>
+/// </summary>
 internal sealed class AggregateFactory : IAggregateFactory
 {
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public TAggregate FromHistory<TAggregate, TState>(IEnumerable<IEvent>? events = null)
         where TAggregate : Aggregate<TState>
         where TState : IAggregateState, new()
@@ -20,6 +26,9 @@ internal sealed class AggregateFactory : IAggregateFactory
         return aggregate;
     }
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public TAggregate Create<TAggregate, TState>()
         where TAggregate : Aggregate<TState>
         where TState : IAggregateState, new()

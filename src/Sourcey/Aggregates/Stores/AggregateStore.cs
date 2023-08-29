@@ -5,10 +5,12 @@ using Sourcey.Exceptions;
 using Sourcey.Keys;
 using Sourcey.Events;
 using Sourcey.Events.Stores;
-using Sourcey.Events.Streams;
 
 namespace Sourcey.Aggregates.Stores;
 
+/// <summary>
+/// <inheritdoc/>
+/// </summary>
 internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEventStoreContext>
     where TEventStoreContext : IEventStoreContext
 {
@@ -42,6 +44,9 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
         _serviceScopeFactory = serviceScopeFactory;
     }
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public async Task<TAggregate?> GetAsync<TAggregate, TState>(StreamId id, CancellationToken cancellationToken = default)
         where TAggregate : Aggregate<TState>
         where TState : IAggregateState, new()
@@ -63,6 +68,9 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
         return aggregate;
     }
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
      public async Task SaveAsync<TState>(
         Aggregate<TState> aggregate,
         Actor? actor = null,
@@ -107,6 +115,9 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
         await SaveSnapshotAsync(aggregate, cancellationToken);
     }
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public async Task SaveAsync<TState>(Aggregate<TState> aggregate, CancellationToken cancellationToken = default)
         where TState : IAggregateState, new()
         => await SaveAsync(
@@ -118,6 +129,9 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
             expectedVersion: null,
             cancellationToken: cancellationToken);
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public async Task SaveAsync<TState>(Aggregate<TState> aggregate, IEventContext<IEvent> causation, int? expectedVersion = null, CancellationToken cancellationToken = default)
         where TState : IAggregateState, new()
         => await SaveAsync(
@@ -129,6 +143,9 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
             expectedVersion: expectedVersion,
             cancellationToken: cancellationToken);
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public async Task SaveAsync<TState>(Aggregate<TState> aggregate, IEventContext<IEvent> causation, CancellationToken cancellationToken = default)
         where TState : IAggregateState, new()
         => await SaveAsync(
