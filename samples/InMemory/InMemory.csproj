@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Sourcey\Sourcey.csproj" />
-    <ProjectReference Include="..\..\src\Sourcey.Serialization.Json\Sourcey.Serialization.Json.csproj" />
   </ItemGroup>
 
 </Project>

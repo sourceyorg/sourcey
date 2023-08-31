@@ -5,15 +5,12 @@ using InMemory.Projections.Managers;
 using Microsoft.AspNetCore.Mvc;
 using Sourcey.Aggregates;
 using Sourcey.Aggregates.Stores;
-using Sourcey.Events.Streams;
 using Sourcey.Extensions;
 using Sourcey.Keys;
 using Sourcey.Projections;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSourcey(builder =>
@@ -37,7 +34,7 @@ builder.Services.AddSourcey(builder =>
         x.WithInMemoryStateManager();
     });
 
-    builder.AddJsonSerialization(x =>
+    builder.AddSerialization(x =>
     {
         x.AddEventSerialization();
         x.AddAggregateSerialization();
@@ -46,7 +43,6 @@ builder.Services.AddSourcey(builder =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -58,7 +54,6 @@ app.UseHttpsRedirection();
 app.MapPost("/sample", async (
     [FromServices] IAggregateFactory aggregateFactory,
     [FromServices] IAggregateStore<SampleAggreagte, SampleState> aggregateStore,
-    [FromServices] IEventStreamManager eventStreamManager,
     [FromBody] SampleRequest request,
     CancellationToken cancellationToken) =>
 {
@@ -66,12 +61,10 @@ app.MapPost("/sample", async (
     aggregate.MakeSomethingHappen(request.Something);
     await aggregateStore.SaveAsync(aggregate, cancellationToken);
 
-    if(eventStreamManager.TryGetLastEvent<SomethingHappened>(aggregate.Id, out var @event))
-        return Results.Accepted(@event.StreamId);
-
-    return Results.Accepted("unknown");
+    return Results.Accepted(aggregate.Id);
 })
 .WithName("AddSample")
+.WithTags("Sample")
 .WithOpenApi();
 
 app.MapGet("/sample", async (
@@ -82,6 +75,7 @@ app.MapGet("/sample", async (
     return projections;
 })
 .WithName("GetSamples")
+.WithTags("Sample")
 .WithOpenApi();
 
 app.MapGet("/sample/{subject}", async (
@@ -93,6 +87,7 @@ app.MapGet("/sample/{subject}", async (
     return projection;
 })
 .WithName("GetSample")
+.WithTags("Sample")
 .WithOpenApi();
 
 await app.RunAsync();
