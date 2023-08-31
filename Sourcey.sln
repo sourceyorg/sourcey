@@ -33,6 +33,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.EntityFrameworkCore
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.Serialization.Json.Tests", "tests\Sourcey.Serialization.Json.Tests\Sourcey.Serialization.Json.Tests.csproj", "{C17ABA06-9937-4B79-B050-84B85F71EEB5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{023B1653-D745-4F5F-B2C4-37FCDFC40903}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InMemory", "samples\InMemory\InMemory.csproj", "{6759D376-185C-447B-BB40-9F3784804598}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +75,10 @@ Global
 		{C17ABA06-9937-4B79-B050-84B85F71EEB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C17ABA06-9937-4B79-B050-84B85F71EEB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C17ABA06-9937-4B79-B050-84B85F71EEB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6759D376-185C-447B-BB40-9F3784804598}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6759D376-185C-447B-BB40-9F3784804598}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6759D376-185C-447B-BB40-9F3784804598}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6759D376-185C-447B-BB40-9F3784804598}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,6 +93,7 @@ Global
 		{36397B9F-5875-4D18-ABC4-F618F28922EA} = {B90D8DB0-BEAA-473F-AA75-9CBA71EC1ABC}
 		{452DA726-74E6-4BE7-B1E1-55DDA064037C} = {B90D8DB0-BEAA-473F-AA75-9CBA71EC1ABC}
 		{C17ABA06-9937-4B79-B050-84B85F71EEB5} = {B90D8DB0-BEAA-473F-AA75-9CBA71EC1ABC}
+		{6759D376-185C-447B-BB40-9F3784804598} = {023B1653-D745-4F5F-B2C4-37FCDFC40903}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6CD256CE-A8F8-4D99-A2CB-9515CAA6F31D}

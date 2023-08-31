@@ -19,7 +19,7 @@ public static partial class ServiceCollectionExtensions
     public static IServiceCollection AddAggregateStore<TEventStoreContext>(this IServiceCollection services)
         where TEventStoreContext : IEventStoreContext
     {
-        services.TryAddScoped<IAggregateStore<TEventStoreContext>, AggregateStore<TEventStoreContext>>();
+        // services.TryAddScoped<IAggregateStore<TEventStoreContext>, AggregateStore<TEventStoreContext>>();
         return services;
     }
 }

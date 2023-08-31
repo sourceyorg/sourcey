@@ -26,8 +26,17 @@ internal readonly struct EventsBuilder: IEventsBuilder
 
     public IEventsBuilder RegisterEventCache(params Type[] types)
     {
+        var eventType = typeof(IEvent);
         foreach (var type in types)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(types));
+                
+            if(!eventType.IsAssignableFrom(type))
+                throw new ArgumentException($"Type {type} is not an event type.");
+
             Services.AddSingleton(new EventTypeCacheRecord(type));
+        }
 
         return this;
     }

@@ -10,21 +10,20 @@ using Sourcey.Projections.Configuration;
 
 namespace Sourcey.Projections;
 
-public sealed class StoreProjector<TProjection, TDbContextStore> : BackgroundService
+public sealed class StoreProjector<TProjection> : BackgroundService
     where TProjection : class, IProjection
-    where TDbContextStore : IEventStoreContext
 {
     private readonly IProjectionManager<TProjection> _projectionManager;
     private readonly IProjectionStateManager<TProjection> _projectionStateManager;
     private readonly IServiceScope _scope;
-    private readonly IEventStore<TDbContextStore> _eventStore;
-    private readonly ILogger<StoreProjector<TProjection, TDbContextStore>> _logger;
+    private readonly IEventStoreFactory _eventStoreFactory;
+    private readonly ILogger<StoreProjector<TProjection>> _logger;
     private readonly IOptionsMonitor<StoreProjectorOptions<TProjection>> _options;
     private readonly string _name;
     private int _retries = 0;
 
     public StoreProjector(IServiceScopeFactory serviceScopeFactory,
-        ILogger<StoreProjector<TProjection, TDbContextStore>> logger)
+        ILogger<StoreProjector<TProjection>> logger)
     {
         if (serviceScopeFactory == null)
             throw new ArgumentNullException(nameof(serviceScopeFactory));
@@ -36,7 +35,7 @@ public sealed class StoreProjector<TProjection, TDbContextStore> : BackgroundSer
 
         _projectionManager = _scope.ServiceProvider.GetRequiredService<IProjectionManager<TProjection>>();
         _projectionStateManager = _scope.ServiceProvider.GetRequiredService<IProjectionStateManager<TProjection>>();
-        _eventStore = _scope.ServiceProvider.GetRequiredService<IEventStore<TDbContextStore>>();
+        _eventStoreFactory = _scope.ServiceProvider.GetRequiredService<IEventStoreFactory>();
         _options = _scope.ServiceProvider.GetRequiredService<IOptionsMonitor<StoreProjectorOptions<TProjection>>>();
 
         _name = typeof(TProjection).FriendlyFullName();
@@ -46,7 +45,7 @@ public sealed class StoreProjector<TProjection, TDbContextStore> : BackgroundSer
     {
         if (cancellationToken.IsCancellationRequested)
         {
-            _logger.LogInformation($"{nameof(StoreProjector<TProjection, TDbContextStore>)}.{nameof(ResetAsync)} was cancelled before execution");
+            _logger.LogInformation($"{nameof(StoreProjector<TProjection>)}.{nameof(ResetAsync)} was cancelled before execution");
             cancellationToken.ThrowIfCancellationRequested();
         }
 
@@ -59,11 +58,12 @@ public sealed class StoreProjector<TProjection, TDbContextStore> : BackgroundSer
     {
         if (cancellationToken.IsCancellationRequested)
         {
-            _logger.LogInformation($"{nameof(StoreProjector<TProjection, TDbContextStore>)}.{nameof(ExecuteAsync)} was cancelled before execution");
+            _logger.LogInformation($"{nameof(StoreProjector<TProjection>)}.{nameof(ExecuteAsync)} was cancelled before execution");
             cancellationToken.ThrowIfCancellationRequested();
         }
 
         var state = await _projectionStateManager.RetrieveAsync(cancellationToken) ?? await _projectionStateManager.CreateAsync(cancellationToken);
+        var eventStore = _eventStoreFactory.Create<TProjection>();
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -71,7 +71,7 @@ public sealed class StoreProjector<TProjection, TDbContextStore> : BackgroundSer
             {
                 state = await _projectionStateManager.RetrieveAsync(cancellationToken);
 
-                var page = await _eventStore.GetEventsAsync(state.Position, _options.CurrentValue.PageSize, cancellationToken);;
+                var page = await eventStore.GetEventsAsync(state.Position, _options.CurrentValue.PageSize, cancellationToken);;
 
                 await Task.WhenAll(page.Events.Select(e => ProjectStreamAsync(e.Value, cancellationToken)));
 

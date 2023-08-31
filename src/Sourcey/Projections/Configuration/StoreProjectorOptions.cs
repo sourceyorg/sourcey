@@ -8,15 +8,25 @@ public sealed class StoreProjectorOptions<TProjection>
 
     }
 
-    public int Interval { get; set; }
-    public int PageSize { get; set; }
-    public int RetryCount { get; set; }
+    internal int Interval { get; set; } = 5000;
+    internal int PageSize { get; set; } = 500;
+    internal int RetryCount { get; set; } = 5;
 
-
-    public static StoreProjectorOptions<TProjection> Default = new()
+    public StoreProjectorOptions<TProjection> WithInterval(int interval)
     {
-        Interval = 5000,
-        PageSize = 500,
-        RetryCount = 5
-    };
+        Interval = interval;
+        return this;
+    }
+
+    public StoreProjectorOptions<TProjection> WithPageSize(int pageSize)
+    {
+        PageSize = pageSize;
+        return this;
+    }
+
+    public StoreProjectorOptions<TProjection> WithRetries(int retryCount)
+    {
+        RetryCount = retryCount;
+        return this;
+    }
 }

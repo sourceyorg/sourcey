@@ -11,23 +11,24 @@ namespace Sourcey.Aggregates.Stores;
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEventStoreContext>
-    where TEventStoreContext : IEventStoreContext
+internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggregate, TState>
+    where TState : IAggregateState, new()
+    where TAggregate : Aggregate<TState>
 {
-    private readonly IEventStore<TEventStoreContext> _eventStore;
+    private readonly IEventStoreFactory _eventStoreFactory;
     private readonly IAggregateFactory _aggregateFactory;
     private readonly IConflictResolver _conflictResolver;
     private readonly IExceptionStream _exceptionStream;
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public AggregateStore(IEventStore<TEventStoreContext> eventStore,
+    public AggregateStore(IEventStoreFactory eventStoreFactory,
         IAggregateFactory aggregateFactory,
         IConflictResolver conflictResolver,
         IExceptionStream exceptionStream,
         IServiceScopeFactory serviceScopeFactory)
     {
-        if (eventStore == null)
-            throw new ArgumentNullException(nameof(eventStore));
+        if (eventStoreFactory == null)
+            throw new ArgumentNullException(nameof(eventStoreFactory));
         if (aggregateFactory == null)
             throw new ArgumentNullException(nameof(aggregateFactory));
         if (conflictResolver == null)
@@ -37,7 +38,7 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
         if (serviceScopeFactory == null)
             throw new ArgumentNullException(nameof(serviceScopeFactory));
 
-        _eventStore = eventStore;
+        _eventStoreFactory = eventStoreFactory;
         _aggregateFactory = aggregateFactory;
         _conflictResolver = conflictResolver;
         _exceptionStream = exceptionStream;
@@ -47,18 +48,16 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public async Task<TAggregate?> GetAsync<TAggregate, TState>(StreamId id, CancellationToken cancellationToken = default)
-        where TAggregate : Aggregate<TState>
-        where TState : IAggregateState, new()
+    public async Task<TAggregate?> GetAsync(StreamId id, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var snapshot = await GetSnapshotAsync<TAggregate, TState>(id, cancellationToken);
+        var snapshot = await GetSnapshotAsync(id, cancellationToken);
 
         if (snapshot is not null)
             return snapshot;
 
-        var events = await _eventStore.GetEventsAsync(id, null, cancellationToken);
+        var events = await _eventStoreFactory.Create<TAggregate, TState>().GetEventsAsync(id, null, cancellationToken);
 
         if (!events.Any())
             return null;
@@ -71,15 +70,14 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-     public async Task SaveAsync<TState>(
-        Aggregate<TState> aggregate,
+     public async Task SaveAsync(
+        TAggregate aggregate,
         Actor? actor = null,
         Causation? causation = null,
         Correlation? correlation = null,
         DateTimeOffset? scheduledPublication = null,
         int? expectedVersion = null,
         CancellationToken cancellationToken = default)
-    where TState : IAggregateState, new()
     {
         if (aggregate == null)
             throw new ArgumentNullException(nameof(aggregate));
@@ -91,7 +89,9 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
         if (!events.Any())
             return;
 
-        var currentVersion = await _eventStore.CountAsync(aggregate.Id);
+        var eventStore = _eventStoreFactory.Create<TAggregate, TState>();
+
+        var currentVersion = await eventStore.CountAsync(aggregate.Id);
 
         if (expectedVersion.HasValue && expectedVersion.Value != currentVersion
             && !await ResolveConflictAsync(aggregate, expectedVersion.Value, currentVersion, cancellationToken))
@@ -108,7 +108,7 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
             actor: actor ?? Actor.From("unknown"),
             scheduledPublication: scheduledPublication));
 
-        await _eventStore.SaveAsync(aggregate.Id, contexts);
+        await eventStore.SaveAsync(aggregate.Id, contexts);
 
         aggregate.ClearUncommittedEvents();
 
@@ -118,8 +118,9 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public async Task SaveAsync<TState>(Aggregate<TState> aggregate, CancellationToken cancellationToken = default)
-        where TState : IAggregateState, new()
+    public async Task SaveAsync(
+        TAggregate aggregate,
+        CancellationToken cancellationToken = default)
         => await SaveAsync(
             aggregate: aggregate,
             actor: null,
@@ -132,8 +133,11 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public async Task SaveAsync<TState>(Aggregate<TState> aggregate, IEventContext<IEvent> causation, int? expectedVersion = null, CancellationToken cancellationToken = default)
-        where TState : IAggregateState, new()
+    public async Task SaveAsync(
+        TAggregate aggregate,
+        IEventContext<IEvent> causation,
+        int? expectedVersion = null,
+        CancellationToken cancellationToken = default)
         => await SaveAsync(
             aggregate: aggregate,
             actor: causation.Actor,
@@ -146,18 +150,23 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public async Task SaveAsync<TState>(Aggregate<TState> aggregate, IEventContext<IEvent> causation, CancellationToken cancellationToken = default)
-        where TState : IAggregateState, new()
+    public async Task SaveAsync(
+        TAggregate aggregate,
+        IEventContext<IEvent> causation,
+        CancellationToken cancellationToken = default)
         => await SaveAsync(
             aggregate: aggregate,
             causation: causation,
             expectedVersion: null,
             cancellationToken: cancellationToken);
 
-    private async Task<bool> ResolveConflictAsync<TState>(Aggregate<TState> aggregate, int expectedVersion, long currentVersion, CancellationToken cancellationToken = default)
-        where TState : IAggregateState, new()
+    private async Task<bool> ResolveConflictAsync(
+        TAggregate aggregate,
+        int expectedVersion,
+        long currentVersion,
+        CancellationToken cancellationToken = default)
     {
-        var exisitngEvents = await _eventStore.GetEventsAsync(aggregate.Id, null, cancellationToken);
+        var exisitngEvents = await _eventStoreFactory.Create<TAggregate, TState>().GetEventsAsync(aggregate.Id, null, cancellationToken);
         exisitngEvents = exisitngEvents.OrderByDescending(e => e.Payload.Version);
         var prevEvent = exisitngEvents.FirstOrDefault(e => e.Payload.Version < expectedVersion);
         var nextEvent = exisitngEvents.FirstOrDefault(e => e.Payload.Version > expectedVersion);
@@ -174,11 +183,9 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
         return true;
     }
 
-    private async Task<TAggregate> RehydrateAsync<TAggregate, TState>(TAggregate aggregate, CancellationToken cancellationToken = default)
-        where TAggregate : Aggregate<TState>
-        where TState : IAggregateState, new()
+    private async Task<TAggregate> RehydrateAsync(TAggregate aggregate, CancellationToken cancellationToken = default)
     {
-        var events = await _eventStore.GetEventsBackwardsAsync(aggregate.Id, aggregate.Version, null, cancellationToken);
+        var events = await _eventStoreFactory.Create<TAggregate, TState>().GetEventsBackwardsAsync(aggregate.Id, aggregate.Version, null, cancellationToken);
 
         if (!events.Any())
             return aggregate;
@@ -189,9 +196,7 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
         return aggregate;
     }
 
-    private async Task<TAggregate?> GetSnapshotAsync<TAggregate, TState>(StreamId streamId, CancellationToken cancellationToken = default)
-        where TAggregate : Aggregate<TState>
-        where TState : IAggregateState, new()
+    private async Task<TAggregate?> GetSnapshotAsync(StreamId streamId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -201,11 +206,10 @@ internal sealed class AggregateStore<TEventStoreContext> : IAggregateStore<TEven
         if (snapshot == null)
             return null;
 
-        return await snapshot.GetAsync(streamId, RehydrateAsync<TAggregate, TState>, cancellationToken);
+        return await snapshot.GetAsync(streamId, RehydrateAsync, cancellationToken);
     }
 
-    private async Task SaveSnapshotAsync<TState>(Aggregate<TState> aggregate, CancellationToken cancellationToken = default)
-        where TState : IAggregateState, new()
+    private async Task SaveSnapshotAsync(TAggregate aggregate, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

@@ -3,8 +3,12 @@ using Sourcey.Events.Streams;
 
 namespace Sourcey.Events.Stores;
 
-public interface IEventStore<TEventStoreContext>
+public interface IEventStore<TEventStoreContext> : IEventStore
     where TEventStoreContext : IEventStoreContext
+{
+}
+
+public interface IEventStore
 {
     Task<Page> GetEventsAsync(long offset, int? pageSize = null, CancellationToken cancellationToken = default);
     Task<IEnumerable<IEventContext<IEvent>>> GetEventsAsync(StreamId streamId, int? pageSize = null, CancellationToken cancellationToken = default);

@@ -40,4 +40,18 @@ public static class TypeExtensions
         var name = type.FullName ?? type.Name;
         return name.Split('`')[0] + "<" + string.Join(", ", type.GetGenericArguments().Select(arg => arg.FriendlyName())) + ">";
     }
+
+    public static bool IsSubclassOfGeneric(this Type toCheck, Type generic)
+    {
+        while (toCheck != null && toCheck != typeof(object))
+        {
+            var cur = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
+            if (generic == cur)
+            {
+                return true;
+            }
+            toCheck = toCheck.BaseType;
+        }
+        return false;
+    }
 }
