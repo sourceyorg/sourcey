@@ -16,14 +16,14 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
     private static readonly int DefaultReloadInterval = 50;
     private static readonly int DefaultPageSize = 500;
 
-    private readonly IEventStoreDbContextFactory<TStoreDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<TStoreDbContext> _dbContextFactory;
     private readonly IEventContextFactory _eventContextFactory;
     private readonly IEventModelFactory _eventModelFactory;
     private readonly IEventTypeCache _eventTypeCache;
     private readonly ILogger<EventStore<TStoreDbContext>> _logger;
     private readonly IEventStreamManager _eventStreamManager;
 
-    public EventStore(IEventStoreDbContextFactory<TStoreDbContext> dbContextFactory,
+    public EventStore(IDbContextFactory<TStoreDbContext> dbContextFactory,
                                          IEventContextFactory eventContextFactory,
                                          IEventModelFactory eventModelFactory,
                                          IEventTypeCache eventTypeCache,
@@ -53,7 +53,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
     public async Task<long> CountAsync(StreamId streamId, CancellationToken cancellationToken = default)
     {
-        using var context = _dbContextFactory.Create();
+        using var context = _dbContextFactory.CreateDbContext();
         return await context.Events.LongCountAsync(@event => @event.StreamId == streamId, cancellationToken);
     }
 
@@ -135,7 +135,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
     public async Task<IEventContext<IEvent>> GetEventAsync(Subject subject, CancellationToken cancellationToken = default)
     {
-        using (var context = _dbContextFactory.Create())
+        using (var context = _dbContextFactory.CreateDbContext())
         {
             var @event = await context.Events
                 .AsNoTracking()
@@ -175,7 +175,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
         if (events == null)
             throw new ArgumentNullException(nameof(events));
 
-        using (var context = _dbContextFactory.Create())
+        using (var context = _dbContextFactory.CreateDbContext())
         {
             foreach (var @event in events)
                 await context.Events.AddAsync(_eventModelFactory.Create(streamId, @event));
@@ -207,7 +207,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
     private async Task<List<Entities.Event>> GetEventsBackwardsInternalAsync(StreamId streamId, long? version, long? position, CancellationToken cancellationToken = default)
     {
-        using var context = _dbContextFactory.Create();
+        using var context = _dbContextFactory.CreateDbContext();
 
         var events = context.Events
             .AsNoTracking()
@@ -225,7 +225,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
     private async Task<List<Entities.Event>> GetAllEventsForwardsInternalAsync(long offset, int? pageSize = null, CancellationToken cancellationToken = default)
     {
-        using var context = _dbContextFactory.Create();
+        using var context = _dbContextFactory.CreateDbContext();
 
         var events = context.Events
             .AsNoTracking()
@@ -241,7 +241,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
     private async Task<List<Entities.Event>> GetAllEventsForwardsForStreamInternalAsync(StreamId streamId, DateTimeOffset timeStamp, int? pageSize = null, CancellationToken cancellationToken = default)
     {
-        using var context = _dbContextFactory.Create();
+        using var context = _dbContextFactory.CreateDbContext();
         
         var events = context.Events
             .AsNoTracking()
@@ -258,7 +258,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
     private async Task<List<Entities.Event>> GetAllEventsForwardsForStreamInternalAsync(StreamId streamId, long offset, int? pageSize = null, CancellationToken cancellationToken = default)
     {
-        using var context = _dbContextFactory.Create();
+        using var context = _dbContextFactory.CreateDbContext();
         
         var events = context.Events
             .AsNoTracking()

@@ -24,6 +24,8 @@ public readonly struct Correlation : IEquatable<Correlation>
         return new Correlation(value);
     }
 
+    public static readonly Correlation Unknown = new("Unknown");
+
     public bool Equals(Correlation other) => _value == other._value;
     public override bool Equals(object? obj) => obj is Correlation other && Equals(other);
     public override int GetHashCode() => _value.GetHashCode();

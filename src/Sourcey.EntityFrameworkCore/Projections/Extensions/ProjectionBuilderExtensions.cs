@@ -1,24 +1,31 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Sourcey.EntityFrameworkCore.Projections;
-using Sourcey.EntityFrameworkCore.Projections.Builder;
 using Sourcey.Projections;
 using Sourcey.Projections.Builder;
+using Sourcey.Projections.InMemory;
 
 namespace Sourcey.Extensions;
 
-public static class ProjectionBuilderExtensions
+public static partial class ProjectionBuilderExtensions
 {
-    public static IProjectionBuilder<TProjection> WithEntityFrameworkCoreWriter<TProjection>(this IProjectionBuilder<TProjection> builder,
-        Action<IEntityFrameworkCoreProjectionWriterBuilder<TProjection>> configuration)
-        
-        where TProjection : class, IProjection
+    public static IProjectionBuilder<TProjection> WithEntityFrameworkCoreStateManager<TProjection>(
+        this IProjectionBuilder<TProjection> builder,
+        Action<IEntityFrameworkCoreStateManagementBuilder<TProjection>> action)
+        where TProjection : class, IProjection, new()
     {
-        builder.Services.TryAddScoped<IProjectionWriter<TProjection>, ProjectionWriter<TProjection>>();
-        builder.Services.TryAddScoped<IProjectionReader<TProjection>, ProjectionReader<TProjection>>();
+        builder.Services.TryAddScoped<IProjectionStateManager<TProjection>, ProjectionStateManager<TProjection>>();
+        action(new EntityFrameworkCoreStateManagementBuilder<TProjection>(builder.Services));
+        return builder;
+    }
 
-        var entityFrameworkCoreProjectionWriterBuilder = new EntityFrameworkCoreProjectionWriterBuilder<TProjection>(builder.Services);
-        configuration(entityFrameworkCoreProjectionWriterBuilder);
-
+    public static IProjectionBuilder<TProjection> WithEntityFrameworkCoreWriter<TProjection>(this IProjectionBuilder<TProjection> builder, Action<IEntityFrameworkCoreProjectionManagerBuilder<TProjection>> action)
+        where TProjection : class, IProjection, new()
+    {
+        builder.Services.AddScoped<IProjectionReader<TProjection>, ProjectionReader<TProjection>>();
+        builder.Services.AddScoped<IProjectionWriter<TProjection>, ProjectionWriter<TProjection>>();
+        action(new EntityFrameworkCoreProjectionManagerBuilder<TProjection>(builder.Services));
         return builder;
     }
 }

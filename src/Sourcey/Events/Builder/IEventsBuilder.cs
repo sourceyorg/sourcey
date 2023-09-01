@@ -8,5 +8,4 @@ public interface IEventsBuilder
     IEventsBuilder RegisterEventCache<TEvent>() where TEvent : IEvent;
     IEventsBuilder RegisterEventCache(params Type[] types);
     IEventsBuilder RegisterEventCache();
-
 }

@@ -1,26 +1,35 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Sourcey.EntityFrameworkCore.Builder;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sourcey.EntityFrameworkCore.Events.DbContexts;
-using Sourcey.Extensions;
+using Sourcey.EntityFrameworkCore.Events.Factories;
+using Sourcey.EntityFrameworkCore.Events.Initializers;
+using Sourcey.EntityFrameworkCore.Events.Stores;
+using Sourcey.Events.Builder;
+using Sourcey.Events.Stores;
+using Sourcey.Initialization;
 
 namespace Sourcey.EntityFrameworkCore.Events.Builder;
 
-internal readonly struct EntityFrameworkCoreEventStoreBuilder<TEventStoreContext> : IEntityFrameworkCoreEventStoreBuilder<TEventStoreContext>
+internal sealed class EntityFrameworkCoreEventStoreBuilder<TEventStoreContext> : BaseEventStoreBuilder<TEventStoreContext>
     where TEventStoreContext : DbContext, IEventStoreDbContext
 {
-    private readonly IEntityFrameworkCoreBuilder _parent;
-    public readonly IServiceCollection Services => _parent.Services;
-
-    public EntityFrameworkCoreEventStoreBuilder(IEntityFrameworkCoreBuilder parent)
+    public EntityFrameworkCoreEventStoreBuilder(
+        IServiceCollection services,
+        Action<DbContextOptionsBuilder> options,
+        bool autoMigrate = true) : base(services)
     {
-        if (parent == null)
-            throw new ArgumentNullException(nameof(parent));
-
-        _parent = parent;
+        services.AddDbContextFactory<TEventStoreContext>(options);
+        services.AddScoped<ISourceyInitializer, EventStoreInitializer<TEventStoreContext>>();
+        services.AddSingleton(new EventStoreInitializerOptions<TEventStoreContext>(autoMigrate));
+        services.TryAddScoped<IEventContextFactory, EventContextFactory>();
+        services.TryAddScoped<IEventModelFactory, EventModelFactory>();
+        services.AddScoped<IEventStore<TEventStoreContext>, EventStore<TEventStoreContext>>();
     }
 
-    public IEntityFrameworkCoreEventStoreBuilder<TNewEventStoreContext> AddEventStore<TNewEventStoreContext>(Action<DbContextOptionsBuilder> options)
-        where TNewEventStoreContext : DbContext, IEventStoreDbContext
-        => _parent.AddEventStore<TNewEventStoreContext>(options);
+    protected override TEventStoreContext GetEventStoreContext(IServiceProvider provider)
+    {
+        var factory = provider.GetRequiredService<IDbContextFactory<TEventStoreContext>>();
+        return factory.CreateDbContext();
+    }
 }

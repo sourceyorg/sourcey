@@ -6,6 +6,7 @@ using Sourcey.Builder;
 using Sourcey.Events;
 using Sourcey.Events.Builder;
 using Sourcey.Events.Cache;
+using Sourcey.Events.Stores;
 using Sourcey.Events.Streams;
 
 namespace Sourcey.Extensions;
@@ -16,7 +17,7 @@ public static partial class SourceyBuilderExtensions
     public static ISourceyBuilder AddEvents(this ISourceyBuilder builder)
     {
         builder.Services.TryAddScoped<IEventStreamManager, EventStreamManager>();
-        builder.Services.TryAddScoped<IEventTypeCache, EventTypeCache>();
+        builder.Services.TryAddSingleton<IEventTypeCache, EventTypeCache>();
 
         return builder;
     }
@@ -24,7 +25,9 @@ public static partial class SourceyBuilderExtensions
     public static ISourceyBuilder AddEvents(this ISourceyBuilder builder, Action<IEventsBuilder> options)
     {
         builder.Services.TryAddScoped<IEventStreamManager, EventStreamManager>();
-        builder.Services.TryAddScoped<IEventTypeCache, EventTypeCache>();
+        builder.Services.TryAddSingleton<IEventTypeCache, EventTypeCache>();
+        builder.Services.TryAddScoped<IEventStoreContextFactory, EventStoreContextFactory>();
+        builder.Services.TryAddScoped<IEventStoreFactory, EventStoreFactory>();
         options(new EventsBuilder(builder.Services));
 
         return builder;

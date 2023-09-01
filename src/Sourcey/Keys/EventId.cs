@@ -24,6 +24,8 @@ public readonly struct EventId : IEquatable<EventId>
         return new EventId(value);
     }
 
+    public static readonly EventId Unknown = new("Unknown");
+
     public bool Equals(EventId other) => _value == other._value;
     public override bool Equals(object? obj) => obj is EventId other && Equals(other);
     public override int GetHashCode() => _value.GetHashCode();

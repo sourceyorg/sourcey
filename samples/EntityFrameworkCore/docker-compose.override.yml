@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  entityframeworkcore.sqlserver:
+    ports:
+       - '5437:1433'
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=1qaz-pl,

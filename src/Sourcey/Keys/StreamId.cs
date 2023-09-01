@@ -24,6 +24,8 @@ public readonly struct StreamId : IEquatable<StreamId>
         return new StreamId(value);
     }
 
+    public static readonly StreamId Unknown = new("Unknown");
+
     public bool Equals(StreamId other) => _value == other._value;
     public override bool Equals(object? obj) => obj is StreamId other && Equals(other);
     public override int GetHashCode() => _value.GetHashCode();

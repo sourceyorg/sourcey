@@ -10,11 +10,11 @@ internal class EventStoreInitializer<TEventStoreDbContext> : ISourceyInitializer
     where TEventStoreDbContext : DbContext, IEventStoreDbContext
 {
     public bool ParallelEnabled => false;
-    private readonly IEventStoreDbContextFactory<TEventStoreDbContext> _eventStoreDbContextFactory;
+    private readonly IDbContextFactory<TEventStoreDbContext> _eventStoreDbContextFactory;
     private readonly EventStoreInitializerOptions<TEventStoreDbContext> _options;
 
 
-    public EventStoreInitializer(IEventStoreDbContextFactory<TEventStoreDbContext> eventStoreDbContextFactory,
+    public EventStoreInitializer(IDbContextFactory<TEventStoreDbContext> eventStoreDbContextFactory,
         EventStoreInitializerOptions<TEventStoreDbContext> options)
     {
         if (eventStoreDbContextFactory is null)
@@ -31,7 +31,7 @@ internal class EventStoreInitializer<TEventStoreDbContext> : ISourceyInitializer
         if (!_options.AutoMigrate)
             return;
         
-        using var context = _eventStoreDbContextFactory.Create();
+        using var context = _eventStoreDbContextFactory.CreateDbContext();
         await context.Database.MigrateAsync();
     }
 }
