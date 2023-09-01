@@ -2,6 +2,6 @@
 
 public interface ISerializationBuilder
 {
-    ISerializationBuilder AddEventSerialization();
-    ISerializationBuilder AddAggregateSerialization();
+    ISerializationBuilder WithEvents();
+    ISerializationBuilder WithAggregates();
 }

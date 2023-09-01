@@ -1,16 +1,18 @@
-﻿using System.Text.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Newtonsoft.Json;
 using Sourcey.Aggregates.Serialization;
 using Sourcey.Events.Serialization;
-using Sourcey.Serialization.Aggregates;
-using Sourcey.Serialization.Events;
+using Sourcey.Newtonsoft.Json.Aggregates;
+using Sourcey.Newtonsoft.Json.Converters;
+using Sourcey.Newtonsoft.Json.Events;
+using Sourcey.Serialization.Builder;
 
-namespace Sourcey.Serialization.Builder;
+namespace Sourcey.Newtonsoft.Json.Builder;
 
 internal readonly struct SerializationBuilder : ISerializationBuilder
 {
-    public readonly IServiceCollection _services;
+    private readonly IServiceCollection _services;
 
     public SerializationBuilder(IServiceCollection services)
     {

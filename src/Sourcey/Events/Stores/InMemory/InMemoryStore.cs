@@ -7,7 +7,18 @@ using Sourcey.Keys;
 namespace Sourcey.Events.Stores.InMemory;
 
 
-internal sealed record InMemoryContext : IEventStoreContext;
+internal sealed class InMemoryContext : IEventStoreContext
+{
+    // public void Dispose()
+    // {
+    //     return;
+    // }
+
+    // public ValueTask DisposeAsync()
+    // {
+    //     return new();
+    // }
+}
 
 internal sealed record InMemoryEvent(
         StreamId StreamId,

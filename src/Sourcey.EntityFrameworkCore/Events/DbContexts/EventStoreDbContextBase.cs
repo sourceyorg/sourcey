@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sourcey.EntityFrameworkCore.Events.Entities;
 using Sourcey.EntityFrameworkCore.Events.EntityTypeConfigurations;
+using Sourcey.Extensions;
 
 namespace Sourcey.EntityFrameworkCore.Events.DbContexts;
 
@@ -16,8 +17,7 @@ public class EventStoreDbContextBase<TStoreDbContext> : DbContext, IEventStoreDb
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.ApplyConfiguration(new EventEntityTypeConfiguration(Schema));
-
+        builder.ApplyEventConfiguration(Schema);
         base.OnModelCreating(builder);
     }
 }

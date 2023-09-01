@@ -17,25 +17,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{A4C3E6AA-FC9B-402C-BCC0-4BC8EE830206}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.Testing", "tests\Sourcey.Testing\Sourcey.Testing.csproj", "{999D7F25-1752-438F-8BDF-10951DF61F96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey.Testing", "tests\Sourcey.Testing\Sourcey.Testing.csproj", "{999D7F25-1752-438F-8BDF-10951DF61F96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.Testing.Integration", "tests\Sourcey.Testing.Integration\Sourcey.Testing.Integration.csproj", "{A079D762-C27F-4599-B2DD-6FA860479E37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey.Testing.Integration", "tests\Sourcey.Testing.Integration\Sourcey.Testing.Integration.csproj", "{A079D762-C27F-4599-B2DD-6FA860479E37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey", "src\Sourcey\Sourcey.csproj", "{AAF073C2-FE8C-4EF4-91C9-ED593EEE10B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey", "src\Sourcey\Sourcey.csproj", "{AAF073C2-FE8C-4EF4-91C9-ED593EEE10B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.EntityFrameworkCore", "src\Sourcey.EntityFrameworkCore\Sourcey.EntityFrameworkCore.csproj", "{15AD476A-FAB2-46A6-8D7B-1277704E092A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey.EntityFrameworkCore", "src\Sourcey.EntityFrameworkCore\Sourcey.EntityFrameworkCore.csproj", "{15AD476A-FAB2-46A6-8D7B-1277704E092A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.Serialization.Json", "src\Sourcey.Serialization.Json\Sourcey.Serialization.Json.csproj", "{50F8658C-9DAE-4261-B7F3-CBD820AF8062}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey.Newtonsoft.Json", "src\Sourcey.Newtonsoft.Json\Sourcey.Newtonsoft.Json.csproj", "{50F8658C-9DAE-4261-B7F3-CBD820AF8062}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.Tests", "tests\Sourcey.Tests\Sourcey.Tests.csproj", "{36397B9F-5875-4D18-ABC4-F618F28922EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey.Tests", "tests\Sourcey.Tests\Sourcey.Tests.csproj", "{36397B9F-5875-4D18-ABC4-F618F28922EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.EntityFrameworkCore.Tests", "tests\Sourcey.EntityFrameworkCore.Tests\Sourcey.EntityFrameworkCore.Tests.csproj", "{452DA726-74E6-4BE7-B1E1-55DDA064037C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey.EntityFrameworkCore.Tests", "tests\Sourcey.EntityFrameworkCore.Tests\Sourcey.EntityFrameworkCore.Tests.csproj", "{452DA726-74E6-4BE7-B1E1-55DDA064037C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sourcey.Serialization.Json.Tests", "tests\Sourcey.Serialization.Json.Tests\Sourcey.Serialization.Json.Tests.csproj", "{C17ABA06-9937-4B79-B050-84B85F71EEB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sourcey.Newtonsoft.Json.Tests", "tests\Sourcey.Newtonsoft.Json.Tests\Sourcey.Newtonsoft.Json.Tests.csproj", "{C17ABA06-9937-4B79-B050-84B85F71EEB5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{023B1653-D745-4F5F-B2C4-37FCDFC40903}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InMemory", "samples\InMemory\InMemory.csproj", "{6759D376-185C-447B-BB40-9F3784804598}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InMemory", "samples\InMemory\InMemory.csproj", "{6759D376-185C-447B-BB40-9F3784804598}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFrameworkCore", "samples\EntityFrameworkCore\EntityFrameworkCore.csproj", "{4ACD3E1D-BE37-4CAC-AB0B-4ED1734AA211}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,10 @@ Global
 		{6759D376-185C-447B-BB40-9F3784804598}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6759D376-185C-447B-BB40-9F3784804598}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6759D376-185C-447B-BB40-9F3784804598}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ACD3E1D-BE37-4CAC-AB0B-4ED1734AA211}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ACD3E1D-BE37-4CAC-AB0B-4ED1734AA211}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ACD3E1D-BE37-4CAC-AB0B-4ED1734AA211}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ACD3E1D-BE37-4CAC-AB0B-4ED1734AA211}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,6 +100,7 @@ Global
 		{452DA726-74E6-4BE7-B1E1-55DDA064037C} = {B90D8DB0-BEAA-473F-AA75-9CBA71EC1ABC}
 		{C17ABA06-9937-4B79-B050-84B85F71EEB5} = {B90D8DB0-BEAA-473F-AA75-9CBA71EC1ABC}
 		{6759D376-185C-447B-BB40-9F3784804598} = {023B1653-D745-4F5F-B2C4-37FCDFC40903}
+		{4ACD3E1D-BE37-4CAC-AB0B-4ED1734AA211} = {023B1653-D745-4F5F-B2C4-37FCDFC40903}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6CD256CE-A8F8-4D99-A2CB-9515CAA6F31D}

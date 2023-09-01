@@ -27,6 +27,6 @@ internal sealed class EventSerializer : IEventSerializer
         if (data == null)
             throw new ArgumentNullException(nameof(data));
 
-        return JsonSerializer.Serialize(data, _serializerOptions);
+        return JsonSerializer.Serialize<object>(data, _serializerOptions);
     }
 }

@@ -1,10 +1,14 @@
-using InMemory.Aggregates;
-using InMemory.Events;
-using InMemory.Projections;
-using InMemory.Projections.Managers;
+using System.Reflection;
+using EntityFrameworkCore.Aggregates;
+using EntityFrameworkCore.Events;
+using EntityFrameworkCore.Projections;
+using EntityFrameworkCore.Projections.DbContexts;
+using EntityFrameworkCore.Projections.Managers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Sourcey.Aggregates;
 using Sourcey.Aggregates.Stores;
+using Sourcey.EntityFrameworkCore.Events.DbContexts;
 using Sourcey.Extensions;
 using Sourcey.Keys;
 using Sourcey.Projections;
@@ -13,28 +17,47 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSourcey(builder =>
+builder.Services.AddSourcey(sourceyBuilder =>
 {
-    builder.AddAggregate<SampleAggreagte, SampleState>();
+    sourceyBuilder.AddAggregate<SampleAggreagte, SampleState>();
 
-    builder.AddEvents(e =>
+    sourceyBuilder.AddEvents(e =>
     {
         e.RegisterEventCache<SomethingHappened>();
-        e.WithInMemoryStore(x =>
+        e.WithEntityFrameworkCoreEventStore<EventStoreDbContext>(x =>
         {
             x.AddAggregate<SampleAggreagte, SampleState>();
             x.AddProjection<Something>();
+        },
+        o =>
+        {
+            o.UseSqlServer(
+                builder.Configuration.GetConnectionString("EventStore"),
+                b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)
+            );
         });
     });
 
-    builder.AddProjection<Something>(x =>
+    sourceyBuilder.AddProjection<Something>(x =>
     {
         x.WithManager<SomethingManager>();
-        x.WithInMemoryWriter();
-        x.WithInMemoryStateManager();
+        x.WithEntityFrameworkCoreWriter(e =>
+        {
+            e.WithContext<SomethingContext>(o => o.UseSqlServer(
+                builder.Configuration.GetConnectionString("Projections"),
+                b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)
+            ));
+        });
+        x.WithEntityFrameworkCoreStateManager(e =>
+        {
+            e.WithContext<SomethingContext>(o => o.UseSqlServer(
+                builder.Configuration.GetConnectionString("Projections"),
+                b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName
+            )));
+        });
     });
 
-    builder.AddSerialization(x =>
+    sourceyBuilder.AddSerialization(x =>
     {
         x.WithEvents();
         x.WithAggregates();
@@ -90,6 +113,7 @@ app.MapGet("/sample/{subject}", async (
 .WithTags("Sample")
 .WithOpenApi();
 
+await app.InitializeSourceyAsync();
 await app.RunAsync();
 
 record SampleRequest(string Something);
