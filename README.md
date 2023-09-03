@@ -11,4 +11,4 @@ Get started by [reading through the documentation](https://sourceyorg.github.io/
 
 
 ## Recognition
-Sourcey was developed with insperation from [OpeneventSourcey](https://github.com/danielcirket/OpenEventSourcing)
+Sourcey was developed with insperation from [OpenEventSourcing](https://github.com/danielcirket/OpenEventSourcing)
