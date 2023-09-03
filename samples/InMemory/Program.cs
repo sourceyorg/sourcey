@@ -83,7 +83,7 @@ app.MapGet("/sample/{subject}", async (
     [FromRoute] string subject,
     CancellationToken cancellationToken) =>
 {
-    var projection = await projectionReader.ReadAsync(Subject.From(subject), cancellationToken);
+    var projection = await projectionReader.ReadAsync(subject, cancellationToken);
     return projection;
 })
 .WithName("GetSample")

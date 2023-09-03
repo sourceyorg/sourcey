@@ -17,14 +17,9 @@ public readonly struct Causation : IEquatable<Causation>
     }
 
     public static Causation From(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException($"'{nameof(value)}' cannot be null or empty.", nameof(value));
+        => new(value ?? IdGenerator.Unknown);
 
-        return new Causation(value);
-    }
-
-    public static readonly Causation Unknown = new("Unknown");
+    public static readonly Causation Unknown = new(IdGenerator.Unknown);
 
     public bool Equals(Causation other) => _value == other._value;
     public override bool Equals(object? obj) => obj is Causation other && Equals(other);
@@ -34,4 +29,5 @@ public readonly struct Causation : IEquatable<Causation>
     public static bool operator ==(Causation left, Causation right) => left.Equals(right);
     public static bool operator !=(Causation left, Causation right) => !left.Equals(right);
     public static implicit operator string(Causation id) => id._value;
+    public static implicit operator Causation(string id) => From(id);
 }

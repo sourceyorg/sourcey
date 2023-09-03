@@ -17,12 +17,7 @@ public readonly struct Subject : IEquatable<Subject>
     }
 
     public static Subject From(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException($"'{nameof(value)}' cannot be null or empty.", nameof(value));
-
-        return new Subject(value);
-    }
+        => new(value ?? IdGenerator.Unknown);
 
     public bool Equals(Subject other) => _value == other._value;
     public override bool Equals(object? obj) => obj is Subject other && Equals(other);
@@ -32,4 +27,5 @@ public readonly struct Subject : IEquatable<Subject>
     public static bool operator ==(Subject left, Subject right) => left.Equals(right);
     public static bool operator !=(Subject left, Subject right) => !left.Equals(right);
     public static implicit operator string(Subject id) => id._value;
+    public static implicit operator Subject(string id) => From(id);
 }

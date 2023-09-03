@@ -17,14 +17,9 @@ public readonly struct Correlation : IEquatable<Correlation>
     }
 
     public static Correlation From(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException($"'{nameof(value)}' cannot be null or empty.", nameof(value));
+        => new(value ?? IdGenerator.Unknown);
 
-        return new Correlation(value);
-    }
-
-    public static readonly Correlation Unknown = new("Unknown");
+    public static readonly Correlation Unknown = new(IdGenerator.Unknown);
 
     public bool Equals(Correlation other) => _value == other._value;
     public override bool Equals(object? obj) => obj is Correlation other && Equals(other);
@@ -34,4 +29,5 @@ public readonly struct Correlation : IEquatable<Correlation>
     public static bool operator ==(Correlation left, Correlation right) => left.Equals(right);
     public static bool operator !=(Correlation left, Correlation right) => !left.Equals(right);
     public static implicit operator string(Correlation id) => id._value;
+    public static implicit operator Correlation(string id) => From(id);
 }

@@ -105,7 +105,7 @@ internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggr
             correlation: correlation,
             causation: causation,
             timestamp: @event.Timestamp,
-            actor: actor ?? Actor.From("unknown"),
+            actor: actor ?? Actor.Unknown,
             scheduledPublication: scheduledPublication));
 
         await eventStore.SaveAsync(aggregate.Id, contexts);

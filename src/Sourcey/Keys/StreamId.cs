@@ -17,14 +17,9 @@ public readonly struct StreamId : IEquatable<StreamId>
     }
 
     public static StreamId From(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException($"'{nameof(value)}' cannot be null or empty.", nameof(value));
+        => new(value ?? IdGenerator.Unknown);
 
-        return new StreamId(value);
-    }
-
-    public static readonly StreamId Unknown = new("Unknown");
+    public static readonly StreamId Unknown = new(IdGenerator.Unknown);
 
     public bool Equals(StreamId other) => _value == other._value;
     public override bool Equals(object? obj) => obj is StreamId other && Equals(other);
@@ -34,4 +29,5 @@ public readonly struct StreamId : IEquatable<StreamId>
     public static bool operator ==(StreamId left, StreamId right) => left.Equals(right);
     public static bool operator !=(StreamId left, StreamId right) => !left.Equals(right);
     public static implicit operator string(StreamId id) => id._value;
+    public static implicit operator StreamId(string id) => From(id);
 }
