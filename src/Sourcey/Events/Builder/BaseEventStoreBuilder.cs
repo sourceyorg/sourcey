@@ -72,7 +72,7 @@ public abstract class BaseEventStoreBuilder<TEventStoreContext> : IEventStoreBui
         return AddAggregates(types);
     }
 
-    public IEventStoreBuilder AddProjections(Action<StoreProjectorOptions<IProjection>>? action = null)
+    public IEventStoreBuilder AddProjections(Action<IStoreProjectorOptions>? action = null)
     {
         var eventType = typeof(IProjection);
 
@@ -97,7 +97,7 @@ public abstract class BaseEventStoreBuilder<TEventStoreContext> : IEventStoreBui
         where TProjection : class, IProjection
         => AddProjection<TProjection>(action: null);
 
-    public IEventStoreBuilder AddProjection<TProjection>(Action<StoreProjectorOptions<IProjection>>? action = null)
+    public IEventStoreBuilder AddProjection<TProjection>(Action<IStoreProjectorOptions>? action = null)
         where TProjection : class, IProjection
         => AddProjections(action, typeof(TProjection));
 
@@ -111,11 +111,10 @@ public abstract class BaseEventStoreBuilder<TEventStoreContext> : IEventStoreBui
 
 
     public IEventStoreBuilder AddProjections(
-        Action<StoreProjectorOptions<IProjection>>? action = null,
+        Action<IStoreProjectorOptions>? action = null,
         params Type[] types)
     {
         var storeProjectorType = typeof(StoreProjector<>);
-        var optionsType = typeof(StoreProjectorOptions<>);
         var projectionType = typeof(IProjection);
 
         foreach (var @type in types)
@@ -128,13 +127,9 @@ public abstract class BaseEventStoreBuilder<TEventStoreContext> : IEventStoreBui
 
             _services.AddSingleton(sp => new ProjectionEventContextCache(type, () => GetEventStoreContext(sp)));
             _services.AddSingleton(typeof(IHostedService), storeProjectorType.MakeGenericType(@type));
-            var options = Activator.CreateInstance(optionsType.MakeGenericType(@type));
-
-            if (options is null)
-                throw new InvalidOperationException($"Failed to create instance of {optionsType.MakeGenericType(@type)}.");
-
-            action?.Invoke((StoreProjectorOptions<IProjection>)options);
-            _services.AddSingleton(options);
+            var options = new StoreProjectorOptions();
+            action?.Invoke((IStoreProjectorOptions)options);
+            _services.AddKeyedSingleton(StoreProjectorOptions.GetKey(@type.FriendlyFullName()), options);
         }
 
         return this;
