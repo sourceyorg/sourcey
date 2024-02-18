@@ -11,31 +11,8 @@ using Sourcey.Testing.Integration.Stubs.Aggregates;
 using Sourcey.Testing.Integration.Stubs.Events;
 using Sourcey.Testing.Integration.Stubs.Projections;
 using Sourcey.Testing.Integration.Stubs.Projections.Managers;
-using Testcontainers.PostgreSql;
 
 namespace Sourcey.Integration.Tests.EntityFrameworkCore;
-
-
-[CollectionDefinition(nameof(PostgreContainerCollection))]
-public class PostgreContainerCollection : ICollectionFixture<ProjectionsDbFixture>, ICollectionFixture<EventStoreDbFixture>;
-
-public class ProjectionsDbFixture : IAsyncLifetime
-{
-    public readonly PostgreSqlContainer projections = new PostgreSqlBuilder().Build();
-
-    public Task InitializeAsync() => projections.StartAsync();
-
-    public async Task DisposeAsync() => await projections.DisposeAsync();
-}
-
-public class EventStoreDbFixture : IAsyncLifetime
-{
-    public readonly PostgreSqlContainer eventStore = new PostgreSqlBuilder().Build();
-
-    public Task InitializeAsync() => eventStore.StartAsync();
-
-    public async Task DisposeAsync() => await eventStore.DisposeAsync();
-}
 
 public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFactory
 {

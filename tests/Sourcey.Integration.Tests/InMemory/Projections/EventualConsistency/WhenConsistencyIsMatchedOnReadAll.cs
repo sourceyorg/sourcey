@@ -10,9 +10,10 @@ using Sourcey.Testing.Integration.Stubs.Aggregates;
 using Sourcey.Testing.Integration.Stubs.Projections;
 using Xunit.Abstractions;
 
-namespace Sourcey.Integration.Tests.Projections.EventualConsistency;
+namespace Sourcey.Integration.Tests.InMemory.Projections.EventualConsistency;
 
-public class WhenConsistencyIsMatchedOnReadAll : IntegrationSpecification<InMemoryWebApplicationFactory>
+[Collection(nameof(InMemoryIntegrationCollection))]
+public class WhenConsistencyIsMatchedOnReadAll : InMemorySpecification
 {
     private readonly Subject _subject = Subject.New();
     private  ValueTask<IQueryableProjection<Something>> consistencyCheck;
@@ -20,7 +21,7 @@ public class WhenConsistencyIsMatchedOnReadAll : IntegrationSpecification<InMemo
     
     public WhenConsistencyIsMatchedOnReadAll(ITestOutputHelper testOutputHelper,
         InMemoryWebApplicationFactory factory)
-        : base(testOutputHelper, factory)
+        : base(factory, testOutputHelper)
     {
     }
 
@@ -47,6 +48,6 @@ public class WhenConsistencyIsMatchedOnReadAll : IntegrationSpecification<InMemo
     {
         var result = await consistencyCheck;
         _scope.Dispose();
-        result.ShouldHaveSingleItem().Subject.ShouldBe(_subject);
+        result.Where(s => s.Subject == _subject).ShouldHaveSingleItem().Subject.ShouldBe(_subject);
     }
 }

@@ -11,21 +11,19 @@ using Xunit.Abstractions;
 
 namespace Sourcey.Integration.Tests.EntityFrameworkCore.Projections.EventualConsistency;
 
-[Collection(nameof(PostgreContainerCollection))]
-public class WhenConsistencyIsMatchedOnReadAll : IntegrationSpecification<EntityFrameworkCoreWebApplicationFactory>
+[Collection(nameof(EntityFrameworkIntegrationCollection))]
+public class WhenConsistencyIsMatchedOnReadAll : EntityFrameworkIntegrationSpecification
 {
     private readonly Subject _subject = Subject.New();
     private  ValueTask<IQueryableProjection<Something>> consistencyCheck;
     private IServiceScope _scope;
     
-    public WhenConsistencyIsMatchedOnReadAll(ITestOutputHelper testOutputHelper,
+    public WhenConsistencyIsMatchedOnReadAll(
         ProjectionsDbFixture projectionsDbFixture,
-        EventStoreDbFixture eventStoreDbFixture,
-        EntityFrameworkCoreWebApplicationFactory factory)
-        : base(testOutputHelper, factory)
+        EventStoreDbFixture eventStoreDbFixture, EntityFrameworkCoreWebApplicationFactory factory,
+        ITestOutputHelper testOutputHelper)
+        : base(projectionsDbFixture, eventStoreDbFixture, factory, testOutputHelper)
     {
-        factory.projections = projectionsDbFixture;
-        factory.eventStore = eventStoreDbFixture;
     }
 
     protected override Task Given()

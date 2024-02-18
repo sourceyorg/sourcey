@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Sourcey.Extensions;
 using Sourcey.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
 using Sourcey.Projections;
@@ -146,7 +147,7 @@ internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProject
 
         using var context = _projectionDbContextFactory.Create<TProjection>();
         var projections = context.Set<TProjection>().ToArray();
-        context.Set<TProjection>().RemoveRange(projections);
+        await context.Set<TProjection>().ExecuteDeleteAsync(cancellationToken);
 
         await context.SaveChangesAsync(cancellationToken);
     }

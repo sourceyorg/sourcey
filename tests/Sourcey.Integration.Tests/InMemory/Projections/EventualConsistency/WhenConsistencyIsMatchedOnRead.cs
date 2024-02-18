@@ -11,7 +11,8 @@ using Xunit.Abstractions;
 
 namespace Sourcey.Integration.Tests.InMemory.Projections.EventualConsistency;
 
-public class WhenConsistencyIsMatchedOnRead : IntegrationSpecification<InMemoryWebApplicationFactory>
+[Collection(nameof(InMemoryIntegrationCollection))]
+public class WhenConsistencyIsMatchedOnRead : InMemorySpecification
 {
     private readonly Subject _subject = Subject.New();
     private  ValueTask<Something?> consistencyCheck;
@@ -19,7 +20,7 @@ public class WhenConsistencyIsMatchedOnRead : IntegrationSpecification<InMemoryW
     
     public WhenConsistencyIsMatchedOnRead(ITestOutputHelper testOutputHelper,
         InMemoryWebApplicationFactory factory)
-        : base(testOutputHelper, factory)
+        : base(factory, testOutputHelper)
     {
     }
 

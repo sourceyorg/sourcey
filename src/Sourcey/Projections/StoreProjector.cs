@@ -68,7 +68,7 @@ public sealed class StoreProjector<TProjection> : BackgroundService
         {
             try
             {
-                state = await _projectionStateManager.RetrieveAsync(cancellationToken);
+                state = await _projectionStateManager.RetrieveAsync(cancellationToken) ?? await _projectionStateManager.CreateAsync(cancellationToken);;
 
                 var page = await eventStore.GetEventsAsync(state.Position, _options.PageSize, cancellationToken);;
 
