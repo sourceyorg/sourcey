@@ -10,7 +10,6 @@ using Sourcey.Aggregates;
 using Sourcey.Aggregates.Stores;
 using Sourcey.EntityFrameworkCore.Events.DbContexts;
 using Sourcey.Extensions;
-using Sourcey.Keys;
 using Sourcey.Projections;
 
 var builder = WebApplication.CreateBuilder(args);

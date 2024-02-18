@@ -1,12 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Sourcey.Extensions;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Sourcey.Testing.Abstractions;
 using Sourcey.Testing.Integration.Stubs;
-using Sourcey.Testing.Integration.Stubs.Aggregates;
-using Sourcey.Testing.Integration.Stubs.Events;
-using Sourcey.Testing.Integration.Stubs.Projections;
-using Sourcey.Testing.Integration.Stubs.Projections.Managers;
 using Xunit;
 using Xunit.Abstractions;
 

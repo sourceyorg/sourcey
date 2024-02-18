@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
 using Sourcey.Events.Cache;
 using Sourcey.Events.Streams;
 using Sourcey.Keys;

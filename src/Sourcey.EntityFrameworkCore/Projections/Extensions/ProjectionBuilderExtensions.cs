@@ -1,10 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using Sourcey.EntityFrameworkCore.Projections;
 using Sourcey.Projections;
 using Sourcey.Projections.Builder;
-using Sourcey.Projections.InMemory;
 
 namespace Sourcey.Extensions;
 

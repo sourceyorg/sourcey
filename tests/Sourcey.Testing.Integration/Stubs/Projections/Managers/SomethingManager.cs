@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Sourcey.Projections;
+﻿using Sourcey.Projections;
 using Sourcey.Testing.Integration.Stubs.Events;
 
 namespace Sourcey.Testing.Integration.Stubs.Projections.Managers;

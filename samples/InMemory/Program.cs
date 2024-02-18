@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Sourcey.Aggregates;
 using Sourcey.Aggregates.Stores;
 using Sourcey.Extensions;
-using Sourcey.Keys;
 using Sourcey.Projections;
 
 var builder = WebApplication.CreateBuilder(args);

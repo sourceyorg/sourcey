@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Sourcey.Aggregates.Concurrency;
+﻿using Sourcey.Aggregates.Concurrency;
 using Sourcey.Aggregates.Snapshots;
 using Sourcey.Events;
 

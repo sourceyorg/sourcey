@@ -1,4 +1,3 @@
-using Sourcey.Keys;
 using Sourcey.Projections;
 
 namespace InMemory.Projections;

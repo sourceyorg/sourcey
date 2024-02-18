@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sourcey.EntityFrameworkCore.Events.Entities;
-using Sourcey.EntityFrameworkCore.Events.EntityTypeConfigurations;
 using Sourcey.Extensions;
 
 namespace Sourcey.EntityFrameworkCore.Events.DbContexts;
