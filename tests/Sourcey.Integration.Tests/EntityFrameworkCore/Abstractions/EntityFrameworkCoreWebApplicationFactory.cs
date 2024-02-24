@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Sourcey.EntityFrameworkCore.Events.DbContexts;
 using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts.Writeable;
 using Sourcey.Extensions;
@@ -48,6 +49,8 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
     }   
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.ConfigureLogging(logging =>
+            logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning));
         builder.ConfigureServices(services =>
         {
             services.AddScoped<ISourceyInitializer, DbInitializer>();
