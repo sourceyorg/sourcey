@@ -2,7 +2,6 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Sourcey.Extensions;
 using Sourcey.Events;
 using Sourcey.Events.Stores;
@@ -18,7 +17,7 @@ public sealed class StoreProjector<TProjection> : BackgroundService
     private readonly IServiceScope _scope;
     private readonly IEventStoreFactory _eventStoreFactory;
     private readonly ILogger<StoreProjector<TProjection>> _logger;
-    private readonly IOptionsMonitor<StoreProjectorOptions<TProjection>> _options;
+    private readonly StoreProjectorOptions _options;
     private readonly string _name;
     private int _retries = 0;
 
@@ -36,9 +35,9 @@ public sealed class StoreProjector<TProjection> : BackgroundService
         _projectionManager = _scope.ServiceProvider.GetRequiredService<IProjectionManager<TProjection>>();
         _projectionStateManager = _scope.ServiceProvider.GetRequiredService<IProjectionStateManager<TProjection>>();
         _eventStoreFactory = _scope.ServiceProvider.GetRequiredService<IEventStoreFactory>();
-        _options = _scope.ServiceProvider.GetRequiredService<IOptionsMonitor<StoreProjectorOptions<TProjection>>>();
-
         _name = typeof(TProjection).FriendlyFullName();
+        _options = _scope.ServiceProvider.GetKeyedService<StoreProjectorOptions>(StoreProjectorOptions.GetKey(_name)) ?? new StoreProjectorOptions();
+
     }
 
     public async Task ResetAsync(CancellationToken cancellationToken = default)
@@ -69,15 +68,15 @@ public sealed class StoreProjector<TProjection> : BackgroundService
         {
             try
             {
-                state = await _projectionStateManager.RetrieveAsync(cancellationToken);
+                state = await _projectionStateManager.RetrieveAsync(cancellationToken) ?? await _projectionStateManager.CreateAsync(cancellationToken);;
 
-                var page = await eventStore.GetEventsAsync(state.Position, _options.CurrentValue.PageSize, cancellationToken);;
+                var page = await eventStore.GetEventsAsync(state.Position, _options.PageSize, cancellationToken);;
 
                 await Task.WhenAll(page.Events.Select(e => ProjectStreamAsync(e.Value, cancellationToken)));
 
                 if (state.Position == page.Offset)
                 {
-                    await Task.Delay(_options.CurrentValue.Interval, cancellationToken);
+                    await Task.Delay(_options.Interval, cancellationToken);
                 }
                 else
                 {
@@ -93,11 +92,11 @@ public sealed class StoreProjector<TProjection> : BackgroundService
             catch (Exception ex)
             {
                 _retries++;
-                _logger.LogCritical("Process '{process}', retries: {retries} of {max}", _name, _retries, _options.CurrentValue.RetryCount);
+                _logger.LogCritical("Process '{process}', retries: {retries} of {max}", _name, _retries, _options.RetryCount);
 
-                if(_retries == _options.CurrentValue.RetryCount)
+                if(_retries == _options.RetryCount)
                 {
-                    _logger.LogCritical("Process '{Process}' stopped executed due to hitting maximum retries of: {Retries}", _name, _options.CurrentValue.RetryCount);
+                    _logger.LogCritical("Process '{Process}' stopped executed due to hitting maximum retries of: {Retries}", _name, _options.RetryCount);
 
                     var (error, errorStackTrace) = GetError(ex);
 

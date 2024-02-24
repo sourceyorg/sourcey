@@ -1,6 +1,4 @@
-﻿using Sourcey.Events;
-using Sourcey.Events.Serialization;
-using Sourcey.Events.Stores;
+﻿using Sourcey.Events.Serialization;
 using Sourcey.Extensions;
 using Sourcey.Keys;
 

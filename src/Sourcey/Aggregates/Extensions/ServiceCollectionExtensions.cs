@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Sourcey.Aggregates.Stores;
 using Sourcey.Events.Stores;
 
 namespace Sourcey.Extensions;

@@ -6,7 +6,6 @@ using Sourcey.Events;
 using Sourcey.Events.Cache;
 using Sourcey.Events.Serialization;
 using Sourcey.Events.Stores;
-using Sourcey.Events.Streams;
 
 namespace Sourcey.EntityFrameworkCore.Events.Factories;
 

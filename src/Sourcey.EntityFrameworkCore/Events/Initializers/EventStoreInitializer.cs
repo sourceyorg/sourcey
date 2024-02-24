@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Hosting;
 using Sourcey.Initialization;
 using Sourcey.EntityFrameworkCore.Events.DbContexts;
-using Sourcey.EntityFrameworkCore.Events.Factories;
 
 namespace Sourcey.EntityFrameworkCore.Events.Initializers;
 

@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Sourcey.Aggregates;
 using Sourcey.Aggregates.Builder;
-using Sourcey.Aggregates.Stores;
 using Xunit.Abstractions;
 
 namespace Sourcey.Tests.Aggregates;

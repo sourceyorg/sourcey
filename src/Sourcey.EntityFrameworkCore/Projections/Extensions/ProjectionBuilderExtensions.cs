@@ -1,10 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using Sourcey.EntityFrameworkCore.Projections;
 using Sourcey.Projections;
 using Sourcey.Projections.Builder;
-using Sourcey.Projections.InMemory;
 
 namespace Sourcey.Extensions;
 
@@ -20,12 +18,19 @@ public static partial class ProjectionBuilderExtensions
         return builder;
     }
 
-    public static IProjectionBuilder<TProjection> WithEntityFrameworkCoreWriter<TProjection>(this IProjectionBuilder<TProjection> builder, Action<IEntityFrameworkCoreProjectionManagerBuilder<TProjection>> action)
+    public static IProjectionBuilder<TProjection> WithEntityFrameworkCoreWriter<TProjection>(this IProjectionBuilder<TProjection> builder, Action<IEntityFrameworkCoreProjectionWriterBuilder<TProjection>> action)
+        where TProjection : class, IProjection, new()
+    {
+        builder.Services.AddScoped<IProjectionWriter<TProjection>, ProjectionWriter<TProjection>>();
+        action(new EntityFrameworkCoreProjectionWriterBuilder<TProjection>(builder.Services));
+        return builder;
+    }
+    
+    public static IProjectionBuilder<TProjection> WithEntityFrameworkCoreReader<TProjection>(this IProjectionBuilder<TProjection> builder, Action<IEntityFrameworkCoreProjectionReaderBuilder<TProjection>> action)
         where TProjection : class, IProjection, new()
     {
         builder.Services.AddScoped<IProjectionReader<TProjection>, ProjectionReader<TProjection>>();
-        builder.Services.AddScoped<IProjectionWriter<TProjection>, ProjectionWriter<TProjection>>();
-        action(new EntityFrameworkCoreProjectionManagerBuilder<TProjection>(builder.Services));
+        action(new EntityFrameworkCoreProjectionReaderBuilder<TProjection>(builder.Services));
         return builder;
     }
 }
