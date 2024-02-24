@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts.Writeable;
 using Sourcey.Extensions;
-using Sourcey.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
 using Sourcey.Projections;
 
 namespace Sourcey.EntityFrameworkCore.Projections;
@@ -9,11 +9,11 @@ namespace Sourcey.EntityFrameworkCore.Projections;
 internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProjection>
     where TProjection : class, IProjection
 {
-    private readonly IProjectionDbContextFactory _projectionDbContextFactory;
+    private readonly IWriteableProjectionDbContextFactory _projectionDbContextFactory;
     private readonly ILogger<ProjectionWriter<TProjection>> _logger;
     private readonly string _name;
 
-    public ProjectionWriter(IProjectionDbContextFactory projectionDbContextFactory,
+    public ProjectionWriter(IWriteableProjectionDbContextFactory projectionDbContextFactory,
         ILogger<ProjectionWriter<TProjection>> logger)
     {
         if (projectionDbContextFactory == null)

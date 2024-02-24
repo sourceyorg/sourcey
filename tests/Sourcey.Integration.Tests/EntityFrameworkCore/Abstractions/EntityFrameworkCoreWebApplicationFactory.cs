@@ -3,9 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Sourcey.EntityFrameworkCore.Events.DbContexts;
-using Sourcey.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
+using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts.Writeable;
 using Sourcey.Extensions;
 using Sourcey.Initialization;
+using Sourcey.Integration.Tests.EntityFrameworkCore.Projections;
 using Sourcey.Testing.Integration.Abstractions;
 using Sourcey.Testing.Integration.Stubs.Aggregates;
 using Sourcey.Testing.Integration.Stubs.Events;
@@ -21,10 +22,10 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
 
     private sealed class DbInitializer : ISourceyInitializer
     {
-        private readonly IProjectionDbContextFactory _projectionDbContextFactory;
+        private readonly IWriteableProjectionDbContextFactory _projectionDbContextFactory;
         private readonly IDbContextFactory<EventStoreDbContext> _eventStoreDbContextFactory;
 
-        public DbInitializer(IProjectionDbContextFactory projectionDbContextFactory, IDbContextFactory<EventStoreDbContext> eventStoreDbContextFactory)
+        public DbInitializer(IWriteableProjectionDbContextFactory projectionDbContextFactory, IDbContextFactory<EventStoreDbContext> eventStoreDbContextFactory)
         {
             _projectionDbContextFactory = projectionDbContextFactory;
             _eventStoreDbContextFactory = eventStoreDbContextFactory;
@@ -75,13 +76,19 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
                     x.WithManager<SomethingManager>();
                     x.WithEntityFrameworkCoreWriter(e =>
                     {
-                        e.WithContext<SomethingContext>(o => o.UseNpgsql(
+                        e.WithContext<WriteableSomethingContext>(o => o.UseNpgsql(
+                            projections.projections.GetConnectionString()
+                        ));
+                    });
+                    x.WithEntityFrameworkCoreReader(e =>
+                    {
+                        e.WithContext<ReadonlySomethingContext>(o => o.UseNpgsql(
                             projections.projections.GetConnectionString()
                         ));
                     });
                     x.WithEntityFrameworkCoreStateManager(e =>
                     {
-                        e.WithContext<SomethingContext>(o => o.UseNpgsql(
+                        e.WithContext<WriteableSomethingContext>(o => o.UseNpgsql(
                             projections.projections.GetConnectionString()
                         ));
                     });

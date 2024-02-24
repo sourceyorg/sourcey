@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts.Readonly;
 using Sourcey.Keys;
-using Sourcey.EntityFrameworkCore.Projections.Factories.ProjecitonContexts;
 using Sourcey.Projections;
 using Sourcey.Extensions;
 
@@ -10,11 +11,11 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
     where TProjection : class, IProjection
 {
     private readonly ILogger<ProjectionReader<TProjection>> _logger;
-    private readonly IProjectionDbContextFactory _projectionDbContextFactory;
+    private readonly IReadonlyProjectionDbContextFactory _projectionDbContextFactory;
 
 
     public ProjectionReader(ILogger<ProjectionReader<TProjection>> logger,
-        IProjectionDbContextFactory projectionDbContextFactory)
+        IReadonlyProjectionDbContextFactory projectionDbContextFactory)
     {
         if (logger == null)
             throw new ArgumentNullException(nameof(logger));
@@ -35,7 +36,7 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
 
         using var context = _projectionDbContextFactory.Create<TProjection>();
         return await context.Set<TProjection>()
-            .FindAsync(new object?[] { subject.ToString() }, cancellationToken: cancellationToken);
+            .AsQueryable().AsNoTracking().FirstOrDefaultAsync(s => s.Subject == subject.ToString(), cancellationToken: cancellationToken);
     }
 
     public async ValueTask<TProjection?> ReadWithConsistencyAsync(
@@ -83,7 +84,7 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
         var context = _projectionDbContextFactory.Create<TProjection>();
         
         return new ValueTask<IQueryableProjection<TProjection>>(new QueryableProjection<TProjection>(
-            context.Set<TProjection>(),
+            context.Set<TProjection>().AsQueryable().AsNoTracking(),
             context)
         );
     }

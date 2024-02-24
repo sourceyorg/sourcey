@@ -42,7 +42,14 @@ builder.Services.AddSourcey(sourceyBuilder =>
         x.WithManager<SomethingManager>();
         x.WithEntityFrameworkCoreWriter(e =>
         {
-            e.WithContext<SomethingContext>(o => o.UseSqlServer(
+            e.WithContext<WriteableSomethingContext>(o => o.UseSqlServer(
+                builder.Configuration.GetConnectionString("Projections"),
+                b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)
+            ));
+        });
+        x.WithEntityFrameworkCoreReader(e =>
+        {
+            e.WithContext<ReadonlySomethingContext>(o => o.UseSqlServer(
                 builder.Configuration.GetConnectionString("Projections"),
                 b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)
             ));

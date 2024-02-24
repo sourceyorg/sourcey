@@ -4,7 +4,6 @@ using Sourcey.Aggregates;
 using Sourcey.Aggregates.Stores;
 using Sourcey.Keys;
 using Sourcey.Projections;
-using Sourcey.Testing.Integration.Abstractions;
 using Sourcey.Testing.Integration.Stubs.Aggregates;
 using Sourcey.Testing.Integration.Stubs.Projections;
 using Xunit.Abstractions;

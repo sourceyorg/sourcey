@@ -1,18 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Sourcey.EntityFrameworkCore.Projections.DbContexts;
 using Sourcey.Testing.Integration.Stubs.Projections;
 
-namespace Sourcey.Integration.Tests.EntityFrameworkCore;
+namespace Sourcey.Integration.Tests.EntityFrameworkCore.Projections;
 
-public class SomethingContext : ProjectionStateDbContext
+public abstract class SomethingContext(DbContextOptions options) : ProjectionStateDbContext(options)
 {
     protected override string Schema => "Sample";
 
-    DbSet<Something> Somethings { get; set;}
-
-    public SomethingContext(DbContextOptions<SomethingContext> options) : base(options)
-    {
-    }
+    public DbSet<Something> Somethings { get; set;}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
