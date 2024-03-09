@@ -22,13 +22,12 @@ internal readonly struct EntityFrameworkCoreProjectionWriterBuilder<TProjection>
         _services = services;
     }
 
-    public IEntityFrameworkCoreProjectionWriterBuilder<TProjection> WithContext<TProjectionContext>(Action<DbContextOptionsBuilder> dbOptions, bool autoMigrate = true)
+    public IEntityFrameworkCoreProjectionWriterBuilder<TProjection> WithContext<TProjectionContext>(bool autoMigrate = true)
         where TProjectionContext : DbContext
     {
         _services.AddSingleton(new WriteableProjectionDbType(typeof(TProjection), typeof(DbContextOptions<TProjectionContext>), typeof(TProjectionContext)));
         _services.AddScoped<ISourceyInitializer, ProjectionInitializer<TProjection>>();
         _services.AddSingleton(new ProjectionOptions<TProjection>(autoMigrate));
-        _services.AddDbContext<TProjectionContext>(dbOptions);
 
         _services.TryAddSingleton<IDbTypeFactory<WriteableProjectionDbType>, DbTypeFactory<WriteableProjectionDbType>>();
         _services.TryAddScoped<IWriteableProjectionDbContextFactory, WriteableProjectionDbContextFactory>();

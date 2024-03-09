@@ -21,11 +21,10 @@ internal readonly struct EntityFrameworkCoreProjectionReaderBuilder<TProjection>
         _services = services;
     }
 
-    public IEntityFrameworkCoreProjectionReaderBuilder<TProjection> WithContext<TProjectionContext>(Action<DbContextOptionsBuilder> dbOptions)
+    public IEntityFrameworkCoreProjectionReaderBuilder<TProjection> WithContext<TProjectionContext>()
         where TProjectionContext : DbContext
     {
         _services.AddSingleton(new ReadonlyProjectionDbType(typeof(TProjection), typeof(DbContextOptions<TProjectionContext>), typeof(TProjectionContext)));
-        _services.AddDbContextPool<TProjectionContext>(dbOptions);
         _services.TryAddSingleton<IDbTypeFactory<ReadonlyProjectionDbType>, DbTypeFactory<ReadonlyProjectionDbType>>();
         _services.TryAddScoped<IReadonlyProjectionDbContextFactory, ReadonlyProjectionDbContextFactory>();
 

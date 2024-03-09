@@ -7,6 +7,6 @@ namespace Sourcey.EntityFrameworkCore.Projections;
 public interface IEntityFrameworkCoreStateManagementBuilder<TProjection>
     where TProjection : class, IProjection, new()
 {
-    IEntityFrameworkCoreStateManagementBuilder<TProjection> WithContext<TProjectionContext>(Action<DbContextOptionsBuilder> dbOptions, bool autoMigrate = true)
+    IEntityFrameworkCoreStateManagementBuilder<TProjection> WithContext<TProjectionContext>(bool autoMigrate = true)
         where TProjectionContext : ProjectionStateDbContext;
 }

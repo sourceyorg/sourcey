@@ -23,10 +23,9 @@ internal readonly struct EntityFrameworkCoreStateManagementBuilder<TProjection> 
         _services = services;
     }
 
-    public IEntityFrameworkCoreStateManagementBuilder<TProjection> WithContext<TProjectionStateDbContext>(Action<DbContextOptionsBuilder> dbOptions, bool autoMigrate = true)
+    public IEntityFrameworkCoreStateManagementBuilder<TProjection> WithContext<TProjectionStateDbContext>(bool autoMigrate = true)
         where TProjectionStateDbContext : ProjectionStateDbContext
     {
-        _services.AddDbContext<TProjectionStateDbContext>(dbOptions);
         _services.AddSingleton(new ProjectionStateDbType(typeof(TProjection), typeof(DbContextOptions<TProjectionStateDbContext>), typeof(TProjectionStateDbContext)));
         _services.AddSingleton(new ProjectionStateOptions<TProjection>(autoMigrate));
         

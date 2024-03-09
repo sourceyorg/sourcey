@@ -6,6 +6,6 @@ namespace Sourcey.EntityFrameworkCore.Projections;
 public interface IEntityFrameworkCoreProjectionWriterBuilder<TProjection>
     where TProjection : class, IProjection, new()
 {
-    IEntityFrameworkCoreProjectionWriterBuilder<TProjection> WithContext<TProjectionContext>(Action<DbContextOptionsBuilder> dbOptions, bool autoMigrate = true)
+    IEntityFrameworkCoreProjectionWriterBuilder<TProjection> WithContext<TProjectionContext>(bool autoMigrate = true)
         where TProjectionContext : DbContext;
 }

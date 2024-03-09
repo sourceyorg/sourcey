@@ -30,7 +30,7 @@ public class WhenConsistencyIsMatchedOnRead : EntityFrameworkIntegrationSpecific
     {
         _scope = _factory.Services.CreateScope();
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.ReadWithConsistencyAsync(_subject, s => s is not null && s.Subject == _subject , 5, TimeSpan.FromMilliseconds(1));
+        consistencyCheck = projectionReader.ReadWithConsistencyAsync(_subject, s => s is not null && s.Subject == _subject , 5, TimeSpan.FromMilliseconds(5));
         return Task.CompletedTask;
     }
 

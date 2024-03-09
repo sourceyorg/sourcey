@@ -54,6 +54,13 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
         builder.ConfigureServices(services =>
         {
             services.AddScoped<ISourceyInitializer, DbInitializer>();
+            services.AddDbContext<WriteableSomethingContext>(o => o.UseNpgsql(
+                projections.projections.GetConnectionString()
+            ));
+            services.AddDbContext<ReadonlySomethingContext>(o => o.UseNpgsql(
+                projections.projections.GetConnectionString()
+            ));
+            
             services.AddSourcey(builder =>
             {
                 builder.AddAggregate<SampleAggreagte, SampleState>();
@@ -77,24 +84,9 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
                 builder.AddProjection<Something>(x =>
                 {
                     x.WithManager<SomethingManager>();
-                    x.WithEntityFrameworkCoreWriter(e =>
-                    {
-                        e.WithContext<WriteableSomethingContext>(o => o.UseNpgsql(
-                            projections.projections.GetConnectionString()
-                        ));
-                    });
-                    x.WithEntityFrameworkCoreReader(e =>
-                    {
-                        e.WithContext<ReadonlySomethingContext>(o => o.UseNpgsql(
-                            projections.projections.GetConnectionString()
-                        ));
-                    });
-                    x.WithEntityFrameworkCoreStateManager(e =>
-                    {
-                        e.WithContext<WriteableSomethingContext>(o => o.UseNpgsql(
-                            projections.projections.GetConnectionString()
-                        ));
-                    });
+                    x.WithEntityFrameworkCoreWriter(e => e.WithContext<WriteableSomethingContext>());
+                    x.WithEntityFrameworkCoreReader(e => e.WithContext<ReadonlySomethingContext>());
+                    x.WithEntityFrameworkCoreStateManager(e => e.WithContext<WriteableSomethingContext>());
                 });
              
                  builder.AddSerialization(x =>

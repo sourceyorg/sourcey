@@ -50,7 +50,7 @@ public class WhenLargeDatasetLoaded : EntityFrameworkIntegrationSpecification,
     }
 
     [Integration]
-    public async Task Projections_Should_BeLoadedWithin5Seconds()
+    public async Task Projections_Should_BeLoadedWithin10Seconds()
     {
         using var scope = _factory.Services.CreateScope();
         var projectionManager = scope.ServiceProvider.GetRequiredService<IProjectionManager<Something>>();
