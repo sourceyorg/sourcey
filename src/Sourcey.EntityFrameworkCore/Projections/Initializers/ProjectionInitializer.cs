@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts.Writeable;
 using Sourcey.Initialization;
 using Sourcey.Projections;
@@ -12,18 +13,20 @@ internal class ProjectionInitializer<TProjection> : ISourceyInitializer
     public bool ParallelEnabled => false;
     private readonly IWriteableProjectionDbContextFactory _projectionDbContextFactory;
     private readonly ProjectionOptions<TProjection> _options;
+    private readonly ILogger<ProjectionInitializer<TProjection>> _logger;
 
 
     public ProjectionInitializer(IWriteableProjectionDbContextFactory projectionDbContextFactory,
-        ProjectionOptions<TProjection> options)
+        ProjectionOptions<TProjection> options,
+        ILogger<ProjectionInitializer<TProjection>> logger)
     {
-        if (projectionDbContextFactory is null)
-            throw new ArgumentNullException(nameof(projectionDbContextFactory));
-        if(options is null)
-            throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(projectionDbContextFactory);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(logger);
 
         _projectionDbContextFactory = projectionDbContextFactory;
         _options = options;
+        _logger = logger;
     }
 
     public async Task InitializeAsync(IHost host)
@@ -31,7 +34,28 @@ internal class ProjectionInitializer<TProjection> : ISourceyInitializer
         if (!_options.AutoMigrate)
             return;
         
-        using var context = _projectionDbContextFactory.Create<TProjection>();
-        await context.Database.MigrateAsync();
+        _logger.LogDebug("Starting - migration {projection}", typeof(TProjection).FullName);
+        
+        var success = false;
+        var attempts = 0;
+        
+        while (!success && attempts < 10)
+        {
+            try
+            {
+                await using var context = _projectionDbContextFactory.Create<TProjection>();
+                await context.Database.MigrateAsync();
+            }
+            catch (Exception e)
+            {
+                _logger.LogDebug("Unable to migrate {projection}, attempts: {attempt}, exception: {exception}", typeof(TProjection).FullName, attempts++, e.Message);
+                await Task.Delay(200);
+                continue;
+            }
+
+            success = true;
+        }
+
+        _logger.LogDebug("Finished - migration {projection}", typeof(TProjection).FullName);
     }
 }

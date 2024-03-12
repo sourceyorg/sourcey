@@ -16,10 +16,8 @@ internal sealed class EntityFrameworkCoreEventStoreBuilder<TEventStoreContext> :
 {
     public EntityFrameworkCoreEventStoreBuilder(
         IServiceCollection services,
-        Action<DbContextOptionsBuilder> options,
         bool autoMigrate = true) : base(services)
     {
-        services.AddDbContextFactory<TEventStoreContext>(options);
         services.AddScoped<ISourceyInitializer, EventStoreInitializer<TEventStoreContext>>();
         services.AddSingleton(new EventStoreInitializerOptions<TEventStoreContext>(autoMigrate));
         services.TryAddScoped<IEventContextFactory, EventContextFactory>();

@@ -54,11 +54,14 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
         builder.ConfigureServices(services =>
         {
             services.AddScoped<ISourceyInitializer, DbInitializer>();
-            services.AddDbContext<WriteableSomethingContext>(o => o.UseNpgsql(
+            services.AddDbContextFactory<WriteableSomethingContext>(o => o.UseNpgsql(
                 projections.projections.GetConnectionString()
             ));
-            services.AddDbContext<ReadonlySomethingContext>(o => o.UseNpgsql(
+            services.AddPooledDbContextFactory<ReadonlySomethingContext>(o => o.UseNpgsql(
                 projections.projections.GetConnectionString()
+            ));
+            services.AddDbContextFactory<EventStoreDbContext>(o => o.UseNpgsql(
+                eventStore.eventStore.GetConnectionString()
             ));
             
             services.AddSourcey(builder =>
@@ -69,16 +72,10 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
                 {
                     e.RegisterEventCache<SomethingHappened>();
                     e.WithEntityFrameworkCoreEventStore<EventStoreDbContext>(x =>
-                        {
-                            x.AddAggregate<SampleAggreagte, SampleState>();
-                            x.AddProjection<Something>(p => p.WithInterval(1));
-                        },
-                        o =>
-                        {
-                            o.UseNpgsql(
-                                eventStore.eventStore.GetConnectionString()
-                            );
-                        });
+                    {
+                        x.AddAggregate<SampleAggreagte, SampleState>();
+                        x.AddProjection<Something>(p => p.WithInterval(1));
+                    });
                 });
 
                 builder.AddProjection<Something>(x =>

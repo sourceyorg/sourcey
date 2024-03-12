@@ -16,18 +16,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<WriteableSomethingContext>(o => o.UseSqlServer(
+Action<DbContextOptionsBuilder> dbOptions = (o) => o.UseSqlServer(
     builder.Configuration.GetConnectionString("Projections"),
+    b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName));
+
+builder.Services.AddDbContextFactory<WriteableSomethingContext>(dbOptions);
+builder.Services.AddPooledDbContextFactory<ReadonlySomethingContext>(dbOptions);
+builder.Services.AddDbContextFactory<EventStoreDbContext>(o => o.UseSqlServer(
+    builder.Configuration.GetConnectionString("EventStore"),
     b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)
 ));
-builder.Services.AddDbContext<ReadonlySomethingContext>(o => o.UseSqlServer(
-    builder.Configuration.GetConnectionString("Projections"),
-    b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)
-));
-builder.Services.AddDbContext<SomethingContext>(o => o.UseSqlServer(
-    builder.Configuration.GetConnectionString("Projections"),
-    b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)
-));
+
 builder.Services.AddSourcey(sourceyBuilder =>
 {
     sourceyBuilder.AddAggregate<SampleAggreagte, SampleState>();
@@ -39,13 +38,6 @@ builder.Services.AddSourcey(sourceyBuilder =>
         {
             x.AddAggregate<SampleAggreagte, SampleState>();
             x.AddProjection<Something>();
-        },
-        o =>
-        {
-            o.UseSqlServer(
-                builder.Configuration.GetConnectionString("EventStore"),
-                b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)
-            );
         });
     });
 
@@ -54,7 +46,7 @@ builder.Services.AddSourcey(sourceyBuilder =>
         x.WithManager<SomethingManager>();
         x.WithEntityFrameworkCoreWriter(e => e.WithContext<WriteableSomethingContext>());
         x.WithEntityFrameworkCoreReader(e => e.WithContext<ReadonlySomethingContext>());
-        x.WithEntityFrameworkCoreStateManager(e => e.WithContext<SomethingContext>());
+        x.WithEntityFrameworkCoreStateManager(e => e.WithContext<WriteableSomethingContext>());
     });
 
     sourceyBuilder.AddSerialization(x =>

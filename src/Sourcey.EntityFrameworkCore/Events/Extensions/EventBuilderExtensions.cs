@@ -10,11 +10,10 @@ public static class EventsBuilderExtensions
     public static IEventsBuilder WithEntityFrameworkCoreEventStore<TEventStoreContext>(
         this IEventsBuilder builder,
         Action<IEventStoreBuilder> action,
-        Action<DbContextOptionsBuilder> options,
         bool autoMigrate = true)
         where TEventStoreContext : DbContext, IEventStoreDbContext
     {
-        action(new EntityFrameworkCoreEventStoreBuilder<TEventStoreContext>(builder.Services, options, autoMigrate));
+        action(new EntityFrameworkCoreEventStoreBuilder<TEventStoreContext>(builder.Services, autoMigrate));
         return builder;
     }
 }
