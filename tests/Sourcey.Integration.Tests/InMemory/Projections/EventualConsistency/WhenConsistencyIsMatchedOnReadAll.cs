@@ -27,7 +27,7 @@ public class WhenConsistencyIsMatchedOnReadAll : InMemorySpecification
     {
         _scope = _factory.Services.CreateScope();  
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.ReadAllWithConsistencyAsync(q => new(q.Any(s => s.Subject == _subject)), 5, TimeSpan.FromMilliseconds(1));
+        consistencyCheck = projectionReader.QueryWithConsistencyAsync(q => new(q.Any(s => s.Subject == _subject)), 5, TimeSpan.FromMilliseconds(1));
     }
 
     protected override async Task When()

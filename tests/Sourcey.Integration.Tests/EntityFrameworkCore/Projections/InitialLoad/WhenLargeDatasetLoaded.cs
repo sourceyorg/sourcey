@@ -56,7 +56,7 @@ public class WhenLargeDatasetLoaded : EntityFrameworkIntegrationSpecification,
         var projectionManager = scope.ServiceProvider.GetRequiredService<IProjectionManager<Something>>();
         var projectionReader = scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
         await projectionManager.ResetAsync();
-        var query = await projectionReader.ReadAllWithConsistencyAsync(async q => (await q.CountAsync()) == Count, 5, TimeSpan.FromSeconds(2));
+        var query = await projectionReader.QueryWithConsistencyAsync(async q => (await q.CountAsync()) == Count, 5, TimeSpan.FromSeconds(2));
         var count = query.Count();
         
         count.ShouldBe(Count);

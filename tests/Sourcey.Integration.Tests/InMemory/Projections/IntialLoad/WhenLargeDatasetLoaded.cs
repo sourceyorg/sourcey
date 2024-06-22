@@ -47,7 +47,7 @@ public class WhenLargeDatasetLoaded : InMemorySpecification, IClassFixture<InMem
         var projectionManager = scope.ServiceProvider.GetRequiredService<IProjectionManager<Something>>();
         var projectionReader = scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
         await projectionManager.ResetAsync();
-        var query = await projectionReader.ReadAllWithConsistencyAsync(q => new(q.Count() == Count), 5, TimeSpan.FromSeconds(2));
+        var query = await projectionReader.QueryWithConsistencyAsync(q => new(q.Count() == Count), 5, TimeSpan.FromSeconds(2));
         var count = query.Count();
         
         count.ShouldBe(Count);

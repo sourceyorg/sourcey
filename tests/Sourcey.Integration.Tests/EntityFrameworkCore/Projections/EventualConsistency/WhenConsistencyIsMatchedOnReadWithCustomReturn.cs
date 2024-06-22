@@ -11,13 +11,17 @@ using Xunit.Abstractions;
 namespace Sourcey.Integration.Tests.EntityFrameworkCore.Projections.EventualConsistency;
 
 [Collection(nameof(EntityFrameworkIntegrationCollection))]
-public class WhenConsistencyIsMatchedOnReadAll : EntityFrameworkIntegrationSpecification
+public class WhenConsistencyIsMatchedOnReadWithCustomReturn : EntityFrameworkIntegrationSpecification
 {
-    private readonly Subject _subject = Subject.New();
-    private  ValueTask<IQueryableProjection<Something>> consistencyCheck;
-    private IServiceScope _scope;
+    private readonly record struct SomethingProjection(string Value);
     
-    public WhenConsistencyIsMatchedOnReadAll(
+    private const string Value = "Something";
+    
+    private readonly string _subject = Subject.New();
+    private ValueTask<SomethingProjection?> consistencyCheck;
+    private IServiceScope _scope;
+
+    public WhenConsistencyIsMatchedOnReadWithCustomReturn(
         ProjectionsDbFixture projectionsDbFixture,
         EventStoreDbFixture eventStoreDbFixture, EntityFrameworkCoreWebApplicationFactory factory,
         ITestOutputHelper testOutputHelper)
@@ -25,23 +29,29 @@ public class WhenConsistencyIsMatchedOnReadAll : EntityFrameworkIntegrationSpeci
     {
     }
 
+
     protected override Task Given()
     {
         _scope = _factory.Services.CreateScope();
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.QueryWithConsistencyAsync(q => new(q.Any(s => s.Subject == _subject.ToString())), 5, TimeSpan.FromMilliseconds(1));
+        consistencyCheck = projectionReader.ReadWithConsistencyAsync<SomethingProjection?>(
+            subject: _subject,
+            projection: s => new SomethingProjection(s.Value),
+            consistencyCheck: s => s != null && s.Subject == _subject,
+            retryCount: 5, 
+            delay: TimeSpan.FromMilliseconds(5));
         return Task.CompletedTask;
     }
 
     protected override async Task When()
     {
-        using var scope = _factory.Services.CreateScope(); 
+        using var scope = _factory.Services.CreateScope();
         var aggregateFactory = scope.ServiceProvider.GetRequiredService<IAggregateFactory>();
         var aggregateStore = scope.ServiceProvider.GetRequiredService<IAggregateStore<SampleAggreagte, SampleState>>();
-        
+
         var aggregate = aggregateFactory.Create<SampleAggreagte, SampleState>();
-        aggregate.MakeSomethingHappen(StreamId.From(_subject), "Something");
-        await aggregateStore.SaveAsync(aggregate, default); 
+        aggregate.MakeSomethingHappen(StreamId.From(_subject), Value);
+        await aggregateStore.SaveAsync(aggregate, default);
     }
 
     [Integration]
@@ -49,6 +59,6 @@ public class WhenConsistencyIsMatchedOnReadAll : EntityFrameworkIntegrationSpeci
     {
         var result = await consistencyCheck;
         _scope.Dispose();
-        result.Where(s => s.Subject == _subject.ToString()).ShouldHaveSingleItem().Subject.ShouldBe(_subject);
+        result.ShouldNotBeNull().Value.ShouldBe(Value);
     }
 }

@@ -13,10 +13,10 @@ namespace Sourcey.Integration.Tests.EntityFrameworkCore.Projections.EventualCons
 [Collection(nameof(EntityFrameworkIntegrationCollection))]
 public class WhenConsistencyIsMatchedOnRead : EntityFrameworkIntegrationSpecification
 {
-    private readonly Subject _subject = Subject.New();
-    private  ValueTask<Something?> consistencyCheck;
+    private readonly string _subject = Subject.New();
+    private ValueTask<Something?> consistencyCheck;
     private IServiceScope _scope;
-    
+
     public WhenConsistencyIsMatchedOnRead(
         ProjectionsDbFixture projectionsDbFixture,
         EventStoreDbFixture eventStoreDbFixture, EntityFrameworkCoreWebApplicationFactory factory,
@@ -24,25 +24,26 @@ public class WhenConsistencyIsMatchedOnRead : EntityFrameworkIntegrationSpecific
         : base(projectionsDbFixture, eventStoreDbFixture, factory, testOutputHelper)
     {
     }
-    
+
 
     protected override Task Given()
     {
         _scope = _factory.Services.CreateScope();
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.ReadWithConsistencyAsync(_subject, s => s is not null && s.Subject == _subject , 5, TimeSpan.FromMilliseconds(5));
+        consistencyCheck = projectionReader.ReadWithConsistencyAsync(_subject, s => s != null && s.Subject == _subject,
+            5, TimeSpan.FromMilliseconds(5));
         return Task.CompletedTask;
     }
 
     protected override async Task When()
     {
-        using var scope = _factory.Services.CreateScope(); 
+        using var scope = _factory.Services.CreateScope();
         var aggregateFactory = scope.ServiceProvider.GetRequiredService<IAggregateFactory>();
         var aggregateStore = scope.ServiceProvider.GetRequiredService<IAggregateStore<SampleAggreagte, SampleState>>();
-        
+
         var aggregate = aggregateFactory.Create<SampleAggreagte, SampleState>();
         aggregate.MakeSomethingHappen(StreamId.From(_subject), "Something");
-        await aggregateStore.SaveAsync(aggregate, default); 
+        await aggregateStore.SaveAsync(aggregate, default);
     }
 
     [Integration]
