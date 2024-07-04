@@ -31,9 +31,9 @@ public class WhenLargeDatasetLoaded : InMemorySpecification, IClassFixture<InMem
             {
                 using var scope = _factory.Services.CreateScope(); 
                 var aggregateFactory = scope.ServiceProvider.GetRequiredService<IAggregateFactory>();
-                var aggregateStore = scope.ServiceProvider.GetRequiredService<IAggregateStore<SampleAggreagte, SampleState>>();
+                var aggregateStore = scope.ServiceProvider.GetRequiredService<IAggregateStore<SampleAggregate, SampleState>>();
                 
-                var aggregate = aggregateFactory.Create<SampleAggreagte, SampleState>();
+                var aggregate = aggregateFactory.Create<SampleAggregate, SampleState>();
                 aggregate.MakeSomethingHappen(StreamId.New(), "Something");
                 await aggregateStore.SaveAsync(aggregate, default);
             }));
@@ -47,7 +47,7 @@ public class WhenLargeDatasetLoaded : InMemorySpecification, IClassFixture<InMem
         var projectionManager = scope.ServiceProvider.GetRequiredService<IProjectionManager<Something>>();
         var projectionReader = scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
         await projectionManager.ResetAsync();
-        var query = await projectionReader.QueryWithConsistencyAsync(q => new(q.Count() == Count), 5, TimeSpan.FromSeconds(2));
+        var query = await projectionReader.QueryAsync(q => new(q.Count() == Count), 5, TimeSpan.FromSeconds(2));
         var count = query.Count();
         
         count.ShouldBe(Count);

@@ -29,6 +29,8 @@ public static partial class SourceyBuilderExtensions
         
         if (configuration is not null)
             configuration(sourceyAggregateBuilder);
+        
+        builder.Services.TryAddTransient<TAggregate>();
 
         return builder;
     }

@@ -30,7 +30,7 @@ public class WhenConsistencyIsMatchedOnRead : EntityFrameworkIntegrationSpecific
     {
         _scope = _factory.Services.CreateScope();
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.ReadWithConsistencyAsync(_subject, s => s != null && s.Subject == _subject,
+        consistencyCheck = projectionReader.ReadAsync(_subject, s => s != null && s.Subject == _subject,
             5, TimeSpan.FromMilliseconds(5));
         return Task.CompletedTask;
     }
@@ -39,9 +39,9 @@ public class WhenConsistencyIsMatchedOnRead : EntityFrameworkIntegrationSpecific
     {
         using var scope = _factory.Services.CreateScope();
         var aggregateFactory = scope.ServiceProvider.GetRequiredService<IAggregateFactory>();
-        var aggregateStore = scope.ServiceProvider.GetRequiredService<IAggregateStore<SampleAggreagte, SampleState>>();
+        var aggregateStore = scope.ServiceProvider.GetRequiredService<IAggregateStore<SampleAggregate, SampleState>>();
 
-        var aggregate = aggregateFactory.Create<SampleAggreagte, SampleState>();
+        var aggregate = aggregateFactory.Create<SampleAggregate, SampleState>();
         aggregate.MakeSomethingHappen(StreamId.From(_subject), "Something");
         await aggregateStore.SaveAsync(aggregate, default);
     }

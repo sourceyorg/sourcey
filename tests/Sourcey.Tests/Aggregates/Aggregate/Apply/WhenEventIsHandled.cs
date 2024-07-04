@@ -21,7 +21,7 @@ public record TestAggregateCreated(StreamId StreamId, int? Version, string Name)
 
 public class TestAggregate : Aggregate<TestAggregateState>
 {
-    public TestAggregate(TestAggregateState state) : base(state)
+    public TestAggregate()
     {
         Handles<TestAggregateCreated>(@event => {
             Id = @event.StreamId;

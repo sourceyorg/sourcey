@@ -29,14 +29,14 @@ builder.Services.AddDbContextFactory<EventStoreDbContext>(o => o.UseSqlServer(
 
 builder.Services.AddSourcey(sourceyBuilder =>
 {
-    sourceyBuilder.AddAggregate<SampleAggreagte, SampleState>();
+    sourceyBuilder.AddAggregate<SampleAggregate, SampleState>();
 
     sourceyBuilder.AddEvents(e =>
     {
         e.RegisterEventCache<SomethingHappened>();
         e.WithEntityFrameworkCoreEventStore<EventStoreDbContext>(x =>
         {
-            x.AddAggregate<SampleAggreagte, SampleState>();
+            x.AddAggregate<SampleAggregate, SampleState>();
             x.AddProjection<Something>();
         });
     });
@@ -68,11 +68,11 @@ app.UseHttpsRedirection();
 
 app.MapPost("/sample", async (
     [FromServices] IAggregateFactory aggregateFactory,
-    [FromServices] IAggregateStore<SampleAggreagte, SampleState> aggregateStore,
+    [FromServices] IAggregateStore<SampleAggregate, SampleState> aggregateStore,
     [FromBody] SampleRequest request,
     CancellationToken cancellationToken) =>
 {
-    var aggregate = aggregateFactory.Create<SampleAggreagte, SampleState>();
+    var aggregate = aggregateFactory.Create<SampleAggregate, SampleState>();
     aggregate.MakeSomethingHappen(request.Something);
     await aggregateStore.SaveAsync(aggregate, cancellationToken);
 

@@ -1,12 +1,16 @@
-﻿using Sourcey.Events;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Sourcey.Events;
 
 namespace Sourcey.Aggregates;
 
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-internal sealed class AggregateFactory : IAggregateFactory
+internal sealed class AggregateFactory(IServiceProvider serviceProvider) : IAggregateFactory
 {
+    private readonly IServiceProvider _serviceProvider =
+        serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -14,14 +18,9 @@ internal sealed class AggregateFactory : IAggregateFactory
         where TAggregate : Aggregate<TState>
         where TState : IAggregateState, new()
     {
-        events ??= Enumerable.Empty<IEvent>();
-        
-        var aggregate = (TAggregate?)Activator.CreateInstance(typeof(TAggregate), new object[] { new TState() });
+        var aggregate = _serviceProvider.GetRequiredService<TAggregate>();
 
-        if (aggregate is null)
-            throw new InvalidOperationException();
-        
-        aggregate.FromHistory(events);
+        aggregate.FromHistory(events ?? []);
 
         return aggregate;
     }

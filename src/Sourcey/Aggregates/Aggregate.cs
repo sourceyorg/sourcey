@@ -7,15 +7,15 @@ namespace Sourcey.Aggregates;
 /// Base class for all aggregates.
 /// </summary>
 public abstract class Aggregate<TState>
-        where TState : IAggregateState, new()
+    where TState : IAggregateState, new()
 {
-    private readonly List<IEvent> _uncommitedEvents;
-    private readonly Dictionary<Type, Action<IEvent>> _eventHandlers;
+    private readonly List<IEvent> _uncommitedEvents = new();
+    private readonly Dictionary<Type, Action<IEvent>> _eventHandlers = new();
 
     /// <summary>
     /// The current state of the aggregate.
     /// </summary>
-    protected readonly TState _state;
+    protected readonly TState _state = new();
 
     /// <summary>
     /// The unique identifier of the aggregate.
@@ -26,16 +26,6 @@ public abstract class Aggregate<TState>
     /// The current version of the aggregate.
     /// </summary>
     public int? Version { get; protected set; }
-
-    protected Aggregate(TState state)
-    {
-        if (state == null)
-            throw new ArgumentNullException(nameof(state));
-
-        _uncommitedEvents = new List<IEvent>();
-        _eventHandlers = new Dictionary<Type, Action<IEvent>>();
-        _state = state;
-    }
 
     /// <summary>
     /// Initializes a new instance of the state <see cref="TState"/>.

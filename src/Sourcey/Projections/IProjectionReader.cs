@@ -15,14 +15,25 @@ public interface IProjectionReader<TProjection>
         Expression<Func<TProjection, TResult>> projection,
         CancellationToken cancellationToken = default);
 
-    ValueTask<TProjection?> ReadWithConsistencyAsync(Subject subject,
+    ValueTask<TProjection?> ReadAsync(Subject subject,
         Expression<Func<TProjection?, bool>> consistencyCheck,
         int retryCount = 3,
         TimeSpan? delay = null,
         CancellationToken cancellationToken = default);
+    
+    ValueTask<TProjection?> ReadAsync(Subject subject,
+        int retryCount = 3,
+        TimeSpan? delay = null,
+        CancellationToken cancellationToken = default);
 
-    ValueTask<TResult?> ReadWithConsistencyAsync<TResult>(Subject subject,
+    ValueTask<TResult?> ReadAsync<TResult>(Subject subject,
         Expression<Func<TProjection?, bool>> consistencyCheck,
+        Expression<Func<TProjection, TResult>> projection,
+        int retryCount = 3,
+        TimeSpan? delay = null,
+        CancellationToken cancellationToken = default);
+    
+    ValueTask<TResult?> ReadAsync<TResult>(Subject subject,
         Expression<Func<TProjection, TResult>> projection,
         int retryCount = 3,
         TimeSpan? delay = null,
@@ -30,15 +41,21 @@ public interface IProjectionReader<TProjection>
 
     ValueTask<IQueryableProjection<TProjection>> QueryAsync(CancellationToken cancellationToken = default);
 
-    ValueTask<IQueryableProjection<TProjection>> QueryWithConsistencyAsync(
+    ValueTask<IQueryableProjection<TProjection>> QueryAsync(
         Subject subject,
         Expression<Func<TProjection?, bool>> consistencyCheck,
         int retryCount = 3,
         TimeSpan? delay = null,
         CancellationToken cancellationToken = default);
+    
+    ValueTask<IQueryableProjection<TProjection>> QueryAsync(
+        Subject subject,
+        int retryCount = 3,
+        TimeSpan? delay = null,
+        CancellationToken cancellationToken = default);
 
-    ValueTask<IQueryableProjection<TProjection>> QueryWithConsistencyAsync(
-        Func<IQueryable<TProjection>, ValueTask<bool>> consistencyCheckAsync,
+    ValueTask<IQueryableProjection<TProjection>> QueryAsync(
+        Func<IQueryable<TProjection?>, ValueTask<bool>> consistencyCheckAsync,
         int retryCount = 3,
         TimeSpan? delay = null,
         CancellationToken cancellationToken = default);

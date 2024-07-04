@@ -27,16 +27,16 @@ public class WhenConsistencyIsMatchedOnReadAll : InMemorySpecification
     {
         _scope = _factory.Services.CreateScope();  
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.QueryWithConsistencyAsync(q => new(q.Any(s => s.Subject == _subject)), 5, TimeSpan.FromMilliseconds(1));
+        consistencyCheck = projectionReader.QueryAsync(q => new(q.Any(s => s.Subject == _subject)), 5, TimeSpan.FromMilliseconds(1));
     }
 
     protected override async Task When()
     {
         using var scope = _factory.Services.CreateScope(); 
         var aggregateFactory = scope.ServiceProvider.GetRequiredService<IAggregateFactory>();
-        var aggregateStore = scope.ServiceProvider.GetRequiredService<IAggregateStore<SampleAggreagte, SampleState>>();
+        var aggregateStore = scope.ServiceProvider.GetRequiredService<IAggregateStore<SampleAggregate, SampleState>>();
         
-        var aggregate = aggregateFactory.Create<SampleAggreagte, SampleState>();
+        var aggregate = aggregateFactory.Create<SampleAggregate, SampleState>();
         aggregate.MakeSomethingHappen(StreamId.From(_subject), "Something");
         await aggregateStore.SaveAsync(aggregate, default); 
     }

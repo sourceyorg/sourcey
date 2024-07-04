@@ -41,69 +41,77 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
         return Task.FromResult(entity);
     }
 
-    public async ValueTask<TResult?> ReadWithConsistencyAsync<TResult>(Subject subject,
-        Expression<Func<TProjection?, bool>> consistencyCheck, Expression<Func<TProjection, TResult>> projection,
-        int retryCount = 3, TimeSpan? delay = null, CancellationToken cancellationToken = default)
-    {
-        var result =
-            await ReadWithConsistencyAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
-
-        if (result is null)
-            return default;
-
-        return projection.Compile()(result);
-    }
-
     public ValueTask<IQueryableProjection<TProjection>> QueryAsync(CancellationToken cancellationToken = default)
     {
         return new(new QueryableProjection<TProjection>(_projections.Values.AsQueryable(), new InMemoryDisposable()));
     }
 
-    public async ValueTask<IQueryableProjection<TProjection>> QueryWithConsistencyAsync(Subject subject,
+    public async ValueTask<IQueryableProjection<TProjection>> QueryAsync(Subject subject,
         Expression<Func<TProjection?, bool>> consistencyCheck, int retryCount = 3, TimeSpan? delay = null,
         CancellationToken cancellationToken = default)
     {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            _logger.LogInformation(
-                $"{nameof(InMemoryProjectionManager<TProjection>)}.{nameof(QueryWithConsistencyAsync)} was cancelled before execution");
-            cancellationToken.ThrowIfCancellationRequested();
-        }
-
-        _ = await ReadWithConsistencyAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
-        return await QueryAsync(cancellationToken);
-    }
-
-    public async ValueTask<IQueryableProjection<TProjection>> QueryWithConsistencyAsync(
-        Func<IQueryable<TProjection>, ValueTask<bool>> consistencyCheckAsync, int retryCount = 3,
-        TimeSpan? delay = null, CancellationToken cancellationToken = default)
-    {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            _logger.LogInformation(
-                $"{nameof(InMemoryProjectionManager<TProjection>)}.{nameof(QueryWithConsistencyAsync)} was cancelled before execution");
-            cancellationToken.ThrowIfCancellationRequested();
-        }
-
-        var readFunc = (CancellationToken ct) => QueryAsync(ct);
-
-        var (success, result) = await readFunc.WithRetryAsync(
-            validityCheck: consistencyCheckAsync,
-            retryCount: retryCount,
-            delay: delay ?? TimeSpan.FromMilliseconds(50),
-            cancellationToken: cancellationToken
-        );
+        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
 
         if (!success)
         {
             _logger.LogWarning(
-                "{service} failed to read consistent version of projections after {retryCount} retries",
-                $"{nameof(InMemoryProjectionManager<TProjection>)}.{nameof(QueryWithConsistencyAsync)}",
+                "{reader}.{service} failed to read consistent version of projection with subject {subject} after {retryCount} retries",
+                nameof(InMemoryProjectionManager<TProjection>),
+                nameof(QueryAsync),
+                subject,
                 retryCount);
         }
 
-        return result ?? await QueryAsync(cancellationToken);
+        return await QueryAsync(cancellationToken);
     }
+
+    public async ValueTask<IQueryableProjection<TProjection>> QueryAsync(Subject subject, int retryCount = 3, TimeSpan? delay = null,
+        CancellationToken cancellationToken = default)
+    {
+        var success = await ConsistencyCheckAsync(subject, null, retryCount, delay, cancellationToken);
+
+        if (!success)
+        {
+            _logger.LogWarning(
+                "{reader}.{service} failed to read consistent version of projection with subject {subject} after {retryCount} retries",
+                nameof(InMemoryProjectionManager<TProjection>),
+                nameof(QueryAsync),
+                subject,
+                retryCount);
+        }
+
+        return await QueryAsync(cancellationToken);   
+    }
+
+    public async ValueTask<IQueryableProjection<TProjection>> QueryAsync(
+        Func<IQueryable<TProjection?>, ValueTask<bool>> consistencyCheckAsync, int retryCount = 3,
+        TimeSpan? delay = null,
+        CancellationToken cancellationToken = default)
+    {
+        Func<Task<bool>> readFunc = async () =>
+        {
+            var query = await QueryAsync(cancellationToken);
+            return await consistencyCheckAsync(query);
+        };
+        
+        var success = await readFunc.WithRetryAsync(
+            retryCount: retryCount,
+            delay: delay ?? TimeSpan.FromMilliseconds(50),
+            cancellationToken: cancellationToken
+        );
+        
+        if (!success)
+        {
+            _logger.LogWarning(
+                "{reader}.{service} failed to read consistent version of projection after {retryCount} retries",
+                nameof(InMemoryProjectionManager<TProjection>),
+                nameof(QueryAsync),
+                retryCount);
+        }
+
+        return await QueryAsync(cancellationToken);
+    }
+
 
     public ValueTask<TProjection?> ReadAsync(Subject subject, CancellationToken cancellationToken = default)
     {
@@ -129,36 +137,80 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
         return projection.Compile()(result);
     }
 
-    public async ValueTask<TProjection?> ReadWithConsistencyAsync(Subject subject,
-        Expression<Func<TProjection?, bool>> consistencyCheck, int retryCount = 3, TimeSpan? delay = null,
+    public async ValueTask<TResult?> ReadAsync<TResult>(Subject subject, Expression<Func<TProjection, TResult>> projection,
+        int retryCount = 3, TimeSpan? delay = null,
         CancellationToken cancellationToken = default)
     {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            _logger.LogInformation(
-                $"{nameof(InMemoryProjectionManager<TProjection>)}.{nameof(ReadAsync)} was cancelled before execution");
-            cancellationToken.ThrowIfCancellationRequested();
-        }
-
-        var readFunc = (CancellationToken ct) => ReadAsync(subject, ct);
-
-        var (success, result) = await readFunc.WithRetryAsync(
-            validityCheck: consistencyCheck.Compile(),
-            retryCount: retryCount,
-            delay: delay ?? TimeSpan.FromMilliseconds(50),
-            cancellationToken: cancellationToken
-        );
+        var success = await ConsistencyCheckAsync(subject, null, retryCount, delay, cancellationToken);
 
         if (!success)
         {
             _logger.LogWarning(
-                "{service} failed to read consistent version of projection with subject {subject} after {retryCount} retries",
-                $"{nameof(InMemoryProjectionManager<TProjection>)}.{nameof(ReadWithConsistencyAsync)}",
+                "{reader}.{service} failed to read consistent version of projection with subject {subject} after {retryCount} retries",
+                nameof(InMemoryProjectionManager<TProjection>),
+                nameof(QueryAsync),
                 subject,
                 retryCount);
         }
 
-        return result;
+        return await ReadAsync(subject, projection, cancellationToken);
+    }
+
+    public async ValueTask<TProjection?> ReadAsync(Subject subject, Expression<Func<TProjection?, bool>> consistencyCheck,
+        int retryCount = 3, TimeSpan? delay = null,
+        CancellationToken cancellationToken = default)
+    {
+        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
+
+        if (!success)
+        {
+            _logger.LogWarning(
+                "{reader}.{service} failed to read consistent version of projection with subject {subject} after {retryCount} retries",
+                nameof(InMemoryProjectionManager<TProjection>),
+                nameof(QueryAsync),
+                subject,
+                retryCount);
+        }
+
+        return await ReadAsync(subject, cancellationToken);
+    }
+
+    public async ValueTask<TProjection?> ReadAsync(Subject subject, int retryCount = 3, TimeSpan? delay = null,
+        CancellationToken cancellationToken = default)
+    {
+        var success = await ConsistencyCheckAsync(subject, null, retryCount, delay, cancellationToken);
+
+        if (!success)
+        {
+            _logger.LogWarning(
+                "{reader}.{service} failed to read consistent version of projection with subject {subject} after {retryCount} retries",
+                nameof(InMemoryProjectionManager<TProjection>),
+                nameof(QueryAsync),
+                subject,
+                retryCount);
+        }
+
+        return await ReadAsync(subject, cancellationToken);
+    }
+
+    public async ValueTask<TResult?> ReadAsync<TResult>(Subject subject,
+        Expression<Func<TProjection?, bool>> consistencyCheck, Expression<Func<TProjection, TResult>> projection,
+        int retryCount = 3,
+        TimeSpan? delay = null, CancellationToken cancellationToken = default)
+    {
+        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
+
+        if (!success)
+        {
+            _logger.LogWarning(
+                "{reader}.{service} failed to read consistent version of projection with subject {subject} after {retryCount} retries",
+                nameof(InMemoryProjectionManager<TProjection>),
+                nameof(QueryAsync),
+                subject,
+                retryCount);
+        }
+
+        return await ReadAsync(subject, projection, cancellationToken);
     }
 
     public Task RemoveAsync(string subject, CancellationToken cancellationToken = default)
@@ -188,5 +240,39 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
         update(entity);
         _projections.AddOrUpdate(subject, _ => entity, (_, _) => entity);
         return Task.FromResult(entity);
+    }
+    
+    private async Task<bool> ConsistencyCheckAsync(Subject subject,
+        Expression<Func<TProjection?, bool>>? consistencyCheck, int retryCount,
+        TimeSpan? delay, CancellationToken cancellationToken)
+    {
+        var readFunc = BuildConsistencyCheck(subject, consistencyCheck, cancellationToken);
+
+        return await readFunc.WithRetryAsync(
+            retryCount: retryCount,
+            delay: delay ?? TimeSpan.FromMilliseconds(50),
+            cancellationToken: cancellationToken
+        );
+    }
+
+    private Func<Task<bool>> BuildConsistencyCheck(Subject subject,
+        Expression<Func<TProjection?, bool>>? consistencyCheck, CancellationToken cancellationToken)
+    {
+        return ReadFunc;
+
+        Task<bool> ReadFunc()
+        {
+            var query = _projections
+                .Where(s => s.Key == subject.ToString());
+
+            if (consistencyCheck is not null)
+            {
+                var compiledCheck = consistencyCheck.Compile();
+                query = query.Where(s => compiledCheck(s.Value));
+            }
+
+
+            return Task.FromResult(query.Any());
+        }
     }
 }

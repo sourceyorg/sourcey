@@ -4,9 +4,9 @@ using Sourcey.Testing.Integration.Stubs.Events;
 
 namespace Sourcey.Testing.Integration.Stubs.Aggregates;
 
-public class SampleAggreagte: Aggregate<SampleState>
+public class SampleAggregate: Aggregate<SampleState>
 {
-    public SampleAggreagte(SampleState state): base(state)
+    public SampleAggregate()
     {
         Handles<SomethingHappened>(@event =>
         {

@@ -14,14 +14,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSourcey(builder =>
 {
-    builder.AddAggregate<SampleAggreagte, SampleState>();
+    builder.AddAggregate<SampleAggregate, SampleState>();
 
     builder.AddEvents(e =>
     {
         e.RegisterEventCache<SomethingHappened>();
         e.WithInMemoryStore(x =>
         {
-            x.AddAggregate<SampleAggreagte, SampleState>();
+            x.AddAggregate<SampleAggregate, SampleState>();
             x.AddProjection<Something>();
         });
     });
@@ -52,11 +52,11 @@ app.UseHttpsRedirection();
 
 app.MapPost("/sample", async (
     [FromServices] IAggregateFactory aggregateFactory,
-    [FromServices] IAggregateStore<SampleAggreagte, SampleState> aggregateStore,
+    [FromServices] IAggregateStore<SampleAggregate, SampleState> aggregateStore,
     [FromBody] SampleRequest request,
     CancellationToken cancellationToken) =>
 {
-    var aggregate = aggregateFactory.Create<SampleAggreagte, SampleState>();
+    var aggregate = aggregateFactory.Create<SampleAggregate, SampleState>();
     aggregate.MakeSomethingHappen(request.Something);
     await aggregateStore.SaveAsync(aggregate, cancellationToken);
 

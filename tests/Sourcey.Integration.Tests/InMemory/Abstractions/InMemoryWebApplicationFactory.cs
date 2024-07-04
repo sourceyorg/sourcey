@@ -16,14 +16,14 @@ public class InMemoryWebApplicationFactory : SourceyWebApplicationFactory
         {
             services.AddSourcey(builder =>
             {
-                builder.AddAggregate<SampleAggreagte, SampleState>();
+                builder.AddAggregate<SampleAggregate, SampleState>();
             
                 builder.AddEvents(e =>
                 {
                     e.RegisterEventCache<SomethingHappened>();
                     e.WithInMemoryStore(x =>
                     {
-                        x.AddAggregate<SampleAggreagte, SampleState>();
+                        x.AddAggregate<SampleAggregate, SampleState>();
                         x.AddProjection<Something>(p=> p.WithInterval(1));
                     });
                 });
