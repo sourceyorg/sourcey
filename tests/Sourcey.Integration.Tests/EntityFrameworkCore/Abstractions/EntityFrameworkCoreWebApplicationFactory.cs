@@ -18,8 +18,7 @@ namespace Sourcey.Integration.Tests.EntityFrameworkCore;
 
 public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFactory
 {
-    public ProjectionsDbFixture projections;
-    public EventStoreDbFixture eventStore;
+    public HostFixture HostFixture { get; set; }
 
     private sealed class DbInitializer : ISourceyInitializer
     {
@@ -55,13 +54,13 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
         {
             services.AddScoped<ISourceyInitializer, DbInitializer>();
             services.AddDbContextFactory<WriteableSomethingContext>(o => o.UseNpgsql(
-                projections.projections.GetConnectionString()
+                HostFixture.Projections.GetConnectionStringAsync().Result
             ));
             services.AddPooledDbContextFactory<ReadonlySomethingContext>(o => o.UseNpgsql(
-                projections.projections.GetConnectionString()
+                HostFixture.Projections.GetConnectionStringAsync().Result
             ));
             services.AddDbContextFactory<EventStoreDbContext>(o => o.UseNpgsql(
-                eventStore.eventStore.GetConnectionString()
+                HostFixture.EventStore.GetConnectionStringAsync().Result
             ));
             
             services.AddSourcey(builder =>

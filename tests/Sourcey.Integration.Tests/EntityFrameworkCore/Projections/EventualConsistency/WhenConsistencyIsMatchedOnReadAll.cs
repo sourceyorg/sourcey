@@ -18,10 +18,9 @@ public class WhenConsistencyIsMatchedOnReadAll : EntityFrameworkIntegrationSpeci
     private IServiceScope _scope;
     
     public WhenConsistencyIsMatchedOnReadAll(
-        ProjectionsDbFixture projectionsDbFixture,
-        EventStoreDbFixture eventStoreDbFixture, EntityFrameworkCoreWebApplicationFactory factory,
+        HostFixture hostFixture, EntityFrameworkCoreWebApplicationFactory factory,
         ITestOutputHelper testOutputHelper)
-        : base(projectionsDbFixture, eventStoreDbFixture, factory, testOutputHelper)
+        : base(hostFixture, factory, testOutputHelper)
     {
     }
 

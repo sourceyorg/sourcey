@@ -1,4 +1,3 @@
-using Docker.DotNet.Models;
 using Xunit.Abstractions;
 
 namespace Sourcey.Integration.Tests.InMemory;

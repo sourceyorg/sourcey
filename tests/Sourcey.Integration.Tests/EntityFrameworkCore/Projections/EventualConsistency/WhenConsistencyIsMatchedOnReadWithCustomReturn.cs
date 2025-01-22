@@ -14,18 +14,17 @@ namespace Sourcey.Integration.Tests.EntityFrameworkCore.Projections.EventualCons
 public class WhenConsistencyIsMatchedOnReadWithCustomReturn : EntityFrameworkIntegrationSpecification
 {
     private readonly record struct SomethingProjection(string Value);
-    
+
     private const string Value = "Something";
-    
+
     private readonly string _subject = Subject.New();
     private ValueTask<SomethingProjection?> consistencyCheck;
     private IServiceScope _scope;
 
     public WhenConsistencyIsMatchedOnReadWithCustomReturn(
-        ProjectionsDbFixture projectionsDbFixture,
-        EventStoreDbFixture eventStoreDbFixture, EntityFrameworkCoreWebApplicationFactory factory,
+        HostFixture hostFixture, EntityFrameworkCoreWebApplicationFactory factory,
         ITestOutputHelper testOutputHelper)
-        : base(projectionsDbFixture, eventStoreDbFixture, factory, testOutputHelper)
+        : base(hostFixture, factory, testOutputHelper)
     {
     }
 
@@ -38,7 +37,7 @@ public class WhenConsistencyIsMatchedOnReadWithCustomReturn : EntityFrameworkInt
             subject: _subject,
             projection: s => new SomethingProjection(s.Value),
             consistencyCheck: s => s != null && s.Subject == _subject,
-            retryCount: 5, 
+            retryCount: 5,
             delay: TimeSpan.FromMilliseconds(5));
         return Task.CompletedTask;
     }
