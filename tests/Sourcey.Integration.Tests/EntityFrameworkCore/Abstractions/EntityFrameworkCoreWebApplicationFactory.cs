@@ -16,7 +16,7 @@ using Sourcey.Testing.Integration.Stubs.Projections.Managers;
 
 namespace Sourcey.Integration.Tests.EntityFrameworkCore;
 
-public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFactory
+public class EntityFrameworkCoreWebApplicationFactory : SourceyWebApplicationFactory
 {
     public HostFixture HostFixture { get; set; }
 
@@ -25,14 +25,15 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
         private readonly IWriteableProjectionDbContextFactory _projectionDbContextFactory;
         private readonly IDbContextFactory<EventStoreDbContext> _eventStoreDbContextFactory;
 
-        public DbInitializer(IWriteableProjectionDbContextFactory projectionDbContextFactory, IDbContextFactory<EventStoreDbContext> eventStoreDbContextFactory)
+        public DbInitializer(IWriteableProjectionDbContextFactory projectionDbContextFactory,
+            IDbContextFactory<EventStoreDbContext> eventStoreDbContextFactory)
         {
             _projectionDbContextFactory = projectionDbContextFactory;
             _eventStoreDbContextFactory = eventStoreDbContextFactory;
         }
 
         public bool ParallelEnabled => false;
-        
+
         public async Task InitializeAsync(IHost host)
         {
             await using (var dbContext = _projectionDbContextFactory.Create<Something>())
@@ -45,7 +46,8 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
                 await dbContext.Database.EnsureCreatedAsync();
             }
         }
-    }   
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureLogging(logging =>
@@ -54,15 +56,15 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
         {
             services.AddScoped<ISourceyInitializer, DbInitializer>();
             services.AddDbContextFactory<WriteableSomethingContext>(o => o.UseNpgsql(
-                HostFixture.Projections.GetConnectionStringAsync().Result
+                HostFixture.ProjectionsConnectionString
             ));
             services.AddPooledDbContextFactory<ReadonlySomethingContext>(o => o.UseNpgsql(
-                HostFixture.Projections.GetConnectionStringAsync().Result
+                HostFixture.ProjectionsConnectionString
             ));
             services.AddDbContextFactory<EventStoreDbContext>(o => o.UseNpgsql(
-                HostFixture.EventStore.GetConnectionStringAsync().Result
+                HostFixture.EventStoreConnectionString
             ));
-            
+
             services.AddSourcey(builder =>
             {
                 builder.AddAggregate<SampleAggregate, SampleState>();
@@ -84,15 +86,15 @@ public class EntityFrameworkCoreWebApplicationFactory: SourceyWebApplicationFact
                     x.WithEntityFrameworkCoreReader(e => e.WithContext<ReadonlySomethingContext>());
                     x.WithEntityFrameworkCoreStateManager(e => e.WithContext<WriteableSomethingContext>());
                 });
-             
-                 builder.AddSerialization(x =>
-                 {
-                     x.WithEvents();
-                     x.WithAggregates();
-                 });
-            });  
+
+                builder.AddSerialization(x =>
+                {
+                    x.WithEvents();
+                    x.WithAggregates();
+                });
+            });
         });
-         
-         base.ConfigureWebHost(builder);
+
+        base.ConfigureWebHost(builder);
     }
 }

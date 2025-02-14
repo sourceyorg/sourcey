@@ -31,7 +31,7 @@ public class WhenLargeDatasetLoaded : EntityFrameworkIntegrationSpecification,
 
     protected override async Task When()
     {
-        foreach (var chunk in Enumerable.Range(0, Count).Chunk(1000))
+        foreach (var chunk in Enumerable.Range(0, Count).Chunk(10))
         {
             await Task.WhenAll(chunk.Select(async _ =>
             {

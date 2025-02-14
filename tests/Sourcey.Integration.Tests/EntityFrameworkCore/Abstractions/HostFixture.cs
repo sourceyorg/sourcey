@@ -10,6 +10,10 @@ public class HostFixture : IAsyncLifetime
 {
     public PostgresServerResource? EventStore { get; private set; }
     public PostgresServerResource? Projections { get; private set; }
+    
+    public string? EventStoreConnectionString { get; private set; }
+    
+    public string? ProjectionsConnectionString { get; private set; }
 
     private DistributedApplication? App { get; set; }
 
@@ -34,6 +38,9 @@ public class HostFixture : IAsyncLifetime
 
         await resourceNotificationService.WaitForResourceHealthyAsync(DistributedApplicationKeys.Projections);
         await resourceNotificationService.WaitForResourceHealthyAsync(DistributedApplicationKeys.EventStore);
+
+        EventStoreConnectionString = await EventStore.GetConnectionStringAsync();
+        ProjectionsConnectionString = await Projections.GetConnectionStringAsync();
     }
 
     public async Task DisposeAsync()
