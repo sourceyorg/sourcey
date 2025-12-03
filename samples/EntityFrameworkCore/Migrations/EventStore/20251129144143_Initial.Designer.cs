@@ -12,15 +12,15 @@ using Sourcey.EntityFrameworkCore.Events.DbContexts;
 namespace EntityFrameworkCore.Migrations.EventStore
 {
     [DbContext(typeof(EventStoreDbContext))]
-    [Migration("20230901175457_AddEventStore")]
-    partial class AddEventStore
+    [Migration("20251129144143_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
