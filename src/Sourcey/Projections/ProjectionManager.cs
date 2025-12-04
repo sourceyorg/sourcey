@@ -3,27 +3,18 @@ using Sourcey.Events;
 
 namespace Sourcey.Projections;
 
-public abstract class ProjectionManager<TProjection> : IProjectionManager<TProjection>
+public abstract class ProjectionManager<TProjection>(
+    ILogger<ProjectionManager<TProjection>> logger,
+    IEnumerable<IProjectionWriter<TProjection>> projectionWriters,
+    IEnumerable<IProjectionStateManager<TProjection>> projectionStateManagers)
+    : IProjectionManager<TProjection>
     where TProjection : class, IProjection
 {
-    private readonly Dictionary<Type, Func<IEvent, CancellationToken, Task>> _eventHandlers;
+    private readonly Dictionary<Type, Func<IEvent, CancellationToken, Task>> _eventHandlers = new();
 
-    protected readonly IEnumerable<IProjectionWriter<TProjection>> _projectionWriters;
-    protected readonly IEnumerable<IProjectionStateManager<TProjection>> _projectionStateManagers;
-    protected readonly ILogger<ProjectionManager<TProjection>> _logger;
-
-    public ProjectionManager(ILogger<ProjectionManager<TProjection>> logger,
-        IEnumerable<IProjectionWriter<TProjection>> projectionWriters,
-        IEnumerable<IProjectionStateManager<TProjection>> projectionStateManagers)
-    {
-        if (logger == null)
-            throw new ArgumentNullException(nameof(logger));
-
-        _logger = logger;
-        _eventHandlers = new Dictionary<Type, Func<IEvent, CancellationToken, Task>>();
-        _projectionWriters = projectionWriters ?? Enumerable.Empty<IProjectionWriter<TProjection>>();
-        _projectionStateManagers = projectionStateManagers ?? Enumerable.Empty<IProjectionStateManager<TProjection>>();
-    }
+    protected readonly IEnumerable<IProjectionWriter<TProjection>> _projectionWriters = projectionWriters ?? [];
+    protected readonly IEnumerable<IProjectionStateManager<TProjection>> _projectionStateManagers = projectionStateManagers ?? [];
+    protected readonly ILogger<ProjectionManager<TProjection>> _logger = logger;
 
     protected void Handle<TEvent>(Func<TEvent, CancellationToken, Task> func)
         where TEvent : IEvent => _eventHandlers.Add(typeof(TEvent), (@event, cancellationToken) => func((TEvent)@event, cancellationToken));

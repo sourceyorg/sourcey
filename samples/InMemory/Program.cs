@@ -70,8 +70,8 @@ app.MapGet("/sample", async (
     [FromServices] IProjectionReader<Something> projectionReader,
     CancellationToken cancellationToken) =>
 {
-    var projections = await projectionReader.QueryAsync(cancellationToken);
-    return projections;
+    await using var projections = await projectionReader.QueryAsync(cancellationToken);
+    return projections.ToArray();
 })
 .WithName("GetSamples")
 .WithTags("Sample")

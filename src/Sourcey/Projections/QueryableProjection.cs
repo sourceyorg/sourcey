@@ -2,27 +2,21 @@
 using System.Linq.Expressions;
 
 namespace Sourcey.Projections;
-public sealed class QueryableProjection<TProjection> : IQueryableProjection<TProjection>
+public sealed class QueryableProjection<TProjection>(
+    IQueryable<TProjection> queryable,
+    IAsyncDisposable asyncDisposable)
+    : IQueryableProjection<TProjection>
     where TProjection : class, IProjection
 {
-    private readonly IQueryable<TProjection> _queryable;
-    private readonly IAsyncDisposable _asyncDisposable;
+    public Type ElementType => queryable.ElementType;
 
-    public QueryableProjection(IQueryable<TProjection> queryable, IAsyncDisposable asyncDisposable)
-    {
-        _queryable = queryable;
-        _asyncDisposable = asyncDisposable;
-    }
+    public Expression Expression => queryable.Expression;
 
-    public Type ElementType => _queryable.ElementType;
+    public IQueryProvider Provider => queryable.Provider;
 
-    public Expression Expression => _queryable.Expression;
+    public ValueTask DisposeAsync() => asyncDisposable.DisposeAsync();
 
-    public IQueryProvider Provider => _queryable.Provider;
-
-    public ValueTask DisposeAsync() => _asyncDisposable.DisposeAsync();
-
-    public IEnumerator<TProjection> GetEnumerator() => _queryable.GetEnumerator();
+    public IEnumerator<TProjection> GetEnumerator() => queryable.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

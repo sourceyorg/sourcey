@@ -86,7 +86,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
         foreach (var @event in events.OrderBy(e => e.SequenceNo))
         {
-            if (@event.Type is null || !_eventTypeCache.TryGet(@event.Type, out var type))
+            if (@event.Type is null || !_eventTypeCache.ContainsKey(@event.Type))
                 continue;
 
             var result = _eventContextFactory.CreateContext(@event);
@@ -107,7 +107,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
         foreach (var @event in events)
         {
-            if (@event.Type is null || !_eventTypeCache.TryGet(@event.Type, out var type))
+            if (@event.Type is null || !_eventTypeCache.ContainsKey(@event.Type))
                 continue;
 
             var result = _eventContextFactory.CreateContext(@event);
@@ -128,7 +128,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
         foreach (var @event in events)
         {
-            if (@event.Type is null || !_eventTypeCache.TryGet(@event.Type, out _))
+            if (@event.Type is null || !_eventTypeCache.ContainsKey(@event.Type))
                 continue;
 
             var result = _eventContextFactory.CreateContext(@event);
@@ -151,7 +151,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
             if (@event == null)
                 throw new InvalidOperationException($"Unable to find event: {subject}");
 
-            if (!_eventTypeCache.TryGet(@event.Type, out _))
+            if (!_eventTypeCache.ContainsKey(@event.Type))
                 throw new InvalidOperationException($"Unable to find event type: {@event.Type}");
 
             return _eventContextFactory.CreateContext(@event);
@@ -168,7 +168,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
         foreach (var @event in events)
         {
-            if (@event.Type is null || !_eventTypeCache.TryGet(@event.Type, out var type))
+            if (@event.Type is null || !_eventTypeCache.ContainsKey(@event.Type))
                 throw new InvalidOperationException($"Cannot find type for event '{@event.Name}' - '{@event.Type}'.");
 
             var result = _eventContextFactory.CreateContext(@event);
@@ -205,7 +205,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
         foreach (var @event in events.OrderBy(e => e.SequenceNo))
         {
-            if (@event.Type is null || !_eventTypeCache.TryGet(@event.Type, out var type))
+            if (@event.Type is null || !_eventTypeCache.ContainsKey(@event.Type))
                 throw new InvalidOperationException($"Cannot find type for event '{@event.Name}' - '{@event.Type}'.");
 
             var result = _eventContextFactory.CreateContext(@event);
