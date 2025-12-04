@@ -9,7 +9,9 @@
     <UserSecretsId>249d40c7-74d3-47e8-9145-1e70b2292f00</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.0.1" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.0.1" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.0.2" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.0.2" />
+    <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15" />
+    <PackageReference Update="Meziantou.Analyzer" Version="2.0.257" />
   </ItemGroup>
 </Project>
