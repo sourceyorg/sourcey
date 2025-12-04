@@ -36,10 +36,14 @@ public class EntityFrameworkCoreWebApplicationFactory : SourceyWebApplicationFac
 
         public async Task InitializeAsync(IHost host)
         {
-            var dbContext = await _eventStoreDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
-            await using (dbContext.ConfigureAwait(false))
+            await using (var dbContext = _projectionDbContextFactory.Create<Something>())
             {
-                await dbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
+                await dbContext.Database.EnsureCreatedAsync();
+            }
+
+            await using (var dbContext = await _eventStoreDbContextFactory.CreateDbContextAsync())
+            {
+                await dbContext.Database.EnsureCreatedAsync();
             }
         }
     }

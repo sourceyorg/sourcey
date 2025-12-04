@@ -24,7 +24,7 @@ public abstract class AggregateSpecification<TAggregate, TAggregateState> : Spec
         var aggregateFactory = ServiceProvider.GetRequiredService<IAggregateFactory>();
         var aggregate = aggregateFactory.Create<TAggregate, TAggregateState>();
 
-        await SetupAsync(aggregate).ConfigureAwait(false);
+        await SetupAsync(aggregate);
 
         _aggregate = aggregate;
     }

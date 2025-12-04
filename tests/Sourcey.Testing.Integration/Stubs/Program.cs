@@ -14,7 +14,7 @@ public sealed class Program
         builder.Services.AddSourcey(s => s.AddAggregate<SampleAggregate, SampleState>());
 
         var app = builder.Build();
-        await app.InitializeSourceyAsync().ConfigureAwait(false);
-        await app.RunAsync().ConfigureAwait(false);
+        await app.InitializeSourceyAsync();
+        await app.RunAsync();
     }
 }

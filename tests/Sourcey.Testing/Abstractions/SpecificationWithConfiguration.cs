@@ -48,11 +48,11 @@ public abstract class SpecificationWithConfiguration<TConfigurationFixture, TRes
 
     public virtual async Task InitializeAsync()
     {
-        await When().ConfigureAwait(false);
+        await When();
 
         try
         {
-            Result = await Given().ConfigureAwait(false);
+            Result = await Given();
         }
         catch (Exception e)
         {
@@ -106,11 +106,11 @@ public abstract class SpecificationWithConfiguration<TConfigurationFixture> : IA
 
     public virtual async Task InitializeAsync()
     {
-        await When().ConfigureAwait(false);
+        await When();
 
         try
         {
-            await Given().ConfigureAwait(false);
+            await Given();
         }
         catch (Exception e) when (_exceptionMode == ExceptionMode.Record)
         {
