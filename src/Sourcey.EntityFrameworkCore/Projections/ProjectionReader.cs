@@ -36,12 +36,14 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        await using var context = _projectionDbContextFactory.Create<TProjection>();
-
-        return await context.Set<TProjection>()
+        var context = _projectionDbContextFactory.Create<TProjection>();
+        await using (context.ConfigureAwait(false))
+        {
+            return await context.Set<TProjection>()
             .AsQueryable()
             .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync(s => s.Subject == subject.ToString(), cancellationToken: cancellationToken);
+            .FirstOrDefaultAsync(s => s.Subject == subject.ToString(), cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
     }
 
     public async ValueTask<TResult?> ReadAsync<TResult>(Subject subject,
@@ -54,14 +56,16 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        await using var context = _projectionDbContextFactory.Create<TProjection>();
-
-        return await context.Set<TProjection>()
+        var context = _projectionDbContextFactory.Create<TProjection>();
+        await using (context.ConfigureAwait(false))
+        {
+            return await context.Set<TProjection>()
             .AsQueryable()
             .AsNoTrackingWithIdentityResolution()
             .Where(s => s.Subject == subject.ToString())
             .Select(projection)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
     }
 
     public ValueTask<TProjection?> ReadAsync(Subject subject, int retryCount = 3, TimeSpan? delay = null,
@@ -73,10 +77,10 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
         Expression<Func<TProjection?, bool>>? consistencyCheck, int retryCount = 3, TimeSpan? delay = null,
         CancellationToken cancellationToken = default)
     {
-        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
+        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken).ConfigureAwait(false);
 
         if (success)
-            return await ReadAsync(subject, cancellationToken);
+            return await ReadAsync(subject, cancellationToken).ConfigureAwait(false);
         
         _logger.LogWarning(
             "{reader}.{service} failed to read consistent version of projection with subject {subject} after {retryCount} retries",
@@ -100,10 +104,10 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
         int retryCount = 3,
         TimeSpan? delay = null, CancellationToken cancellationToken = default)
     {
-        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
+        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken).ConfigureAwait(false);
 
         if (success)
-            return await ReadAsync(subject, projection, cancellationToken);
+            return await ReadAsync(subject, projection, cancellationToken).ConfigureAwait(false);
         
         _logger.LogWarning(
             "{reader}.{service} failed to read consistent version of projection with subject {subject} after {retryCount} retries",
@@ -126,10 +130,12 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
 
         var context = _projectionDbContextFactory.Create<TProjection>();
 
+#pragma warning disable CA2000 // Dispose objects before losing scope
         return new ValueTask<IQueryableProjection<TProjection>>(new QueryableProjection<TProjection>(
             context.Set<TProjection>().AsQueryable().AsNoTracking(),
             context)
         );
+#pragma warning restore CA2000 // Dispose objects before losing scope
     }
     
     public ValueTask<IQueryableProjection<TProjection>> QueryAsync(Subject subject, int retryCount = 3,
@@ -142,7 +148,7 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
         Expression<Func<TProjection?, bool>>? consistencyCheck, int retryCount = 3, TimeSpan? delay = null,
         CancellationToken cancellationToken = default)
     {
-        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
+        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken).ConfigureAwait(false);
 
         if (!success)
         {
@@ -154,7 +160,7 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
                 retryCount);
         }
 
-        return await QueryAsync(cancellationToken);
+        return await QueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async ValueTask<IQueryableProjection<TProjection>> QueryAsync(
@@ -164,21 +170,23 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
     {
         Func<Task<bool>> readFunc = async () =>
         {
-            await using var context = _projectionDbContextFactory.Create<TProjection>();
-
-            IQueryable<TProjection?> query = context.Set<TProjection>()
+            var context = _projectionDbContextFactory.Create<TProjection>();
+            await using (context.ConfigureAwait(false))
+            {
+                IQueryable<TProjection?> query = context.Set<TProjection>()
                 .AsQueryable()
                 .AsNoTrackingWithIdentityResolution();
 
 
-            return await consistencyCheckAsync(query);
+            return await consistencyCheckAsync(query).ConfigureAwait(false);
+            }
         };
         
         var success = await readFunc.WithRetryAsync(
             retryCount: retryCount,
             delay: delay ?? TimeSpan.FromMilliseconds(50),
             cancellationToken: cancellationToken
-        );
+        ).ConfigureAwait(false);
         
         if (!success)
         {
@@ -189,7 +197,7 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
                 retryCount);
         }
 
-        return await QueryAsync(cancellationToken);
+        return await QueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<bool> ConsistencyCheckAsync(Subject subject,
@@ -202,7 +210,7 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
             retryCount: retryCount,
             delay: delay ?? TimeSpan.FromMilliseconds(50),
             cancellationToken: cancellationToken
-        );
+        ).ConfigureAwait(false);
     }
 
     private Func<Task<bool>> BuildConsistencyCheck(Subject subject,
@@ -212,9 +220,10 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
 
         async Task<bool> ReadFunc()
         {
-            await using var context = _projectionDbContextFactory.Create<TProjection>();
-
-            IQueryable<TProjection?> query = context.Set<TProjection>()
+            var context = _projectionDbContextFactory.Create<TProjection>();
+            await using (context.ConfigureAwait(false))
+            {
+                IQueryable<TProjection?> query = context.Set<TProjection>()
                 .AsQueryable()
                 .AsNoTrackingWithIdentityResolution()
                 .Where(s => s.Subject == subject.ToString());
@@ -222,8 +231,9 @@ internal sealed class ProjectionReader<TProjection> : IProjectionReader<TProject
             if (consistencyCheck is not null) query = query.Where(consistencyCheck);
 
 
-            return await query.AnyAsync(cancellationToken: cancellationToken);
+            return await query.AnyAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
             ;
+            }
         }
     }
 }

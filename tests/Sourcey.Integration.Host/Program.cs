@@ -5,4 +5,4 @@ var builder = DistributedApplication.CreateBuilder(args);
 builder.AddPostgres(DistributedApplicationKeys.EventStore);
 builder.AddPostgres(DistributedApplicationKeys.Projections);
 
-builder.Build().Run();
+await builder.Build().RunAsync().ConfigureAwait(false);

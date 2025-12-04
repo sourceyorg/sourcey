@@ -43,13 +43,16 @@ internal class ProjectionStateInitializer<TProjection> : ISourceyInitializer
         {
             try
             {
-                await using var context = _projectionStateDbContextFactory.Create<TProjection>();
-                await context.Database.MigrateAsync();
+                var context = _projectionStateDbContextFactory.Create<TProjection>();
+                await using (context.ConfigureAwait(false))
+                {
+                    await context.Database.MigrateAsync().ConfigureAwait(false);
+                }
             }
             catch (Exception e)
             {
                 _logger.LogDebug("Unable to migrate {projection}, attempts: {attempt}, exception: {exception}", typeof(TProjection).FullName, attempts++, e.Message);
-                await Task.Delay(200);
+                await Task.Delay(200).ConfigureAwait(false);
                 continue;
             }
 

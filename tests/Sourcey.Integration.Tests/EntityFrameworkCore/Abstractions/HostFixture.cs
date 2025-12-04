@@ -20,7 +20,7 @@ public class HostFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         var appHost = await DistributedApplicationTestingBuilder
-            .CreateAsync<Projects.Sourcey_Integration_Host>();
+            .CreateAsync<Projects.Sourcey_Integration_Host>().ConfigureAwait(false);
 
         EventStore = (PostgresServerResource)appHost.Resources
             .Single(static r => r.Name == DistributedApplicationKeys.EventStore);
@@ -28,19 +28,19 @@ public class HostFixture : IAsyncLifetime
         Projections = (PostgresServerResource)appHost.Resources
             .Single(static r => r.Name == DistributedApplicationKeys.Projections);
 
-        App = await appHost.BuildAsync();
+        App = await appHost.BuildAsync().ConfigureAwait(false);
 
         var resourceNotificationService = App.Services
             .GetRequiredService<ResourceNotificationService>();
 
-        await App.StartAsync();
+        await App.StartAsync().ConfigureAwait(false);
         
 
-        await resourceNotificationService.WaitForResourceHealthyAsync(DistributedApplicationKeys.Projections);
-        await resourceNotificationService.WaitForResourceHealthyAsync(DistributedApplicationKeys.EventStore);
+        await resourceNotificationService.WaitForResourceHealthyAsync(DistributedApplicationKeys.Projections).ConfigureAwait(false);
+        await resourceNotificationService.WaitForResourceHealthyAsync(DistributedApplicationKeys.EventStore).ConfigureAwait(false);
 
-        EventStoreConnectionString = await EventStore.GetConnectionStringAsync();
-        ProjectionsConnectionString = await Projections.GetConnectionStringAsync();
+        EventStoreConnectionString = await EventStore.GetConnectionStringAsync().ConfigureAwait(false);
+        ProjectionsConnectionString = await Projections.GetConnectionStringAsync().ConfigureAwait(false);
     }
 
     public async Task DisposeAsync()
@@ -48,7 +48,7 @@ public class HostFixture : IAsyncLifetime
         if (App is null)
             return;
 
-        await App.StopAsync();
-        await App.DisposeAsync();
+        await App.StopAsync().ConfigureAwait(false);
+        await App.DisposeAsync().ConfigureAwait(false);
     }
 }

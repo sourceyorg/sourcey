@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <!-- Enable .NET analyzers and enforce style/rules at build -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Do NOT turn all warnings into errors globally to avoid noisy failures.
+         Specific rules are set to error via .editorconfig. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Async/threading analyzers -->
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.72" PrivateAssets="all" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.158" PrivateAssets="all" />
+    <PackageReference Include="AsyncFixer" Version="1.6.0" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

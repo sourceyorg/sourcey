@@ -36,20 +36,20 @@ public abstract class ProjectionManager<TProjection>(
         }                
 
         
-        await handler(@event, cancellationToken);
+        await handler(@event, cancellationToken).ConfigureAwait(false);
     }
 
-    protected virtual async Task AddAsync(string subject, Func<TProjection> add, CancellationToken cancellationToken = default)
-        => await Task.WhenAll(_projectionWriters.Select(pw => pw.AddAsync(subject, add, cancellationToken)));
-    protected virtual async Task AddOrUpdateAsync(string subject, Action<TProjection> update, Func<TProjection> create, CancellationToken cancellationToken = default)
-        => await Task.WhenAll(_projectionWriters.Select(pw => pw.AddOrUpdateAsync(subject, update, create, cancellationToken)));
-    protected virtual async Task UpdateAsync(string subject, Func<TProjection, TProjection> update, CancellationToken cancellationToken = default)
-        => await Task.WhenAll(_projectionWriters.Select(pw => pw.UpdateAsync(subject, update, cancellationToken)));
-    protected virtual async Task UpdateAsync(string subject, Action<TProjection> update, CancellationToken cancellationToken = default)
-        => await Task.WhenAll(_projectionWriters.Select(pw => pw.UpdateAsync(subject, update, cancellationToken)));
-    protected virtual async Task RemoveAsync(string subject, CancellationToken cancellationToken = default)
-        => await Task.WhenAll(_projectionWriters.Select(pw => pw.RemoveAsync(subject, cancellationToken)));
-    public virtual async Task ResetAsync(CancellationToken cancellationToken = default)
-        => await Task.WhenAll(_projectionWriters.Select(pw => pw.ResetAsync(cancellationToken))
+    protected virtual Task AddAsync(string subject, Func<TProjection> add, CancellationToken cancellationToken = default)
+        => Task.WhenAll(_projectionWriters.Select(pw => pw.AddAsync(subject, add, cancellationToken)));
+    protected virtual Task AddOrUpdateAsync(string subject, Action<TProjection> update, Func<TProjection> create, CancellationToken cancellationToken = default)
+        => Task.WhenAll(_projectionWriters.Select(pw => pw.AddOrUpdateAsync(subject, update, create, cancellationToken)));
+    protected virtual Task UpdateAsync(string subject, Func<TProjection, TProjection> update, CancellationToken cancellationToken = default)
+        => Task.WhenAll(_projectionWriters.Select(pw => pw.UpdateAsync(subject, update, cancellationToken)));
+    protected virtual Task UpdateAsync(string subject, Action<TProjection> update, CancellationToken cancellationToken = default)
+        => Task.WhenAll(_projectionWriters.Select(pw => pw.UpdateAsync(subject, update, cancellationToken)));
+    protected virtual Task RemoveAsync(string subject, CancellationToken cancellationToken = default)
+        => Task.WhenAll(_projectionWriters.Select(pw => pw.RemoveAsync(subject, cancellationToken)));
+    public virtual Task ResetAsync(CancellationToken cancellationToken = default)
+        => Task.WhenAll(_projectionWriters.Select(pw => pw.ResetAsync(cancellationToken))
                 .Concat(_projectionStateManagers.Select(psm => psm.RemoveAsync(cancellationToken))));
 }

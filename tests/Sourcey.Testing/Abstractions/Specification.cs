@@ -44,11 +44,11 @@ public abstract class Specification<TResult> : IAsyncLifetime
 
         ServiceProvider = services.BuildServiceProvider();
 
-        await When();
+        await When().ConfigureAwait(false);
 
         try
         {
-            Result = await Given();
+            Result = await Given().ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -98,11 +98,11 @@ public abstract class Specification : IAsyncLifetime
 
         ServiceProvider = services.BuildServiceProvider();
 
-        await When();
+        await When().ConfigureAwait(false);
 
         try
         {
-            await Given();
+            await Given().ConfigureAwait(false);
         }
         catch (Exception e) when (_exceptionMode == ExceptionMode.Record)
         {

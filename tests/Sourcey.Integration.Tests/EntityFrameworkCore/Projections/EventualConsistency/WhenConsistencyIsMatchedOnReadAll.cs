@@ -14,7 +14,7 @@ namespace Sourcey.Integration.Tests.EntityFrameworkCore.Projections.EventualCons
 public class WhenConsistencyIsMatchedOnReadAll : EntityFrameworkIntegrationSpecification
 {
     private readonly Subject _subject = Subject.New();
-    private  ValueTask<IQueryableProjection<Something>> consistencyCheck;
+    private  Task<IQueryableProjection<Something>> consistencyCheck;
     private IServiceScope _scope;
     
     public WhenConsistencyIsMatchedOnReadAll(
@@ -26,21 +26,21 @@ public class WhenConsistencyIsMatchedOnReadAll : EntityFrameworkIntegrationSpeci
 
     protected override Task Given()
     {
-        _scope = _factory.Services.CreateScope();
+        _scope = _factory.Services.CreateAsyncScope();
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.QueryAsync(q => new(q.Any(s => s.Subject == _subject.ToString())), 5, TimeSpan.FromMilliseconds(1));
+        consistencyCheck = projectionReader.QueryAsync(q => new(q.Any(s => s.Subject == _subject.ToString())), 5, TimeSpan.FromMilliseconds(1)).AsTask();
         return Task.CompletedTask;
     }
 
     protected override async Task When()
     {
-        using var scope = _factory.Services.CreateScope(); 
+        await using var scope = _factory.Services.CreateAsyncScope(); 
         var aggregateFactory = scope.ServiceProvider.GetRequiredService<IAggregateFactory>();
         var aggregateStore = scope.ServiceProvider.GetRequiredService<IAggregateStore<SampleAggregate, SampleState>>();
         
         var aggregate = aggregateFactory.Create<SampleAggregate, SampleState>();
         aggregate.MakeSomethingHappen(StreamId.From(_subject), "Something");
-        await aggregateStore.SaveAsync(aggregate, default); 
+        await aggregateStore.SaveAsync(aggregate, default).ConfigureAwait(false); 
     }
 
     [Integration]

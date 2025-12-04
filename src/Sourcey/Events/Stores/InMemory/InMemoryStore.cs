@@ -69,7 +69,7 @@ internal sealed class InMemoryEventStore : IEventStore<InMemoryContext>
             .Select(g => GetValuesAsync(g.Key, g.ToArray()))
             .ToArray();
 
-        await Task.WhenAll(eventsByStreamId);
+        await Task.WhenAll(eventsByStreamId).ConfigureAwait(false);
 
         foreach (var task in eventsByStreamId)
             results.Add(await task);

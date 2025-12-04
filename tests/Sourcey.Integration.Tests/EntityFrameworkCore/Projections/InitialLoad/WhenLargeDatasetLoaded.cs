@@ -35,28 +35,28 @@ public class WhenLargeDatasetLoaded : EntityFrameworkIntegrationSpecification,
         {
             await Task.WhenAll(chunk.Select(async _ =>
             {
-                using var scope = _factory.Services.CreateScope();
+                await using var scope = _factory.Services.CreateAsyncScope();
                 var aggregateFactory = scope.ServiceProvider.GetRequiredService<IAggregateFactory>();
                 var aggregateStore = scope.ServiceProvider
                     .GetRequiredService<IAggregateStore<SampleAggregate, SampleState>>();
 
                 var aggregate = aggregateFactory.Create<SampleAggregate, SampleState>();
                 aggregate.MakeSomethingHappen(StreamId.New(), "Something");
-                await aggregateStore.SaveAsync(aggregate, default);
-            }));
+                await aggregateStore.SaveAsync(aggregate, default).ConfigureAwait(false);
+            })).ConfigureAwait(false);
         }
     }
 
     [Integration]
     public async Task Projections_Should_BeLoadedWithin10Seconds()
     {
-        using var scope = _factory.Services.CreateScope();
+        await using var scope = _factory.Services.CreateAsyncScope();
         var projectionManager = scope.ServiceProvider.GetRequiredService<IProjectionManager<Something>>();
         var projectionReader = scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
         await projectionManager.ResetAsync();
-        var query = await projectionReader.QueryAsync(async q => (await q.CountAsync()) == Count, 5,
+        var query = await projectionReader.QueryAsync(async q => (await q.CountAsync().ConfigureAwait(false)) == Count, 5,
             TimeSpan.FromSeconds(2));
-        var count = query.Count();
+        var count = await query.CountAsync();
 
         count.ShouldBe(Count);
     }
