@@ -24,5 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Sourcey\Sourcey.csproj" />
     <ProjectReference Include="..\..\src\Sourcey.Newtonsoft.Json\Sourcey.Newtonsoft.Json.csproj" />
+    <ProjectReference Include="..\Sourcey.Testing\Sourcey.Testing.csproj" />
   </ItemGroup>
 </Project>

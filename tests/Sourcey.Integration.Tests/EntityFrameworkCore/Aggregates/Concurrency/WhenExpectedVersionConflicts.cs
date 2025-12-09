@@ -1,26 +1,22 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Sourcey.Aggregates;
-using Sourcey.Aggregates.Concurrency;
 using Sourcey.Aggregates.Stores;
 using Sourcey.EntityFrameworkCore.Events.DbContexts;
-using Sourcey.EntityFrameworkCore.Events.Stores;
 using Sourcey.Events.Stores;
-using Sourcey.Exceptions;
 using Sourcey.Keys;
 using Sourcey.Testing.Integration.Stubs.Aggregates;
 using Xunit.Abstractions;
-using System.Reflection;
 
 namespace Sourcey.Integration.Tests.EntityFrameworkCore.Aggregates.Concurrency;
 
-public class When_expected_version_conflicts : EntityFrameworkIntegrationSpecification,
+public class WhenExpectedVersionConflicts : EntityFrameworkIntegrationSpecification,
     IClassFixture<HostFixture>,
     IClassFixture<EntityFrameworkCoreWebApplicationFactory>
 {
     private StreamId _streamId;
 
-    public When_expected_version_conflicts(HostFixture hostFixture,
+    public WhenExpectedVersionConflicts(HostFixture hostFixture,
         EntityFrameworkCoreWebApplicationFactory factory,
         ITestOutputHelper output) : base(hostFixture, factory, output) { }
 

@@ -14,7 +14,7 @@ namespace Sourcey.Integration.Tests.InMemory.Projections.EventualConsistency;
 public class WhenConsistencyIsMatchedOnReadAll : InMemorySpecification
 {
     private readonly Subject _subject = Subject.New();
-    private  ValueTask<IQueryableProjection<Something>> consistencyCheck;
+    private  ValueTask<IQueryableProjection<Something>> _consistencyCheck;
     private IServiceScope _scope;
     
     public WhenConsistencyIsMatchedOnReadAll(ITestOutputHelper testOutputHelper,
@@ -27,7 +27,7 @@ public class WhenConsistencyIsMatchedOnReadAll : InMemorySpecification
     {
         _scope = _factory.Services.CreateScope();  
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.QueryAsync(q => new(q.Any(s => s.Subject == _subject)), 5, TimeSpan.FromMilliseconds(1));
+        _consistencyCheck = projectionReader.QueryAsync(q => new(q.Any(s => s.Subject == _subject)), 5, TimeSpan.FromMilliseconds(1));
     }
 
     protected override async Task When()
@@ -44,7 +44,7 @@ public class WhenConsistencyIsMatchedOnReadAll : InMemorySpecification
     [Integration]
     public async Task ProjectionWithSubject_Should_BeInResult()
     {
-        var result = await consistencyCheck;
+        var result = await _consistencyCheck;
         _scope.Dispose();
         result.Where(s => s.Subject == _subject).ShouldHaveSingleItem().Subject.ShouldBe(_subject);
     }

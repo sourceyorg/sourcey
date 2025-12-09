@@ -13,8 +13,8 @@ namespace Sourcey.EntityFrameworkCore.Events.Stores;
 internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
     where TStoreDbContext : DbContext, IEventStoreDbContext
 {
-    private static readonly int DefaultReloadInterval = 50;
-    private static readonly int DefaultPageSize = 500;
+    private static readonly int _defaultReloadInterval = 50;
+    private static readonly int _defaultPageSize = 500;
 
     private readonly IDbContextFactory<TStoreDbContext> _dbContextFactory;
     private readonly IEventContextFactory _eventContextFactory;
@@ -304,9 +304,9 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
     private async Task<List<Entities.Event>> GetAllEventsAfterDelayInternalAsync(long offset, int? pageSize = null,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Reloading events after {DefaultReloadInterval}ms.", DefaultReloadInterval);
+        _logger.LogInformation("Reloading events after {DefaultReloadInterval}ms.", _defaultReloadInterval);
 
-        await Task.Delay(DefaultReloadInterval).ConfigureAwait(false);
+        await Task.Delay(_defaultReloadInterval).ConfigureAwait(false);
         return await GetAllEventsForwardsInternalAsync(offset, pageSize, cancellationToken).ConfigureAwait(false);
     }
 }

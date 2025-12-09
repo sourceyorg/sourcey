@@ -14,7 +14,7 @@ namespace Sourcey.Integration.Tests.EntityFrameworkCore.Projections.EventualCons
 public class WhenConsistencyIsMatchedOnReadAll : EntityFrameworkIntegrationSpecification
 {
     private readonly Subject _subject = Subject.New();
-    private  ValueTask<IQueryableProjection<Something>> consistencyCheck;
+    private  ValueTask<IQueryableProjection<Something>> _consistencyCheck;
     private IServiceScope _scope;
     
     public WhenConsistencyIsMatchedOnReadAll(
@@ -28,7 +28,7 @@ public class WhenConsistencyIsMatchedOnReadAll : EntityFrameworkIntegrationSpeci
     {
         _scope = _factory.Services.CreateScope();
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.QueryAsync(q => new(q.Any(s => s.Subject == _subject.ToString())), 5, TimeSpan.FromMilliseconds(1));
+        _consistencyCheck = projectionReader.QueryAsync(q => new(q.Any(s => s.Subject == _subject.ToString())), 5, TimeSpan.FromMilliseconds(1));
         return Task.CompletedTask;
     }
 
@@ -46,7 +46,7 @@ public class WhenConsistencyIsMatchedOnReadAll : EntityFrameworkIntegrationSpeci
     [Integration]
     public async Task ProjectionWithSubject_Should_BeInResult()
     {
-        var result = await consistencyCheck;
+        var result = await _consistencyCheck;
         _scope.Dispose();
         result.Where(s => s.Subject == _subject.ToString()).ShouldHaveSingleItem().Subject.ShouldBe(_subject);
     }

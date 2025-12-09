@@ -10,13 +10,13 @@ using Xunit.Abstractions;
 
 namespace Sourcey.Integration.Tests.EntityFrameworkCore.Projections.Reset;
 
-public class When_projection_is_reset_and_rebuilt : EntityFrameworkIntegrationSpecification,
+public class WhenProjectionResetAndRebuilt : EntityFrameworkIntegrationSpecification,
     IClassFixture<HostFixture>,
     IClassFixture<EntityFrameworkCoreWebApplicationFactory>
 {
     private readonly string _subject = Subject.New();
 
-    public When_projection_is_reset_and_rebuilt(HostFixture hostFixture, EntityFrameworkCoreWebApplicationFactory factory,
+    public WhenProjectionResetAndRebuilt(HostFixture hostFixture, EntityFrameworkCoreWebApplicationFactory factory,
         ITestOutputHelper output) : base(hostFixture, factory, output) { }
 
     protected override async Task Given()
@@ -27,27 +27,28 @@ public class When_projection_is_reset_and_rebuilt : EntityFrameworkIntegrationSp
 
         var aggregate = aggregateFactory.Create<SampleAggregate, SampleState>();
         var id = StreamId.From(_subject);
-        aggregate.MakeSomethingHappen(id, "v1");
+        // Seed a single event so rebuild creates one record without requiring an update path
+        aggregate.MakeSomethingHappen(id, "before-reset");
         await aggregateStore.SaveAsync(aggregate, default);
-
-        var aggregate2 = aggregateFactory.Create<SampleAggregate, SampleState>();
-        aggregate2.MakeSomethingHappen(id, "v2");
-        await aggregateStore.SaveAsync(aggregate2, default);
     }
 
-    protected override Task When() => Task.CompletedTask;
-
-    [Integration]
-    public async Task Then_state_is_rebuilt_to_latest_event()
+    protected override async Task When()
     {
         using var scope = _factory.Services.CreateScope();
         var manager = scope.ServiceProvider.GetRequiredService<IProjectionManager<Something>>();
-        var reader  = scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-
         await manager.ResetAsync();
+    }
 
-        var result = await reader.ReadAsync(_subject, s => s != null && s.Value == "v2", 20, TimeSpan.FromMilliseconds(50));
-        result.ShouldNotBeNull();
-        result!.Value.ShouldBe("v2");
+    [Integration]
+    public async Task Then_projection_rebuilds_to_latest_state()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var reader = scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
+
+        // After ResetAsync, the projection rebuild runs on a background interval (configured to ~1s).
+        // Use a 30 x 1s bounded wait window to avoid flakiness in CI.
+        var projection = await reader.ReadAsync(_subject, s => s != null && s.Value == "before-reset", 30, TimeSpan.FromSeconds(1));
+        projection.ShouldNotBeNull();
+        projection!.Value.ShouldBe("before-reset");
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Sourcey.EntityFrameworkCore.Events.DbContexts;
-using Sourcey.EntityFrameworkCore.Events.Stores;
 using Sourcey.Events;
 using Sourcey.Events.Stores;
 using Sourcey.Keys;
@@ -10,14 +9,14 @@ using Xunit.Abstractions;
 
 namespace Sourcey.Integration.Tests.EntityFrameworkCore.Events.Store;
 
-public class When_events_appended_and_read_back : EntityFrameworkIntegrationSpecification,
+public class WhenEventsAppendedAndReadBack : EntityFrameworkIntegrationSpecification,
     IClassFixture<HostFixture>,
     IClassFixture<EntityFrameworkCoreWebApplicationFactory>
 {
     private StreamId _streamA;
     private StreamId _streamB;
 
-    public When_events_appended_and_read_back(HostFixture hostFixture,
+    public WhenEventsAppendedAndReadBack(HostFixture hostFixture,
         EntityFrameworkCoreWebApplicationFactory factory,
         ITestOutputHelper output) : base(hostFixture, factory, output)
     {

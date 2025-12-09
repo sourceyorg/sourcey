@@ -1,15 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
 using Sourcey.Events;
 using Sourcey.Events.Cache;
-using Sourcey.Extensions;
 using Sourcey.Keys;
-using Xunit;
-using System.Reflection;
 
 namespace Sourcey.Tests.Events.Cache
 {
-    public class When_resolving_event_types
+    public class WhenResolvingEventTypes
     {
         private static ServiceProvider BuildProvider(params Type[] eventTypes)
         {
@@ -22,7 +18,7 @@ namespace Sourcey.Tests.Events.Cache
             return services.BuildServiceProvider();
         }
 
-        [Fact]
+        [Then]
         public void Then_simple_name_exists_case_insensitively_TryGet_returns_type()
         {
             using var provider = BuildProvider(typeof(UniqueEvent));
@@ -32,7 +28,7 @@ namespace Sourcey.Tests.Events.Cache
             type.ShouldBe(typeof(UniqueEvent));
         }
 
-        [Fact]
+        [Then]
         public void Then_name_is_fully_qualified_TryGet_returns_false()
         {
             using var provider = BuildProvider(typeof(UniqueEvent));
@@ -42,7 +38,7 @@ namespace Sourcey.Tests.Events.Cache
             type.ShouldBeNull();
         }
 
-        [Fact]
+        [Then]
         public void Then_simple_name_is_ambiguous_TryGet_returns_first_registered_type()
         {
             using var provider = BuildProvider(
@@ -54,7 +50,7 @@ namespace Sourcey.Tests.Events.Cache
             type.ShouldBe(typeof(Sourcey.Tests.Events.Cache.A.NamespaceCollision));
         }
 
-        [Fact]
+        [Then]
         public void Then_simple_name_is_ambiguous_ContainsKey_returns_true()
         {
             using var provider = BuildProvider(
@@ -65,7 +61,7 @@ namespace Sourcey.Tests.Events.Cache
             cache.ContainsKey("NamespaceCollision").ShouldBeTrue();
         }
 
-        [Fact]
+        [Then]
         public void Then_name_not_found_TryGet_returns_false_and_type_null()
         {
             using var provider = BuildProvider(typeof(UniqueEvent));

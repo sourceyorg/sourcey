@@ -18,7 +18,7 @@ public class WhenConsistencyIsMatchedOnReadWithCustomReturn : EntityFrameworkInt
     private const string Value = "Something";
 
     private readonly string _subject = Subject.New();
-    private ValueTask<SomethingProjection?> consistencyCheck;
+    private ValueTask<SomethingProjection?> _consistencyCheck;
     private IServiceScope _scope;
 
     public WhenConsistencyIsMatchedOnReadWithCustomReturn(
@@ -33,7 +33,7 @@ public class WhenConsistencyIsMatchedOnReadWithCustomReturn : EntityFrameworkInt
     {
         _scope = _factory.Services.CreateScope();
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.ReadAsync<SomethingProjection?>(
+        _consistencyCheck = projectionReader.ReadAsync<SomethingProjection?>(
             subject: _subject,
             projection: s => new SomethingProjection(s.Value),
             consistencyCheck: s => s != null && s.Subject == _subject,
@@ -56,7 +56,7 @@ public class WhenConsistencyIsMatchedOnReadWithCustomReturn : EntityFrameworkInt
     [Integration]
     public async Task ProjectionWithSubject_Should_BeInResult()
     {
-        var result = await consistencyCheck;
+        var result = await _consistencyCheck;
         _scope.Dispose();
         result.ShouldNotBeNull().Value.ShouldBe(Value);
     }

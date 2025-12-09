@@ -2,15 +2,14 @@
 using Shouldly;
 using Sourcey.Keys;
 using Sourcey.Newtonsoft.Json.Converters;
-using Xunit;
 
 namespace Sourcey.Newtonsoft.Json.Tests.Keys;
 
-public class When_serializing_StreamId
+public class WhenSerializingStreamId
 {
     private sealed record Wrapper(StreamId Id);
 
-    [Fact]
+    [Then]
     public void Then_it_round_trips_via_converter()
     {
         var id = StreamId.New();
@@ -25,7 +24,7 @@ public class When_serializing_StreamId
         roundTripped.Id.ShouldBe(id);
     }
 
-    [Fact]
+    [Then]
     public void Then_it_treats_null_as_unknown_when_reading()
     {
         var settings = new JsonSerializerSettings
@@ -39,7 +38,7 @@ public class When_serializing_StreamId
         value.Id.ShouldBe(StreamId.Unknown);
     }
 
-    [Fact]
+    [Then]
     public void Then_it_reads_plain_string_value_into_streamid()
     {
         var id = StreamId.New();
