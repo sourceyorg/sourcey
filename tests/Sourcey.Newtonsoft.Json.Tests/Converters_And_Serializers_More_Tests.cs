@@ -71,6 +71,30 @@ public class MoreConvertersTests
         var result = converter.ReadJson(reader, typeof(Correlation?), null, false, serializer);
         result.HasValue.ShouldBeFalse();
     }
+
+    [Then]
+    public void NonNullableConverters_coerce_non_string_tokens_via_serializer()
+    {
+        var serializer = new JsonSerializer();
+
+        // Integer token should be coerced to string by serializer and then wrapped by converters
+        var intToken = new JValue(123);
+
+        var actor = new ActorJsonConverter().ReadJson(new JTokenReader(intToken), typeof(Actor), default, false, serializer);
+        actor.ToString().ShouldBe("123");
+
+        var evt = new EventIdJsonConverter().ReadJson(new JTokenReader(intToken), typeof(EventId), default, false, serializer);
+        evt.ToString().ShouldBe("123");
+
+        var stream = new StreamIdJsonConverter().ReadJson(new JTokenReader(intToken), typeof(StreamId), default, false, serializer);
+        stream.ToString().ShouldBe("123");
+
+        var caus = new CausationJsonConverter().ReadJson(new JTokenReader(intToken), typeof(Causation), default, false, serializer);
+        caus.ToString().ShouldBe("123");
+
+        var corr = new CorrelationJsonConverter().ReadJson(new JTokenReader(intToken), typeof(Correlation), default, false, serializer);
+        corr.ToString().ShouldBe("123");
+    }
 }
 
 public class SerializerDeserializerMoreTests
@@ -136,5 +160,35 @@ public class SerializerDeserializerMoreTests
         converters.ShouldContain(c => c is CorrelationJsonConverter);
         converters.ShouldContain(c => c is NullableCausationJsonConverter);
         converters.ShouldContain(c => c is NullableCorrelationJsonConverter);
+    }
+
+    private sealed record UnknownFriendlyDto(StreamId StreamId, string Name);
+
+    [Then]
+    public void Deserializers_ignore_unknown_fields_by_default()
+    {
+        var services = new ServiceCollection();
+        services.AddSourcey().AddNewtonsoftJsonSerialization(b => b.WithEvents().WithAggregates());
+        using var provider = services.BuildServiceProvider();
+
+        var eventSerializer = provider.GetRequiredService<Sourcey.Events.Serialization.IEventSerializer>();
+        var eventDeserializer = provider.GetRequiredService<Sourcey.Events.Serialization.IEventDeserializer>();
+        var aggregateSerializer = provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateSerializer>();
+        var aggregateDeserializer = provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateDeserializer>();
+
+        var dto = new UnknownFriendlyDto(StreamId.From("s-1"), "N");
+
+        // Inject an unknown property into the payload
+        var evtJson = JObject.Parse(eventSerializer.Serialize(dto));
+        evtJson["unknownProp"] = "xyz";
+        var evtBack = eventDeserializer.Deserialize<UnknownFriendlyDto>(evtJson.ToString());
+        evtBack.StreamId.ToString().ShouldBe("s-1");
+        evtBack.Name.ShouldBe("N");
+
+        var aggJson = JObject.Parse(aggregateSerializer.Serialize(dto));
+        aggJson["unknownProp"] = "xyz";
+        var aggBack = aggregateDeserializer.Deserialize<UnknownFriendlyDto>(aggJson.ToString());
+        aggBack.StreamId.ToString().ShouldBe("s-1");
+        aggBack.Name.ShouldBe("N");
     }
 }
