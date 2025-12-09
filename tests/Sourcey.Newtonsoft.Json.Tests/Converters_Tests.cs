@@ -178,4 +178,34 @@ public class DiRegistrationTests
         provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateSerializer>().ShouldNotBeNull();
         provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateDeserializer>().ShouldNotBeNull();
     }
+
+    [Then]
+    public void WithEvents_only_registers_event_services_not_aggregate_services()
+    {
+        var services = new ServiceCollection();
+        services.AddSourcey().AddNewtonsoftJsonSerialization(b => b.WithEvents());
+
+        using var provider = services.BuildServiceProvider();
+
+        provider.GetRequiredService<Sourcey.Events.Serialization.IEventSerializer>().ShouldNotBeNull();
+        provider.GetRequiredService<Sourcey.Events.Serialization.IEventDeserializer>().ShouldNotBeNull();
+
+        Should.Throw<InvalidOperationException>(() => provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateSerializer>());
+        Should.Throw<InvalidOperationException>(() => provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateDeserializer>());
+    }
+
+    [Then]
+    public void WithAggregates_only_registers_aggregate_services_not_event_services()
+    {
+        var services = new ServiceCollection();
+        services.AddSourcey().AddNewtonsoftJsonSerialization(b => b.WithAggregates());
+
+        using var provider = services.BuildServiceProvider();
+
+        provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateSerializer>().ShouldNotBeNull();
+        provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateDeserializer>().ShouldNotBeNull();
+
+        Should.Throw<InvalidOperationException>(() => provider.GetRequiredService<Sourcey.Events.Serialization.IEventSerializer>());
+        Should.Throw<InvalidOperationException>(() => provider.GetRequiredService<Sourcey.Events.Serialization.IEventDeserializer>());
+    }
 }
