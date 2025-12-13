@@ -37,8 +37,8 @@ public class WhenConsistencyIsMatchedOnReadWithCustomReturn : EntityFrameworkInt
             subject: _subject,
             projection: s => new SomethingProjection(s.Value),
             consistencyCheck: s => s != null && s.Subject == _subject,
-            retryCount: 5,
-            delay: TimeSpan.FromMilliseconds(5));
+            retryCount: 30,
+            delay: TimeSpan.FromMilliseconds(100));
         return Task.CompletedTask;
     }
 

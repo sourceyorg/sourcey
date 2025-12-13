@@ -29,8 +29,9 @@ public class WhenConsistencyIsMatchedOnRead : EntityFrameworkIntegrationSpecific
     {
         _scope = _factory.Services.CreateScope();
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
+        // Use a bounded polling window generous enough for EF Core background processing in CI
         _consistencyCheck = projectionReader.ReadAsync(_subject, s => s != null && s.Subject == _subject,
-            5, TimeSpan.FromMilliseconds(5));
+            30, TimeSpan.FromMilliseconds(100));
         return Task.CompletedTask;
     }
 

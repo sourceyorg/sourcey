@@ -7,7 +7,13 @@ public sealed class NullableCausationJsonConverter : JsonConverter<Causation?>
 {
     public override void WriteJson(JsonWriter writer, Causation? value, JsonSerializer serializer)
     {
-        serializer.Serialize(writer, value.ToString());
+        if (!value.HasValue)
+        {
+            writer.WriteNull();
+            return;
+        }
+
+        serializer.Serialize(writer, value.Value.ToString());
     }
 
     public override Causation? ReadJson(JsonReader reader, Type objectType, Causation? existingValue, bool hasExistingValue,

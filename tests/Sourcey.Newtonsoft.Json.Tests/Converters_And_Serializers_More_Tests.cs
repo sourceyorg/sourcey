@@ -100,6 +100,7 @@ public class MoreConvertersTests
 public class SerializerDeserializerMoreTests
 {
     private sealed record AggregateDto(StreamId StreamId, string Name, Causation? Causation, Correlation? Correlation);
+    private sealed record EventDto(StreamId StreamId, string Name);
 
     [Then]
     public void EventDeserializer_throws_on_null()
@@ -113,6 +114,17 @@ public class SerializerDeserializerMoreTests
     }
 
     [Then]
+    public void EventDeserializer_non_generic_throws_on_null()
+    {
+        var services = new ServiceCollection();
+        services.AddSourcey().AddNewtonsoftJsonSerialization(b => b.WithEvents());
+        using var provider = services.BuildServiceProvider();
+
+        var sut = provider.GetRequiredService<Sourcey.Events.Serialization.IEventDeserializer>();
+        Should.Throw<ArgumentNullException>(new Action(() => sut.Deserialize(null!, typeof(object))));
+    }
+
+    [Then]
     public void AggregateSerializer_throws_on_null()
     {
         var services = new ServiceCollection();
@@ -121,6 +133,17 @@ public class SerializerDeserializerMoreTests
 
         var sut = provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateSerializer>();
         Should.Throw<ArgumentNullException>(new Action(() => sut.Serialize<object>(null!)));
+    }
+
+    [Then]
+    public void AggregateDeserializer_non_generic_throws_on_null()
+    {
+        var services = new ServiceCollection();
+        services.AddSourcey().AddNewtonsoftJsonSerialization(b => b.WithAggregates());
+        using var provider = services.BuildServiceProvider();
+
+        var sut = provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateDeserializer>();
+        Should.Throw<ArgumentNullException>(new Action(() => sut.Deserialize(null!, typeof(object))));
     }
 
     [Then]
@@ -146,6 +169,48 @@ public class SerializerDeserializerMoreTests
         back.Name.ShouldBe("Hello");
         back.Causation!.Value.ToString().ShouldBe("caus-x");
         back.Correlation!.Value.ToString().ShouldBe("corr-y");
+    }
+
+    [Then]
+    public void EventDeserializer_non_generic_roundtrip()
+    {
+        var services = new ServiceCollection();
+        services.AddSourcey().AddNewtonsoftJsonSerialization(b => b.WithEvents());
+        using var provider = services.BuildServiceProvider();
+
+        var serializer = provider.GetRequiredService<Sourcey.Events.Serialization.IEventSerializer>();
+        var deserializer = provider.GetRequiredService<Sourcey.Events.Serialization.IEventDeserializer>();
+
+        var dto = new EventDto(StreamId.From("evt-stream"), "Name");
+        var json = serializer.Serialize(dto);
+
+        var obj = deserializer.Deserialize(json, typeof(EventDto));
+        obj.ShouldBeOfType<EventDto>().ShouldSatisfyAllConditions(
+            e => e.StreamId.ToString().ShouldBe("evt-stream"),
+            e => e.Name.ShouldBe("Name")
+        );
+    }
+
+    [Then]
+    public void AggregateDeserializer_non_generic_roundtrip()
+    {
+        var services = new ServiceCollection();
+        services.AddSourcey().AddNewtonsoftJsonSerialization(b => b.WithAggregates());
+        using var provider = services.BuildServiceProvider();
+
+        var serializer = provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateSerializer>();
+        var deserializer = provider.GetRequiredService<Sourcey.Aggregates.Serialization.IAggregateDeserializer>();
+
+        var dto = new AggregateDto(StreamId.From("agg-stream"), "A", Causation.From("c"), Correlation.From("k"));
+        var json = serializer.Serialize(dto);
+
+        var obj = deserializer.Deserialize(json, typeof(AggregateDto));
+        obj.ShouldBeOfType<AggregateDto>().ShouldSatisfyAllConditions(
+            a => a.StreamId.ToString().ShouldBe("agg-stream"),
+            a => a.Name.ShouldBe("A"),
+            a => a.Causation!.Value.ToString().ShouldBe("c"),
+            a => a.Correlation!.Value.ToString().ShouldBe("k")
+        );
     }
 
     [Then]
