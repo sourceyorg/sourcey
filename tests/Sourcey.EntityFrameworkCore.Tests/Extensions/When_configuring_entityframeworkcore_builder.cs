@@ -4,7 +4,7 @@ using Sourcey.Extensions;
 
 namespace Sourcey.EntityFrameworkCore.Tests.Extensions;
 
-public class When_configuring_entityframeworkcore_builder
+public class WhenConfiguringEntityframeworkcoreBuilder
 {
     [Then]
     public void AddEntityFrameworkCore_invokes_configuration_delegate()

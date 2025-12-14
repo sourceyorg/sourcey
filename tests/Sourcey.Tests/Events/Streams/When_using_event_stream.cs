@@ -7,7 +7,7 @@ namespace Sourcey.Tests.Events.Streams;
 
 public sealed record DummyEvent(StreamId StreamId, int? Version, string Name) : Event(StreamId, Version);
 
-public class When_using_event_stream
+public class WhenUsingEventStream
 {
     private static (DummyEvent e1, DummyEvent e2, EventStream stream) Build()
     {

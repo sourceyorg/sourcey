@@ -9,7 +9,7 @@ using Sourcey.Projections;
 
 namespace Sourcey.EntityFrameworkCore.Tests.Projections.Writer;
 
-public class When_using_in_memory_context
+public class WhenUsingInMemoryContext
 {
     private sealed class DummyProjection : IProjection
     {

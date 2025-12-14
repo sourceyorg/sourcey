@@ -22,7 +22,7 @@ public class ReplayAggregate : Aggregate<ReplayState>
     public override ReplayState GetState() => _state;
 }
 
-public class When_replaying_and_clearing_uncommitted
+public class WhenReplayingAndClearingUncommitted
 {
     [Then]
     public void Apply_isNew_false_sets_version_and_does_not_enqueue()

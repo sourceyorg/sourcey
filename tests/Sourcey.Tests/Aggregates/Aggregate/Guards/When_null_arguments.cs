@@ -14,7 +14,7 @@ public class GuardAggregate : Aggregate<GuardAggregateState>
     public override GuardAggregateState GetState() => new();
 }
 
-public class When_null_arguments
+public class WhenNullArguments
 {
     [Then]
     public void Apply_null_should_throw()

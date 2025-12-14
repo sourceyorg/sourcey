@@ -11,7 +11,7 @@ using Sourcey.Projections;
 
 namespace Sourcey.EntityFrameworkCore.Tests.Projections.Reader;
 
-public class When_using_in_memory_context
+public class WhenUsingInMemoryContext
 {
     private sealed class DummyProjection : IProjection
     {

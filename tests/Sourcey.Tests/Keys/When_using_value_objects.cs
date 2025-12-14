@@ -3,7 +3,7 @@ using Sourcey.Keys;
 
 namespace Sourcey.Tests.Keys;
 
-public class When_using_value_objects
+public class WhenUsingValueObjects
 {
     [Then]
     public void Equality_and_hashcode_should_match_for_same_values()

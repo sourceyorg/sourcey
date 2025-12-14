@@ -10,7 +10,7 @@ using Sourcey.Projections;
 
 namespace Sourcey.EntityFrameworkCore.Tests.Projections.Writer;
 
-public class When_cancellation_is_requested
+public class WhenCancellationIsRequested
 {
     private sealed class DummyProjection : IProjection
     {
