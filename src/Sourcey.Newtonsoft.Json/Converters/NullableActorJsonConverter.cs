@@ -7,7 +7,13 @@ public sealed class NullableActorJsonConverter : JsonConverter<Actor?>
 {
     public override void WriteJson(JsonWriter writer, Actor? value, JsonSerializer serializer)
     {
-        serializer.Serialize(writer, value.ToString());
+        if (!value.HasValue)
+        {
+            writer.WriteNull();
+            return;
+        }
+
+        serializer.Serialize(writer, value.Value.ToString());
     }
 
     public override Actor? ReadJson(JsonReader reader, Type objectType, Actor? existingValue, bool hasExistingValue,

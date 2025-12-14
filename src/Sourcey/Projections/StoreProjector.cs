@@ -40,7 +40,7 @@ public sealed class StoreProjector<TProjection> : BackgroundService
 
     }
 
-    public async Task ResetAsync(CancellationToken cancellationToken = default)
+    public Task ResetAsync(CancellationToken cancellationToken = default)
     {
         if (cancellationToken.IsCancellationRequested)
         {
@@ -48,7 +48,7 @@ public sealed class StoreProjector<TProjection> : BackgroundService
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        await Task.WhenAll(
+        return Task.WhenAll(
             _projectionManager.ResetAsync(cancellationToken),
             _projectionStateManager.RemoveAsync(cancellationToken));
     }
@@ -61,22 +61,22 @@ public sealed class StoreProjector<TProjection> : BackgroundService
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        var state = await _projectionStateManager.RetrieveAsync(cancellationToken) ?? await _projectionStateManager.CreateAsync(cancellationToken);
+        var state = await _projectionStateManager.RetrieveAsync(cancellationToken).ConfigureAwait(false) ?? await _projectionStateManager.CreateAsync(cancellationToken).ConfigureAwait(false);
         var eventStore = _eventStoreFactory.Create<TProjection>();
 
         while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
-                state = await _projectionStateManager.RetrieveAsync(cancellationToken) ?? await _projectionStateManager.CreateAsync(cancellationToken);;
+                state = await _projectionStateManager.RetrieveAsync(cancellationToken).ConfigureAwait(false) ?? await _projectionStateManager.CreateAsync(cancellationToken).ConfigureAwait(false); ;
 
-                var page = await eventStore.GetEventsAsync(state.Position, _options.PageSize, cancellationToken);;
+                var page = await eventStore.GetEventsAsync(state.Position, _options.PageSize, cancellationToken).ConfigureAwait(false); ;
 
-                await Task.WhenAll(page.Events.Select(e => ProjectStreamAsync(e.Value, cancellationToken)));
+                await Task.WhenAll(page.Events.Select(e => ProjectStreamAsync(e.Value, cancellationToken))).ConfigureAwait(false);
 
                 if (state.Position == page.Offset)
                 {
-                    await Task.Delay(_options.Interval, cancellationToken);
+                    await Task.Delay(_options.Interval, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
@@ -86,7 +86,7 @@ public sealed class StoreProjector<TProjection> : BackgroundService
                         state.LastModifiedDate = DateTimeOffset.UtcNow;
                         state.Error = "";
                         state.ErrorStackTrace = "";
-                    }, cancellationToken);
+                    }, cancellationToken).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -104,7 +104,7 @@ public sealed class StoreProjector<TProjection> : BackgroundService
                     {
                         state.Error = error.ToString();
                         state.ErrorStackTrace = errorStackTrace.ToString();
-                    }, cancellationToken);
+                    }, cancellationToken).ConfigureAwait(false);
 
                     break;
                 }
@@ -134,6 +134,6 @@ public sealed class StoreProjector<TProjection> : BackgroundService
     private async Task ProjectStreamAsync(IEnumerable<IEventContext<IEvent>> events, CancellationToken cancellationToken = default)
     {
         foreach (var @event in events)
-            await _projectionManager.HandleAsync(@event.Payload, cancellationToken);
+            await _projectionManager.HandleAsync(@event.Payload, cancellationToken).ConfigureAwait(false);
     }
 }

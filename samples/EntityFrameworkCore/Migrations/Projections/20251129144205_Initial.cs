@@ -5,7 +5,7 @@
 namespace EntityFrameworkCore.Migrations.Projections
 {
     /// <inheritdoc />
-    public partial class AddProjections : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

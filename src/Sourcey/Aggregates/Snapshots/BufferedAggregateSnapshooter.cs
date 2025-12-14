@@ -25,10 +25,10 @@ internal sealed class BufferedAggregateSnapshooter<TState> : BackgroundService, 
         return Task.CompletedTask;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var snapshots = DequeueSnapshots(stoppingToken);
-        await Task.WhenAll(snapshots.Select(s => _aggregateSnapshooter.SaveAsync(s, stoppingToken)));
+        return Task.WhenAll(snapshots.Select(s => _aggregateSnapshooter.SaveAsync(s, stoppingToken)));
     }
 
     private IEnumerable<Aggregate<TState>> DequeueSnapshots(CancellationToken cancellationToken)

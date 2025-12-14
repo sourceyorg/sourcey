@@ -13,8 +13,8 @@ namespace Sourcey.EntityFrameworkCore.Events.Stores;
 internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
     where TStoreDbContext : DbContext, IEventStoreDbContext
 {
-    private static readonly int DefaultReloadInterval = 50;
-    private static readonly int DefaultPageSize = 500;
+    private static readonly int _defaultReloadInterval = 50;
+    private static readonly int _defaultPageSize = 500;
 
     private readonly IDbContextFactory<TStoreDbContext> _dbContextFactory;
     private readonly IEventContextFactory _eventContextFactory;
@@ -53,8 +53,11 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
     public async Task<long> CountAsync(StreamId streamId, CancellationToken cancellationToken = default)
     {
-        using var context = _dbContextFactory.CreateDbContext();
-        return await context.Events.LongCountAsync(@event => @event.StreamId == streamId, cancellationToken);
+        var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        await using (context.ConfigureAwait(false))
+        {
+            return await context.Events.LongCountAsync(@event => @event.StreamId == streamId, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     public async Task<Page> GetEventsAsync(long offset, int? pageSize = null,
@@ -68,7 +71,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
             .Select(g => GetValuesAsync(g.Key, g.ToArray()))
             .ToArray();
 
-        await Task.WhenAll(eventsByStreamId);
+        await Task.WhenAll(eventsByStreamId).ConfigureAwait(false);
 
         foreach (var task in eventsByStreamId)
             results.Add(await task);
@@ -86,7 +89,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
         foreach (var @event in events.OrderBy(e => e.SequenceNo))
         {
-            if (@event.Type is null || !_eventTypeCache.TryGet(@event.Type, out var type))
+            if (@event.Type is null || !_eventTypeCache.ContainsKey(@event.Type))
                 continue;
 
             var result = _eventContextFactory.CreateContext(@event);
@@ -107,7 +110,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
         foreach (var @event in events)
         {
-            if (@event.Type is null || !_eventTypeCache.TryGet(@event.Type, out var type))
+            if (@event.Type is null || !_eventTypeCache.ContainsKey(@event.Type))
                 continue;
 
             var result = _eventContextFactory.CreateContext(@event);
@@ -128,7 +131,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
         foreach (var @event in events)
         {
-            if (@event.Type is null || !_eventTypeCache.TryGet(@event.Type, out _))
+            if (@event.Type is null || !_eventTypeCache.ContainsKey(@event.Type))
                 continue;
 
             var result = _eventContextFactory.CreateContext(@event);
@@ -142,16 +145,17 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
     public async Task<IEventContext<IEvent>> GetEventAsync(Subject subject,
         CancellationToken cancellationToken = default)
     {
-        using (var context = _dbContextFactory.CreateDbContext())
+        var context = await _dbContextFactory.CreateDbContextAsync();
+        await using (context.ConfigureAwait(false))
         {
             var @event = await context.Events
                 .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.Id == subject, cancellationToken);
+                .FirstOrDefaultAsync(e => e.Id == subject, cancellationToken).ConfigureAwait(false);
 
             if (@event == null)
                 throw new InvalidOperationException($"Unable to find event: {subject}");
 
-            if (!_eventTypeCache.TryGet(@event.Type, out _))
+            if (!_eventTypeCache.ContainsKey(@event.Type))
                 throw new InvalidOperationException($"Unable to find event type: {@event.Type}");
 
             return _eventContextFactory.CreateContext(@event);
@@ -168,7 +172,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
         foreach (var @event in events)
         {
-            if (@event.Type is null || !_eventTypeCache.TryGet(@event.Type, out var type))
+            if (@event.Type is null || !_eventTypeCache.ContainsKey(@event.Type))
                 throw new InvalidOperationException($"Cannot find type for event '{@event.Name}' - '{@event.Type}'.");
 
             var result = _eventContextFactory.CreateContext(@event);
@@ -185,14 +189,16 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
         if (events == null)
             throw new ArgumentNullException(nameof(events));
 
-        await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-        
-        foreach (var @event in events)
-            await context.Events.AddAsync(_eventModelFactory.Create(streamId, @event));
+        var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken).ConfigureAwait(false);
+        await using (context.ConfigureAwait(false))
+        {
+            foreach (var @event in events)
+            await context.Events.AddAsync(_eventModelFactory.Create(streamId, @event)).ConfigureAwait(false);
 
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         _eventStreamManager.Append(events.ToArray());
+        }
     }
 
     public async Task<IEnumerable<IEventContext<IEvent>>> GetEventsBackwardsAsync(StreamId streamId, long? version,
@@ -205,7 +211,7 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
 
         foreach (var @event in events.OrderBy(e => e.SequenceNo))
         {
-            if (@event.Type is null || !_eventTypeCache.TryGet(@event.Type, out var type))
+            if (@event.Type is null || !_eventTypeCache.ContainsKey(@event.Type))
                 throw new InvalidOperationException($"Cannot find type for event '{@event.Name}' - '{@event.Type}'.");
 
             var result = _eventContextFactory.CreateContext(@event);
@@ -219,9 +225,10 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
     private async Task<List<Entities.Event>> GetEventsBackwardsInternalAsync(StreamId streamId, long? version,
         long? position, CancellationToken cancellationToken = default)
     {
-        using var context = _dbContextFactory.CreateDbContext();
-
-        var events = context.Events
+        var context = await _dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await using (context.ConfigureAwait(false))
+        {
+            var events = context.Events
             .AsNoTracking()
             .OrderByDescending(e => e.SequenceNo)
             .Where(e => e.StreamId == streamId);
@@ -232,15 +239,17 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
         if (position.HasValue)
             events = events.Where(e => e.SequenceNo <= position.Value);
 
-        return await events.ToListAsync(cancellationToken);
+        return await events.ToListAsync(cancellationToken).ConfigureAwait(false);
+        }
     }
 
     private async Task<List<Entities.Event>> GetAllEventsForwardsInternalAsync(long offset, int? pageSize = null,
         CancellationToken cancellationToken = default)
     {
-        using var context = _dbContextFactory.CreateDbContext();
-
-        var events = context.Events
+        var context = await _dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await using (context.ConfigureAwait(false))
+        {
+            var events = context.Events
             .AsNoTracking()
             .OrderBy(e => e.SequenceNo)
             .Where(e => e.SequenceNo >= offset);
@@ -249,15 +258,17 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
         if (pageSize.HasValue)
             events = events.Take(pageSize.Value);
 
-        return await events.ToListAsync(cancellationToken);
+        return await events.ToListAsync(cancellationToken).ConfigureAwait(false);
+        }
     }
 
     private async Task<List<Entities.Event>> GetAllEventsForwardsForStreamInternalAsync(StreamId streamId,
         DateTimeOffset timeStamp, int? pageSize = null, CancellationToken cancellationToken = default)
     {
-        using var context = _dbContextFactory.CreateDbContext();
-
-        var events = context.Events
+        var context = await _dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await using (context.ConfigureAwait(false))
+        {
+            var events = context.Events
             .AsNoTracking()
             .OrderBy(e => e.SequenceNo)
             .Where(e => e.Timestamp >= timeStamp)
@@ -267,15 +278,17 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
         if (pageSize.HasValue)
             events = events.Take(pageSize.Value);
 
-        return await events.ToListAsync(cancellationToken);
+        return await events.ToListAsync(cancellationToken).ConfigureAwait(false);
+        }
     }
 
     private async Task<List<Entities.Event>> GetAllEventsForwardsForStreamInternalAsync(StreamId streamId, long offset,
         int? pageSize = null, CancellationToken cancellationToken = default)
     {
-        using var context = _dbContextFactory.CreateDbContext();
-
-        var events = context.Events
+        var context = await _dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+        await using (context.ConfigureAwait(false))
+        {
+            var events = context.Events
             .AsNoTracking()
             .OrderBy(e => e.SequenceNo)
             .Where(e => e.SequenceNo >= offset)
@@ -284,15 +297,16 @@ internal sealed class EventStore<TStoreDbContext> : IEventStore<TStoreDbContext>
         if (pageSize.HasValue)
             events = events.Take(pageSize.Value);
 
-        return await events.ToListAsync(cancellationToken);
+        return await events.ToListAsync(cancellationToken).ConfigureAwait(false);
+        }
     }
 
     private async Task<List<Entities.Event>> GetAllEventsAfterDelayInternalAsync(long offset, int? pageSize = null,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Reloading events after {DefaultReloadInterval}ms.", DefaultReloadInterval);
+        _logger.LogInformation("Reloading events after {DefaultReloadInterval}ms.", _defaultReloadInterval);
 
-        await Task.Delay(DefaultReloadInterval).ConfigureAwait(false);
+        await Task.Delay(_defaultReloadInterval).ConfigureAwait(false);
         return await GetAllEventsForwardsInternalAsync(offset, pageSize, cancellationToken).ConfigureAwait(false);
     }
 }

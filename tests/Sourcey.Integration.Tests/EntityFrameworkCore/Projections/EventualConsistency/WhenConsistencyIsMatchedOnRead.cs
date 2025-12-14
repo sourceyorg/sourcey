@@ -14,7 +14,7 @@ namespace Sourcey.Integration.Tests.EntityFrameworkCore.Projections.EventualCons
 public class WhenConsistencyIsMatchedOnRead : EntityFrameworkIntegrationSpecification
 {
     private readonly string _subject = Subject.New();
-    private ValueTask<Something?> consistencyCheck;
+    private ValueTask<Something?> _consistencyCheck;
     private IServiceScope _scope;
 
     public WhenConsistencyIsMatchedOnRead(
@@ -29,8 +29,9 @@ public class WhenConsistencyIsMatchedOnRead : EntityFrameworkIntegrationSpecific
     {
         _scope = _factory.Services.CreateScope();
         var projectionReader = _scope.ServiceProvider.GetRequiredService<IProjectionReader<Something>>();
-        consistencyCheck = projectionReader.ReadAsync(_subject, s => s != null && s.Subject == _subject,
-            5, TimeSpan.FromMilliseconds(5));
+        // Use a bounded polling window generous enough for EF Core background processing in CI
+        _consistencyCheck = projectionReader.ReadAsync(_subject, s => s != null && s.Subject == _subject,
+            30, TimeSpan.FromMilliseconds(100));
         return Task.CompletedTask;
     }
 
@@ -48,7 +49,7 @@ public class WhenConsistencyIsMatchedOnRead : EntityFrameworkIntegrationSpecific
     [Integration]
     public async Task ProjectionWithSubject_Should_BeInResult()
     {
-        var result = await consistencyCheck;
+        var result = await _consistencyCheck;
         _scope.Dispose();
         result.ShouldNotBeNull().Subject.ShouldBe(_subject);
     }

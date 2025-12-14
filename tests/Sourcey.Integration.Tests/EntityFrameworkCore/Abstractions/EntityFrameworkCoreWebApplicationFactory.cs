@@ -75,7 +75,7 @@ public class EntityFrameworkCoreWebApplicationFactory : SourceyWebApplicationFac
                     e.WithEntityFrameworkCoreEventStore<EventStoreDbContext>(x =>
                     {
                         x.AddAggregate<SampleAggregate, SampleState>();
-                        x.AddProjection<Something>(p => p.WithInterval(1));
+                        x.AddProjection<Something>(p => p.WithInterval(1).WithPageSize(10_000));
                     });
                 });
 

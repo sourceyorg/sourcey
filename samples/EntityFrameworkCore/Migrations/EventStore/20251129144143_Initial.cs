@@ -5,7 +5,7 @@
 namespace EntityFrameworkCore.Migrations.EventStore
 {
     /// <inheritdoc />
-    public partial class AddEventStore : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

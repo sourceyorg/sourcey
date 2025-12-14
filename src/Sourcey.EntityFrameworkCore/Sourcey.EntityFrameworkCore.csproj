@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IncludeSymbols>true</IncludeSymbols>
@@ -14,8 +14,11 @@
     <ProjectReference Include="..\Sourcey\Sourcey.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="10.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15" />
+    <PackageReference Update="Meziantou.Analyzer" Version="2.0.257" />
   </ItemGroup>
 </Project>

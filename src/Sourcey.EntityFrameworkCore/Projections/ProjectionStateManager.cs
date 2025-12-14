@@ -34,13 +34,16 @@ internal sealed class ProjectionStateManager<TProjection> : IProjectionStateMana
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        using var context = _projectionStateDbContextFactory.Create<TProjection>();
-        var state = await context.Set<ProjectionState>().FindAsync(new object[] { _key }, cancellationToken: cancellationToken);
+        var context = _projectionStateDbContextFactory.Create<TProjection>();
+        await using (context.ConfigureAwait(false))
+        {
+            var state = await context.Set<ProjectionState>().FindAsync(new object[] { _key }, cancellationToken: cancellationToken).ConfigureAwait(false);
         
         if (state is not null)
             context.Remove(state);
         
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
     }
 
     public async Task<IProjectionState?> RetrieveAsync(CancellationToken cancellationToken = default)
@@ -51,8 +54,11 @@ internal sealed class ProjectionStateManager<TProjection> : IProjectionStateMana
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        using var context = _projectionStateDbContextFactory.Create<TProjection>();
-        return await context.Set<ProjectionState>().FindAsync(new object[] { _key }, cancellationToken: cancellationToken);
+        var context = _projectionStateDbContextFactory.Create<TProjection>();
+        await using (context.ConfigureAwait(false))
+        {
+            return await context.Set<ProjectionState>().FindAsync(new object[] { _key }, cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
     }
 
     public async Task<IProjectionState> UpdateAsync(Action<IProjectionState> update, CancellationToken cancellationToken = default)
@@ -62,10 +68,11 @@ internal sealed class ProjectionStateManager<TProjection> : IProjectionStateMana
             _logger.LogInformation($"{nameof(ProjectionStateManager<TProjection>)}.{nameof(UpdateAsync)} was cancelled before execution");
             cancellationToken.ThrowIfCancellationRequested();
         }
-        
-        using var context = _projectionStateDbContextFactory.Create<TProjection>();
 
-        var entity = await context.Set<ProjectionState>().FindAsync(new object[] { _key }, cancellationToken: cancellationToken);
+        var context = _projectionStateDbContextFactory.Create<TProjection>();
+        await using (context.ConfigureAwait(false))
+        {
+            var entity = await context.Set<ProjectionState>().FindAsync(new object[] { _key }, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (entity is null)
             throw new InvalidOperationException("Missing state for projection");
@@ -73,9 +80,10 @@ internal sealed class ProjectionStateManager<TProjection> : IProjectionStateMana
         update(entity);
         context.Update(entity);
         
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return entity;
+        }
     }
 
     public async Task<IProjectionState> CreateAsync(CancellationToken cancellationToken = default)
@@ -86,9 +94,10 @@ internal sealed class ProjectionStateManager<TProjection> : IProjectionStateMana
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        using var context = _projectionStateDbContextFactory.Create<TProjection>();
-
-        var entity = new ProjectionState
+        var context = _projectionStateDbContextFactory.Create<TProjection>();
+        await using (context.ConfigureAwait(false))
+        {
+            var entity = new ProjectionState
         {
             Key = _key,
             CreatedDate = DateTimeOffset.UtcNow,
@@ -97,8 +106,9 @@ internal sealed class ProjectionStateManager<TProjection> : IProjectionStateMana
 
         context.Add(entity);
 
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return entity;
+        }
     }
 }

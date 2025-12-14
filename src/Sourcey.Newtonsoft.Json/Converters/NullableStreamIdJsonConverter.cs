@@ -7,7 +7,13 @@ public sealed class NullableStreamIdJsonConverter : JsonConverter<StreamId?>
 {
     public override void WriteJson(JsonWriter writer, StreamId? value, JsonSerializer serializer)
     {
-        serializer.Serialize(writer, value.ToString());
+        if (!value.HasValue)
+        {
+            writer.WriteNull();
+            return;
+        }
+
+        serializer.Serialize(writer, value.Value.ToString());
     }
 
     public override StreamId? ReadJson(JsonReader reader, Type objectType, StreamId? existingValue, bool hasExistingValue,

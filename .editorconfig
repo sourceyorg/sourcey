@@ -53,7 +53,7 @@ dotnet_naming_rule.non_private_static_fields_should_be_pascal_case.symbols = non
 dotnet_naming_rule.non_private_static_fields_should_be_pascal_case.style = non_private_static_field_style
 
 dotnet_naming_symbols.non_private_static_fields.applicable_kinds = field
-dotnet_naming_symbols.non_private_static_fields.applicable_accessibilities = public, protected, internal, protected internal, private protected
+dotnet_naming_symbols.non_private_static_fields.applicable_accessibilities = public, protected, internal, protected_internal, private_protected
 dotnet_naming_symbols.non_private_static_fields.required_modifiers = static
 
 dotnet_naming_style.non_private_static_field_style.capitalization = pascal_case
@@ -154,3 +154,37 @@ csharp_new_line_before_catch = true
 csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_members_in_anonymous_types = true
+
+# Analyzer severities and rules
+[*.{cs,vb}]
+# General analyzer configuration
+dotnet_analyzer_diagnostic.severity = warning
+
+# Resource leaks / disposal
+# CA2000: Dispose objects before losing scope
+dotnet_diagnostic.CA2000.severity = warning
+
+# Async correctness
+# CA1849: Call async methods when in async methods
+dotnet_diagnostic.CA1849.severity = warning
+# CA2012: Use ValueTasks correctly
+dotnet_diagnostic.CA2012.severity = warning
+
+# Sync-over-async and blocking waits
+# VSTHRD002: Avoid problematic synchronous waits
+dotnet_diagnostic.VSTHRD002.severity = warning
+# VSTHRD103: Call async methods when possible
+dotnet_diagnostic.VSTHRD103.severity = warning
+
+# AsyncFixer rules
+dotnet_diagnostic.AsyncFixer01.severity = warning
+dotnet_diagnostic.AsyncFixer02.severity = warning
+dotnet_diagnostic.AsyncFixer03.severity = warning
+
+# Meziantou
+# MA0042: Do not use blocking calls in async context
+dotnet_diagnostic.MA0042.severity = warning
+
+# EF Core analyzers
+# EF1001: Internal EF Core API usage
+dotnet_diagnostic.EF1001.severity = warning

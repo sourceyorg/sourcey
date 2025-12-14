@@ -17,8 +17,8 @@ public static class TaskFactoryExtensions
 
         using var timer = new PeriodicTimer(delay);
 
-        while (await timer.WaitForNextTickAsync(cancellationToken)) {
-            if (await func())
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false)) {
+            if (await func().ConfigureAwait(false))
                 return true;
 
             if (retryCount == 0)
@@ -50,8 +50,8 @@ public static class TaskFactoryExtensions
 
         using var timer = new PeriodicTimer(delay);
 
-        while (await timer.WaitForNextTickAsync(cancellationToken)) {
-            result = await func();
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false)) {
+            result = await func().ConfigureAwait(false);
 
             if (validityCheck(result))
                 return (true, result);
@@ -85,10 +85,10 @@ public static class TaskFactoryExtensions
 
         using var timer = new PeriodicTimer(delay);
 
-        while (await timer.WaitForNextTickAsync(cancellationToken)) {
-            result = await func();
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false)) {
+            result = await func().ConfigureAwait(false);
 
-            if (await validityCheck(result))
+            if (await validityCheck(result).ConfigureAwait(false))
                 return (true, result);
 
             if (retryCount == 0)
@@ -120,8 +120,8 @@ public static class TaskFactoryExtensions
 
         using var timer = new PeriodicTimer(delay);
 
-        while (await timer.WaitForNextTickAsync(cancellationToken)) {
-            result = await func(cancellationToken);
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false)) {
+            result = await func(cancellationToken).ConfigureAwait(false);
 
             if (validityCheck(result))
                 return (true, result);
@@ -155,8 +155,8 @@ public static class TaskFactoryExtensions
 
         using var timer = new PeriodicTimer(delay);
 
-        while (await timer.WaitForNextTickAsync(cancellationToken)) {
-            result = await func();
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false)) {
+            result = await func().ConfigureAwait(false);
 
             if (validityCheck(result))
                 return (true, result);
@@ -190,10 +190,10 @@ public static class TaskFactoryExtensions
 
         using var timer = new PeriodicTimer(delay);
 
-        while (await timer.WaitForNextTickAsync(cancellationToken)) {
-            result = await func();
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false)) {
+            result = await func().ConfigureAwait(false);
 
-            if (await validityCheck(result))
+            if (await validityCheck(result).ConfigureAwait(false))
                 return (true, result);
 
             if (retryCount == 0)
@@ -225,8 +225,8 @@ public static class TaskFactoryExtensions
 
         using var timer = new PeriodicTimer(delay);
 
-        while (await timer.WaitForNextTickAsync(cancellationToken)) {
-            result = await func(cancellationToken);
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false)) {
+            result = await func(cancellationToken).ConfigureAwait(false);
 
             if (validityCheck(result))
                 return (true, result);
@@ -260,10 +260,10 @@ public static class TaskFactoryExtensions
 
         using var timer = new PeriodicTimer(delay);
 
-        while (await timer.WaitForNextTickAsync(cancellationToken)) {
-            result = await func(cancellationToken);
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false)) {
+            result = await func(cancellationToken).ConfigureAwait(false);
 
-            if (await validityCheck(result))
+            if (await validityCheck(result).ConfigureAwait(false))
                 return (true, result);
 
             if (retryCount == 0)

@@ -52,12 +52,12 @@ internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggr
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var snapshot = await GetSnapshotAsync(id, cancellationToken);
+        var snapshot = await GetSnapshotAsync(id, cancellationToken).ConfigureAwait(false);
 
         if (snapshot is not null)
             return snapshot;
 
-        var events = await _eventStoreFactory.Create<TAggregate, TState>().GetEventsAsync(id, null, cancellationToken);
+        var events = await _eventStoreFactory.Create<TAggregate, TState>().GetEventsAsync(id, null, cancellationToken).ConfigureAwait(false);
 
         if (!events.Any())
             return null;
@@ -91,10 +91,10 @@ internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggr
 
         var eventStore = _eventStoreFactory.Create<TAggregate, TState>();
 
-        var currentVersion = await eventStore.CountAsync(aggregate.Id);
+        var currentVersion = await eventStore.CountAsync(aggregate.Id).ConfigureAwait(false);
 
         if (expectedVersion.HasValue && expectedVersion.Value != currentVersion
-            && !await ResolveConflictAsync(aggregate, expectedVersion.Value, currentVersion, cancellationToken))
+            && !await ResolveConflictAsync(aggregate, expectedVersion.Value, currentVersion, cancellationToken).ConfigureAwait(false))
             return;
 
         events = aggregate.GetUncommittedEvents();
@@ -108,20 +108,20 @@ internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggr
             actor: actor ?? Actor.Unknown,
             scheduledPublication: scheduledPublication));
 
-        await eventStore.SaveAsync(aggregate.Id, contexts);
+        await eventStore.SaveAsync(aggregate.Id, contexts, cancellationToken).ConfigureAwait(false);
 
         aggregate.ClearUncommittedEvents();
 
-        await SaveSnapshotAsync(aggregate, cancellationToken);
+        await SaveSnapshotAsync(aggregate, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public async Task SaveAsync(
+    public Task SaveAsync(
         TAggregate aggregate,
         CancellationToken cancellationToken = default)
-        => await SaveAsync(
+        => SaveAsync(
             aggregate: aggregate,
             actor: null,
             causation: null,
@@ -133,12 +133,12 @@ internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggr
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public async Task SaveAsync(
+    public Task SaveAsync(
         TAggregate aggregate,
         IEventContext<IEvent> causation,
         int? expectedVersion = null,
         CancellationToken cancellationToken = default)
-        => await SaveAsync(
+        => SaveAsync(
             aggregate: aggregate,
             actor: causation.Actor,
             causation: causation.Causation,
@@ -150,11 +150,11 @@ internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggr
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public async Task SaveAsync(
+    public Task SaveAsync(
         TAggregate aggregate,
         IEventContext<IEvent> causation,
         CancellationToken cancellationToken = default)
-        => await SaveAsync(
+        => SaveAsync(
             aggregate: aggregate,
             causation: causation,
             expectedVersion: null,
@@ -166,13 +166,13 @@ internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggr
         long currentVersion,
         CancellationToken cancellationToken = default)
     {
-        var exisitngEvents = await _eventStoreFactory.Create<TAggregate, TState>().GetEventsAsync(aggregate.Id, null, cancellationToken);
+        var exisitngEvents = await _eventStoreFactory.Create<TAggregate, TState>().GetEventsAsync(aggregate.Id, null, cancellationToken).ConfigureAwait(false);
         exisitngEvents = exisitngEvents.OrderByDescending(e => e.Payload.Version);
         var prevEvent = exisitngEvents.FirstOrDefault(e => e.Payload.Version < expectedVersion);
         var nextEvent = exisitngEvents.FirstOrDefault(e => e.Payload.Version > expectedVersion);
         var conflictingEvent = exisitngEvents.FirstOrDefault(e => e.Payload.Version == expectedVersion);
 
-        var action = await _conflictResolver.ResolveAsync(aggregate, prevEvent?.Payload, nextEvent?.Payload, conflictingEvent?.Payload);
+        var action = await _conflictResolver.ResolveAsync(aggregate, prevEvent?.Payload, nextEvent?.Payload, conflictingEvent?.Payload).ConfigureAwait(false);
 
         if (action == ConflictAction.Throw)
         {
@@ -185,7 +185,7 @@ internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggr
 
     private async Task<TAggregate> RehydrateAsync(TAggregate aggregate, CancellationToken cancellationToken = default)
     {
-        var events = await _eventStoreFactory.Create<TAggregate, TState>().GetEventsBackwardsAsync(aggregate.Id, aggregate.Version, null, cancellationToken);
+        var events = await _eventStoreFactory.Create<TAggregate, TState>().GetEventsBackwardsAsync(aggregate.Id, aggregate.Version, null, cancellationToken).ConfigureAwait(false);
 
         if (!events.Any())
             return aggregate;
@@ -206,7 +206,7 @@ internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggr
         if (snapshot == null)
             return null;
 
-        return await snapshot.GetAsync(streamId, RehydrateAsync, cancellationToken);
+        return await snapshot.GetAsync(streamId, RehydrateAsync, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task SaveSnapshotAsync(TAggregate aggregate, CancellationToken cancellationToken = default)
@@ -219,6 +219,6 @@ internal sealed class AggregateStore<TAggregate, TState> : IAggregateStore<TAggr
         if (snapshot == null)
             return;
 
-        await snapshot.SaveAsync(aggregate, cancellationToken);
+        await snapshot.SaveAsync(aggregate, cancellationToken).ConfigureAwait(false);
     }
 }

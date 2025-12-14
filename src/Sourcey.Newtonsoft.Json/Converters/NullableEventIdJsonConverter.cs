@@ -7,7 +7,13 @@ public sealed class NullableEventIdJsonConverter : JsonConverter<EventId?>
 {
     public override void WriteJson(JsonWriter writer, EventId? value, JsonSerializer serializer)
     {
-        serializer.Serialize(writer, value.ToString());
+        if (!value.HasValue)
+        {
+            writer.WriteNull();
+            return;
+        }
+
+        serializer.Serialize(writer, value.Value.ToString());
     }
 
     public override EventId? ReadJson(JsonReader reader, Type objectType, EventId? existingValue, bool hasExistingValue,

@@ -37,13 +37,15 @@ internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProject
 
         var entity = add();
 
-        using var context = _projectionDbContextFactory.Create<TProjection>();
-
-        await context.Set<TProjection>().AddAsync(entity, cancellationToken: cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        var context = _projectionDbContextFactory.Create<TProjection>();
+        await using (context.ConfigureAwait(false))
+        {
+            await context.Set<TProjection>().AddAsync(entity, cancellationToken: cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
 
         return entity;
+        }
     }
 
     public async Task RemoveAsync(string subject, CancellationToken cancellationToken = default)
@@ -54,17 +56,18 @@ internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProject
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        using var context = _projectionDbContextFactory.Create<TProjection>();
-
-        var entity = await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken);
+        var context = _projectionDbContextFactory.Create<TProjection>();
+        await using (context.ConfigureAwait(false))
+        {
+            var entity = await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (entity == null)
             return;
 
         context.Set<TProjection>().Remove(entity);
 
-        await context.SaveChangesAsync(cancellationToken);
-
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
     }
 
     public async Task<TProjection> UpdateAsync(string subject, Func<TProjection, TProjection> update, CancellationToken cancellationToken = default)
@@ -78,8 +81,9 @@ internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProject
         TProjection entity;
 
         var context = _projectionDbContextFactory.Create<TProjection>();
-
-        entity = await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken);
+        await using (context.ConfigureAwait(false))
+        {
+            entity = await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (entity == null)
             return null;
@@ -88,10 +92,11 @@ internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProject
 
         context.Set<TProjection>().Update(entity);
 
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
 
         return entity;
+        }
     }
 
     public async Task<TProjection> UpdateAsync(string subject, Action<TProjection> update, CancellationToken cancellationToken = default)
@@ -106,7 +111,7 @@ internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProject
         {
             update(v);
             return v;
-        }, cancellationToken);
+        }, cancellationToken).ConfigureAwait(false);
 
         return view;
     }
@@ -119,9 +124,10 @@ internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProject
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        using var context = _projectionDbContextFactory.Create<TProjection>();
-
-        var entity = await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken);
+        var context = _projectionDbContextFactory.Create<TProjection>();
+        await using (context.ConfigureAwait(false))
+        {
+            var entity = await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (entity is not null)
         {
             update(entity);
@@ -130,11 +136,12 @@ internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProject
         else
         {
             entity = create();
-            await context.Set<TProjection>().AddAsync(entity, cancellationToken: cancellationToken);
+            await context.Set<TProjection>().AddAsync(entity, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return entity;
+        }
     }
 
     public async Task ResetAsync(CancellationToken cancellationToken = default)
@@ -145,22 +152,12 @@ internal sealed class ProjectionWriter<TProjection> : IProjectionWriter<TProject
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        using var context = _projectionDbContextFactory.Create<TProjection>();
-        var projections = context.Set<TProjection>().ToArray();
-        await context.Set<TProjection>().ExecuteDeleteAsync(cancellationToken);
-
-        await context.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task<TProjection> RetrieveAsync(string subject, CancellationToken cancellationToken = default)
-    {
-        if (cancellationToken.IsCancellationRequested)
+        var context = _projectionDbContextFactory.Create<TProjection>();
+        await using (context.ConfigureAwait(false))
         {
-            _logger.LogInformation($"{nameof(ProjectionWriter<TProjection>)}.{nameof(UpdateAsync)} was cancelled before execution");
-            cancellationToken.ThrowIfCancellationRequested();
-        }
+            await context.Set<TProjection>().ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
 
-        using var context = _projectionDbContextFactory.Create<TProjection>();
-        return await context.Set<TProjection>().FindAsync(new[] { subject }, cancellationToken: cancellationToken);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
     }
 }

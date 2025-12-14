@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Sourcey.EntityFrameworkCore.Projections.DbContexts;
 using Sourcey.Projections;
 

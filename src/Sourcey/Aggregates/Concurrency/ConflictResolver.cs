@@ -28,7 +28,7 @@ internal sealed class ConflictResolver : IConflictResolver
             if (resolution == null)
                 return ConflictAction.Throw;
 
-            return await resolution.ResolveAsync(aggregate);
+            return await resolution.ResolveAsync(aggregate).ConfigureAwait(false);
         }
 
         if (conflictingEvent is not null)
@@ -38,7 +38,7 @@ internal sealed class ConflictResolver : IConflictResolver
             if (resolution == null)
                 return ConflictAction.Throw;
 
-            return await resolution.ResolveAsync(aggregate, conflictingEvent);
+            return await resolution.ResolveAsync(aggregate, conflictingEvent).ConfigureAwait(false);
         }
 
         if (prevEvent is not null || nextEvent is not null)
@@ -48,7 +48,7 @@ internal sealed class ConflictResolver : IConflictResolver
             if (resolution == null)
                 return ConflictAction.Throw;
 
-            return await resolution.ResolveAsync(aggregate, prevEvent, nextEvent);
+            return await resolution.ResolveAsync(aggregate, prevEvent, nextEvent).ConfigureAwait(false);
         }
 
         return ConflictAction.Throw;

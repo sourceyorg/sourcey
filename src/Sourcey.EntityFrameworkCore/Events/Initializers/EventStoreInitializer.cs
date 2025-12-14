@@ -41,13 +41,16 @@ internal class EventStoreInitializer<TEventStoreDbContext> : ISourceyInitializer
         {
             try
             {
-                await using var context = await _eventStoreDbContextFactory.CreateDbContextAsync();
-                await context.Database.MigrateAsync();
+                var context = await _eventStoreDbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+                await using (context.ConfigureAwait(false))
+                {
+                    await context.Database.MigrateAsync().ConfigureAwait(false);
+                }
             }
             catch (Exception e)
             {
                 _logger.LogDebug("Unable to migrate {context}, attempts: {attempt}, exception: {exception}", typeof(TEventStoreDbContext).FullName, attempts++, e.Message);
-                await Task.Delay(200);
+                await Task.Delay(200).ConfigureAwait(false);
                 continue;
             }
 

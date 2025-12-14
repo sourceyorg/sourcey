@@ -7,7 +7,13 @@ public sealed class NullableCorrelationJsonConverter : JsonConverter<Correlation
 {
     public override void WriteJson(JsonWriter writer, Correlation? value, JsonSerializer serializer)
     {
-        serializer.Serialize(writer, value.ToString());
+        if (!value.HasValue)
+        {
+            writer.WriteNull();
+            return;
+        }
+
+        serializer.Serialize(writer, value.Value.ToString());
     }
 
     public override Correlation? ReadJson(JsonReader reader, Type objectType, Correlation? existingValue, bool hasExistingValue,

@@ -43,14 +43,17 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
 
     public ValueTask<IQueryableProjection<TProjection>> QueryAsync(CancellationToken cancellationToken = default)
     {
+#pragma warning disable CA2000 // Dispose objects before losing scope
         return new(new QueryableProjection<TProjection>(_projections.Values.AsQueryable(), new InMemoryDisposable()));
+#pragma warning restore CA2000 // Dispose objects before losing scope
     }
 
     public async ValueTask<IQueryableProjection<TProjection>> QueryAsync(Subject subject,
         Expression<Func<TProjection?, bool>> consistencyCheck, int retryCount = 3, TimeSpan? delay = null,
         CancellationToken cancellationToken = default)
     {
-        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
+        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken)
+            .ConfigureAwait(false);
 
         if (!success)
         {
@@ -62,13 +65,15 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
                 retryCount);
         }
 
-        return await QueryAsync(cancellationToken);
+        return await QueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async ValueTask<IQueryableProjection<TProjection>> QueryAsync(Subject subject, int retryCount = 3, TimeSpan? delay = null,
+    public async ValueTask<IQueryableProjection<TProjection>> QueryAsync(Subject subject, int retryCount = 3,
+        TimeSpan? delay = null,
         CancellationToken cancellationToken = default)
     {
-        var success = await ConsistencyCheckAsync(subject, null, retryCount, delay, cancellationToken);
+        var success = await ConsistencyCheckAsync(subject, null, retryCount, delay, cancellationToken)
+            .ConfigureAwait(false);
 
         if (!success)
         {
@@ -80,7 +85,7 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
                 retryCount);
         }
 
-        return await QueryAsync(cancellationToken);   
+        return await QueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async ValueTask<IQueryableProjection<TProjection>> QueryAsync(
@@ -90,16 +95,16 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
     {
         Func<Task<bool>> readFunc = async () =>
         {
-            var query = await QueryAsync(cancellationToken);
-            return await consistencyCheckAsync(query);
+            var query = await QueryAsync(cancellationToken).ConfigureAwait(false);
+            return await consistencyCheckAsync(query).ConfigureAwait(false);
         };
-        
+
         var success = await readFunc.WithRetryAsync(
             retryCount: retryCount,
             delay: delay ?? TimeSpan.FromMilliseconds(50),
             cancellationToken: cancellationToken
-        );
-        
+        ).ConfigureAwait(false);
+
         if (!success)
         {
             _logger.LogWarning(
@@ -109,7 +114,7 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
                 retryCount);
         }
 
-        return await QueryAsync(cancellationToken);
+        return await QueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
 
@@ -129,7 +134,7 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
         Expression<Func<TProjection, TResult>> projection,
         CancellationToken cancellationToken = default)
     {
-        var result = await ReadAsync(subject, cancellationToken);
+        var result = await ReadAsync(subject, cancellationToken).ConfigureAwait(false);
 
         if (result is null)
             return default;
@@ -137,11 +142,13 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
         return projection.Compile()(result);
     }
 
-    public async ValueTask<TResult?> ReadAsync<TResult>(Subject subject, Expression<Func<TProjection, TResult>> projection,
+    public async ValueTask<TResult?> ReadAsync<TResult>(Subject subject,
+        Expression<Func<TProjection, TResult>> projection,
         int retryCount = 3, TimeSpan? delay = null,
         CancellationToken cancellationToken = default)
     {
-        var success = await ConsistencyCheckAsync(subject, null, retryCount, delay, cancellationToken);
+        var success = await ConsistencyCheckAsync(subject, null, retryCount, delay, cancellationToken)
+            .ConfigureAwait(false);
 
         if (!success)
         {
@@ -153,14 +160,16 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
                 retryCount);
         }
 
-        return await ReadAsync(subject, projection, cancellationToken);
+        return await ReadAsync(subject, projection, cancellationToken).ConfigureAwait(false);
     }
 
-    public async ValueTask<TProjection?> ReadAsync(Subject subject, Expression<Func<TProjection?, bool>> consistencyCheck,
+    public async ValueTask<TProjection?> ReadAsync(Subject subject,
+        Expression<Func<TProjection?, bool>> consistencyCheck,
         int retryCount = 3, TimeSpan? delay = null,
         CancellationToken cancellationToken = default)
     {
-        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
+        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken)
+            .ConfigureAwait(false);
 
         if (!success)
         {
@@ -172,13 +181,14 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
                 retryCount);
         }
 
-        return await ReadAsync(subject, cancellationToken);
+        return await ReadAsync(subject, cancellationToken).ConfigureAwait(false);
     }
 
     public async ValueTask<TProjection?> ReadAsync(Subject subject, int retryCount = 3, TimeSpan? delay = null,
         CancellationToken cancellationToken = default)
     {
-        var success = await ConsistencyCheckAsync(subject, null, retryCount, delay, cancellationToken);
+        var success = await ConsistencyCheckAsync(subject, null, retryCount, delay, cancellationToken)
+            .ConfigureAwait(false);
 
         if (!success)
         {
@@ -190,7 +200,7 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
                 retryCount);
         }
 
-        return await ReadAsync(subject, cancellationToken);
+        return await ReadAsync(subject, cancellationToken).ConfigureAwait(false);
     }
 
     public async ValueTask<TResult?> ReadAsync<TResult>(Subject subject,
@@ -198,7 +208,8 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
         int retryCount = 3,
         TimeSpan? delay = null, CancellationToken cancellationToken = default)
     {
-        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken);
+        var success = await ConsistencyCheckAsync(subject, consistencyCheck, retryCount, delay, cancellationToken)
+            .ConfigureAwait(false);
 
         if (!success)
         {
@@ -210,7 +221,7 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
                 retryCount);
         }
 
-        return await ReadAsync(subject, projection, cancellationToken);
+        return await ReadAsync(subject, projection, cancellationToken).ConfigureAwait(false);
     }
 
     public Task RemoveAsync(string subject, CancellationToken cancellationToken = default)
@@ -241,7 +252,7 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
         _projections.AddOrUpdate(subject, _ => entity, (_, _) => entity);
         return Task.FromResult(entity);
     }
-    
+
     private async Task<bool> ConsistencyCheckAsync(Subject subject,
         Expression<Func<TProjection?, bool>>? consistencyCheck, int retryCount,
         TimeSpan? delay, CancellationToken cancellationToken)
@@ -252,7 +263,7 @@ internal sealed class InMemoryProjectionManager<TProjection> : IProjectionWriter
             retryCount: retryCount,
             delay: delay ?? TimeSpan.FromMilliseconds(50),
             cancellationToken: cancellationToken
-        );
+        ).ConfigureAwait(false);
     }
 
     private Func<Task<bool>> BuildConsistencyCheck(Subject subject,

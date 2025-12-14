@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts;
 using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts.Readonly;
-using Sourcey.EntityFrameworkCore.Projections.Factories.DbContexts.Writeable;
 using Sourcey.Projections;
 
 namespace Sourcey.EntityFrameworkCore.Projections;

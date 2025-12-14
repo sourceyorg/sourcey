@@ -74,7 +74,7 @@ app.MapPost("/sample", async (
 {
     var aggregate = aggregateFactory.Create<SampleAggregate, SampleState>();
     aggregate.MakeSomethingHappen(request.Something);
-    await aggregateStore.SaveAsync(aggregate, cancellationToken);
+    await aggregateStore.SaveAsync(aggregate, cancellationToken).ConfigureAwait(false);
 
     return Results.Accepted(aggregate.Id);
 })
@@ -86,7 +86,7 @@ app.MapGet("/sample", async (
     [FromServices] IProjectionReader<Something> projectionReader,
     CancellationToken cancellationToken) =>
 {
-    var projections = await projectionReader.QueryAsync(cancellationToken);
+    var projections = await projectionReader.QueryAsync(cancellationToken).ConfigureAwait(false);
     return projections;
 })
 .WithName("GetSamples")
@@ -98,14 +98,14 @@ app.MapGet("/sample/{subject}", async (
     [FromRoute] string subject,
     CancellationToken cancellationToken) =>
 {
-    var projection = await projectionReader.ReadAsync(subject, cancellationToken);
+    var projection = await projectionReader.ReadAsync(subject, cancellationToken).ConfigureAwait(false);
     return projection;
 })
 .WithName("GetSample")
 .WithTags("Sample")
 .WithOpenApi();
 
-await app.InitializeSourceyAsync();
-await app.RunAsync();
+await app.InitializeSourceyAsync().ConfigureAwait(false);
+await app.RunAsync().ConfigureAwait(false);
 
 record SampleRequest(string Something);

@@ -11,16 +11,16 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EntityFrameworkCore.Migrations.Projections
 {
-    [DbContext(typeof(SomethingContext))]
-    [Migration("20230901175511_AddProjections")]
-    partial class AddProjections
+    [DbContext(typeof(WriteableSomethingContext))]
+    [Migration("20251129144205_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);

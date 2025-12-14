@@ -14,8 +14,8 @@ public sealed class SomethingManager : ProjectionManager<Something>
         Handle<SomethingHappened>(OnSomethingHappenedAsync);
     }
 
-    private async Task OnSomethingHappenedAsync(SomethingHappened @event, CancellationToken cancellationToken)
-        => await AddAsync(@event.StreamId, () => new Something
+    private Task OnSomethingHappenedAsync(SomethingHappened @event, CancellationToken cancellationToken)
+        => AddAsync(@event.StreamId, () => new Something
         {
             Subject = @event.StreamId,
             Version = @event.Version.GetValueOrDefault(),

@@ -18,14 +18,14 @@ public abstract class BufferedStore<TItem> : BackgroundService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        await _itemQueue.Writer.WriteAsync(item, cancellationToken);
+        await _itemQueue.Writer.WriteAsync(item, cancellationToken).ConfigureAwait(false);
     }
 
     protected abstract Task ConsumeAsync(TItem item, CancellationToken cancellationToken);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await foreach(var item in _itemQueue.Reader.ReadAllAsync(stoppingToken))
-            await ConsumeAsync(item, stoppingToken);
+        await foreach(var item in _itemQueue.Reader.ReadAllAsync(stoppingToken).ConfigureAwait(false))
+            await ConsumeAsync(item, stoppingToken).ConfigureAwait(false);
     }
 }
